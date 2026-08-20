@@ -39,10 +39,12 @@ function LoginForm() {
 
     const supabase = createClient();
 
+    const nextUrl = searchParams.get("next") || "/profile";
+
     // Check if user already has an active session from email verification redirect
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.push("/profile");
+        router.push(nextUrl);
       } else {
         setCheckingSession(false);
       }
@@ -52,14 +54,14 @@ function LoginForm() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "USER_UPDATED")) {
-        router.push("/profile");
+        router.push(nextUrl);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -98,7 +100,8 @@ function LoginForm() {
       }
 
       if (data?.session) {
-        router.push("/profile");
+        const nextUrl = searchParams.get("next") || "/profile";
+        router.push(nextUrl);
         router.refresh();
       }
     } catch (err) {

@@ -180,10 +180,10 @@ export default function ProfilePage() {
     .toUpperCase();
   const createdDate = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
     : "Recently";
 
   return (
@@ -297,11 +297,10 @@ export default function ProfilePage() {
 
             {nameUpdateMessage && (
               <div
-                className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
-                  nameUpdateMessage.type === "success"
+                className={`p-3 rounded-xl text-xs flex items-center gap-2 ${nameUpdateMessage.type === "success"
                     ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
                     : "bg-rose-50 border border-rose-200 text-rose-700"
-                }`}
+                  }`}
               >
                 {nameUpdateMessage.type === "success" ? (
                   <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
@@ -368,11 +367,10 @@ export default function ProfilePage() {
 
             {passwordMessage && (
               <div
-                className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
-                  passwordMessage.type === "success"
+                className={`p-3 rounded-xl text-xs flex items-center gap-2 ${passwordMessage.type === "success"
                     ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
                     : "bg-rose-50 border border-rose-200 text-rose-700"
-                }`}
+                  }`}
               >
                 {passwordMessage.type === "success" ? (
                   <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
