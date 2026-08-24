@@ -101,9 +101,14 @@ export default function PricingSection() {
             <div className="space-y-6 pt-2">
               {/* Badge & Title */}
               <div className="space-y-3">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-[11px] font-bold text-[#B8F55C]">
-                  <Sparkles className="w-3.5 h-3.5 text-[#B8F55C]" />
-                  <span>{language === "id" ? "Rekomendasi Utama" : "Best Value"}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-[11px] font-bold text-[#B8F55C]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#B8F55C]" />
+                    <span>{language === "id" ? "Rekomendasi Utama" : "Best Value"}</span>
+                  </div>
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-[11px] font-bold text-rose-300">
+                    <span>🔥 {t("pricing.pro_discount_badge")}</span>
+                  </div>
                 </div>
                 <h3 className="text-3xl font-black text-white tracking-tight">
                   {t("pricing.pro_title")}
@@ -115,8 +120,16 @@ export default function PricingSection() {
 
               {/* Price */}
               <div className="pt-2 pb-4 border-b border-[#234235]">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-sm font-semibold text-[#8EA096] line-through">
+                    {t("pricing.pro_original_price")}
+                  </span>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500 text-white shadow-xs uppercase tracking-wider">
+                    Hemat 50%
+                  </span>
+                </div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                  <span className="text-4xl sm:text-5xl font-black text-[#B8F55C] tracking-tight">
                     {t("pricing.pro_price")}
                   </span>
                   <span className="text-xs font-semibold text-[#A1B8AC]">

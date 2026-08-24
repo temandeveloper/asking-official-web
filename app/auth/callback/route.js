@@ -14,8 +14,11 @@ export async function GET(request) {
 
   // 1. Handle PKCE authorization code exchange
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      if (data?.user) {
+        await ensureUserPayment(supabase, data.user.id);
+      }
       return redirectToDestination(request, origin, next);
     }
     console.warn("[Auth Callback] exchangeCodeForSession failed:", error.message);
@@ -23,11 +26,14 @@ export async function GET(request) {
 
   // 2. Handle token_hash verification (Standard Supabase OTP / Email confirmation)
   if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
     if (!error) {
+      if (data?.user) {
+        await ensureUserPayment(supabase, data.user.id);
+      }
       return redirectToDestination(request, origin, next);
     }
     console.warn("[Auth Callback] verifyOtp failed:", error.message);
@@ -39,6 +45,7 @@ export async function GET(request) {
   } = await supabase.auth.getUser();
 
   if (user) {
+    await ensureUserPayment(supabase, user.id);
     return redirectToDestination(request, origin, next);
   }
 
@@ -50,6 +57,33 @@ export async function GET(request) {
 
   // 5. Fallback: If hash fragment exists (handled on client side), redirect to /login with verified indicator
   return NextResponse.redirect(`${origin}/login?verified=true`);
+}
+
+async function ensureUserPayment(supabase, userId) {
+  if (!userId) return;
+  try {
+    const { data, error } = await supabase
+      .from("tb_payment")
+      .select("id")
+      .eq("uid", userId)
+      .maybeSingle();
+
+    if (!data && !error) {
+      const nowMs = Date.now();
+      const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
+      await supabase.from("tb_payment").insert({
+        uid: userId,
+        jenis_plan: 0,
+        note_plan: "free trial",
+        datetime_payment: nowMs,
+        datetime_expired: expiredMs,
+        request_budget: 50,
+        status: "active",
+      });
+    }
+  } catch (err) {
+    console.error("[Auth Callback] ensureUserPayment error:", err);
+  }
 }
 
 function redirectToDestination(request, origin, next) {
