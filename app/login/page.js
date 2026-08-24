@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { ClauseLogo } from "../components/Navbar";
+import { AsKingLogo } from "../components/Navbar";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   Mail,
   Lock,
@@ -14,14 +15,15 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle2,
-  Sparkles,
+  Globe,
+  Check,
 } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isVerified = searchParams.get("verified") === "true";
-  const callbackError = searchParams.get("error");
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,10 +40,9 @@ function LoginForm() {
     }
 
     const supabase = createClient();
-
     const nextUrl = searchParams.get("next") || "/profile";
 
-    // Check if user already has an active session from email verification redirect
+    // Check if user already has an active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         router.push(nextUrl);
@@ -126,7 +127,7 @@ function LoginForm() {
         },
       });
       if (resendErr) throw resendErr;
-      setResendStatus("Verification email resent! Please check your inbox.");
+      setResendStatus(t("auth.resend_success"));
     } catch (err) {
       setError(err.message || "Failed to resend confirmation email.");
     }
@@ -145,13 +146,13 @@ function LoginForm() {
     <div className="w-full max-w-md rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-xl p-8 sm:p-10 space-y-6 animate-in fade-in duration-150">
       <div className="space-y-2 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-          <span>🔐 Secure Member Access</span>
+          <span>{t("auth.secure_badge")}</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
-          Welcome back
+          {t("auth.login_title")}
         </h1>
-        <p className="text-xs text-[#556A60]">
-          Log in to manage contracts, analytics, and integrations.
+        <p className="text-xs text-[#556A60] leading-relaxed">
+          {t("auth.login_subtitle")}
         </p>
       </div>
 
@@ -160,9 +161,9 @@ function LoginForm() {
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5 animate-in slide-in-from-top-2 duration-150">
           <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#22C55E]" />
           <div>
-            <p className="font-bold">Email Verified Successfully!</p>
+            <p className="font-bold">{t("auth.email_verified_title")}</p>
             <p className="text-[11px] text-emerald-700 mt-0.5">
-              Your email has been confirmed. Please enter your credentials below to log in.
+              {t("auth.email_verified_desc")}
             </p>
           </div>
         </div>
@@ -182,7 +183,7 @@ function LoginForm() {
                 onClick={handleResendConfirmation}
                 className="font-bold underline text-rose-800 hover:text-rose-950 cursor-pointer"
               >
-                Resend verification email &rarr;
+                {t("auth.resend_email_btn")} &rarr;
               </button>
             </div>
           )}
@@ -201,14 +202,14 @@ function LoginForm() {
         {/* Email Address */}
         <div className="space-y-1">
           <label className="block text-xs font-bold text-[#2D3E35]">
-            Email Address
+            {t("auth.email_label")}
           </label>
           <div className="relative">
             <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
             <input
               type="email"
               required
-              placeholder="name@company.com"
+              placeholder={t("auth.email_placeholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -220,7 +221,7 @@ function LoginForm() {
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="block text-xs font-bold text-[#2D3E35]">
-              Password
+              {t("auth.password_label")}
             </label>
           </div>
           <div className="relative">
@@ -228,7 +229,7 @@ function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               required
-              placeholder="••••••••"
+              placeholder={t("auth.password_placeholder")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pl-10 pr-10 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -256,11 +257,11 @@ function LoginForm() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin text-[#B8F55C]" />
-              <span>Signing in...</span>
+              <span>{t("auth.logging_in")}</span>
             </>
           ) : (
             <>
-              <span>Log In</span>
+              <span>{t("auth.btn_login")}</span>
               <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
             </>
           )}
@@ -268,12 +269,12 @@ function LoginForm() {
       </form>
 
       <div className="pt-2 text-center text-xs text-[#556A60]">
-        Don&apos;t have an account yet?{" "}
+        {t("auth.no_account_text")}{" "}
         <Link
           href="/signup"
           className="font-bold text-[#12281F] hover:underline"
         >
-          Start free trial
+          {t("auth.start_free_trial")}
         </Link>
       </div>
     </div>
@@ -281,6 +282,8 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const { t, language, toggleLanguage } = useTranslation();
+
   return (
     <div className="min-h-screen bg-[#F8FAF7] flex flex-col justify-between hero-grid relative overflow-hidden text-[#11231B]">
       {/* Glow Orbs */}
@@ -289,34 +292,49 @@ export default function LoginPage() {
       {/* Header Bar */}
       <header className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 flex items-center justify-between">
         <Link href="/" className="group flex items-center">
-          <ClauseLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
+          <AsKingLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
         </Link>
-        <div className="text-xs sm:text-sm font-medium text-[#4A5F54]">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="font-bold text-[#12281F] hover:underline ml-1"
+        <div className="flex items-center gap-4 text-xs sm:text-sm font-medium text-[#4A5F54]">
+          {/* Language Switcher Pill */}
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EBF1EB] hover:bg-[#DDE7DE] border border-[#CFE2D3] text-xs font-bold text-[#184530] transition-all cursor-pointer shadow-2xs"
+            title="Toggle Language"
           >
-            Sign up
-          </Link>
+            <Globe className="w-3.5 h-3.5 text-[#184530]" />
+            <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
+          </button>
+
+          <div>
+            {t("auth.no_account_text")}{" "}
+            <Link
+              href="/signup"
+              className="font-bold text-[#12281F] hover:underline ml-1"
+            >
+              {t("nav.signup")}
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Main Container */}
       <main className="flex-1 flex items-center justify-center px-6 py-8">
-        <Suspense fallback={
-          <div className="p-8 text-center text-xs text-[#556A60]">
-            <Loader2 className="w-6 h-6 animate-spin text-[#184530] mx-auto mb-2" />
-            Loading authentication...
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="p-8 text-center text-xs text-[#556A60]">
+              <Loader2 className="w-6 h-6 animate-spin text-[#184530] mx-auto mb-2" />
+              Loading authentication...
+            </div>
+          }
+        >
           <LoginForm />
         </Suspense>
       </main>
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075]">
-        &copy; {new Date().getFullYear()} Clause Inc. All rights reserved.
+        &copy; {new Date().getFullYear()} {t("footer.copyright")}
       </footer>
     </div>
   );

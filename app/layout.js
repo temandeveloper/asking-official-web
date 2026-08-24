@@ -1,5 +1,6 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -9,18 +10,24 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "Clause — One tool to manage contracts and your team",
-  description: "Clause helps agile teams work faster, smarter, and more efficiently, delivering flexibility and data-driven insights to mitigate risk and ensure compliance.",
+  title: "AsKing — Local-First Customer Manager & Omnichannel AI Automation",
+  description:
+    "AsKing adalah Customer Manager modern untuk manajemen tiket Kanban, omnichannel messaging WhatsApp & Telegram, dan AI Customer Agent dengan privasi data 100% di perangkat Anda.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} font-sans scroll-smooth`}>
+    <html lang="id" className={`${plusJakartaSans.variable} font-sans scroll-smooth`}>
       <body className="bg-[#F8FAF7] text-[#11231B] antialiased selection:bg-[#B8F55C] selection:text-[#11281F]">
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

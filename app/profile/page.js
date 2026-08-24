@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { ClauseLogo } from "../components/Navbar";
+import { AsKingLogo } from "../components/Navbar";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   User,
   Mail,
@@ -20,10 +21,13 @@ import {
   Sparkles,
   ArrowUpRight,
   Fingerprint,
+  Globe,
 } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t, language, toggleLanguage } = useTranslation();
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState(false);
@@ -92,9 +96,15 @@ export default function ProfilePage() {
 
       if (error) throw error;
       setUser(data.user);
-      setNameUpdateMessage({ type: "success", text: "Name updated successfully!" });
+      setNameUpdateMessage({
+        type: "success",
+        text: t("profile.name_updated_success"),
+      });
     } catch (err) {
-      setNameUpdateMessage({ type: "error", text: err.message || "Failed to update profile name." });
+      setNameUpdateMessage({
+        type: "error",
+        text: err.message || "Failed to update profile name.",
+      });
     } finally {
       setIsUpdatingName(false);
     }
@@ -105,11 +115,17 @@ export default function ProfilePage() {
     setPasswordMessage(null);
 
     if (newPassword.length < 6) {
-      setPasswordMessage({ type: "error", text: "New password must be at least 6 characters." });
+      setPasswordMessage({
+        type: "error",
+        text: language === "id" ? "Kata sandi minimal 6 karakter." : "New password must be at least 6 characters.",
+      });
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordMessage({ type: "error", text: "Passwords do not match." });
+      setPasswordMessage({
+        type: "error",
+        text: language === "id" ? "Konfirmasi kata sandi tidak cocok." : "Passwords do not match.",
+      });
       return;
     }
 
@@ -121,11 +137,17 @@ export default function ProfilePage() {
       });
 
       if (error) throw error;
-      setPasswordMessage({ type: "success", text: "Password changed successfully!" });
+      setPasswordMessage({
+        type: "success",
+        text: t("profile.password_updated_success"),
+      });
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      setPasswordMessage({ type: "error", text: err.message || "Failed to change password." });
+      setPasswordMessage({
+        type: "error",
+        text: err.message || "Failed to change password.",
+      });
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -146,7 +168,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-[#F8FAF7] flex flex-col items-center justify-center space-y-3">
         <Loader2 className="w-8 h-8 animate-spin text-[#184530]" />
-        <p className="text-xs font-semibold text-[#556A60]">Loading your profile...</p>
+        <p className="text-xs font-semibold text-[#556A60]">{t("profile.loading_profile")}</p>
       </div>
     );
   }
@@ -179,7 +201,7 @@ export default function ProfilePage() {
     .charAt(0)
     .toUpperCase();
   const createdDate = user?.created_at
-    ? new Date(user.created_at).toLocaleDateString("en-US", {
+    ? new Date(user.created_at).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -193,27 +215,34 @@ export default function ProfilePage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="group flex items-center">
-              <ClauseLogo className="w-8 h-8 group-hover:scale-105 transition-transform" />
+              <AsKingLogo className="w-8 h-8 group-hover:scale-105 transition-transform" />
             </Link>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-              <Sparkles className="w-3.5 h-3.5 text-[#184530]" />
-              <span>Clause Workspace</span>
-            </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Language Switcher Pill */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EBF1EB] hover:bg-[#DDE7DE] border border-[#CFE2D3] text-xs font-bold text-[#184530] transition-all cursor-pointer shadow-2xs"
+              title="Toggle Language"
+            >
+              <Globe className="w-3.5 h-3.5 text-[#184530]" />
+              <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
+            </button>
+
             <Link
               href="/"
               className="hidden sm:inline-flex text-xs font-semibold text-[#4A5F54] hover:text-[#11231B] px-3 py-2 transition-colors"
             >
-              View Landing Page
+              {t("profile.view_landing")}
             </Link>
             <button
               onClick={handleSignOut}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-rose-200 bg-rose-50/80 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <span>{t("profile.sign_out")}</span>
             </button>
           </div>
         </div>
@@ -236,7 +265,7 @@ export default function ProfilePage() {
                 </h1>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px]">
                   <CheckCircle2 className="w-3 h-3 text-[#22C55E]" />
-                  Verified Email
+                  <span>{t("profile.verified_badge")}</span>
                 </span>
               </div>
 
@@ -248,11 +277,11 @@ export default function ProfilePage() {
               <div className="flex items-center gap-4 text-[11px] text-[#8EA096] pt-1 flex-wrap">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  Member since {createdDate}
+                  {t("profile.member_since", { date: createdDate })}
                 </span>
                 <span className="flex items-center gap-1 font-mono">
                   <Fingerprint className="w-3 h-3" />
-                  ID: {user?.id?.slice(0, 8)}...
+                  {t("profile.user_id")}: {user?.id?.slice(0, 8)}...
                   <button
                     type="button"
                     onClick={handleCopyId}
@@ -275,7 +304,7 @@ export default function ProfilePage() {
               href="/#features"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs"
             >
-              <span>Explore Features</span>
+              <span>{t("profile.explore_features")}</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -290,8 +319,8 @@ export default function ProfilePage() {
                 <User className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#11231B]">Personal Profile</h3>
-                <p className="text-xs text-[#556A60]">Update your display name and contact identity</p>
+                <h3 className="text-sm font-bold text-[#11231B]">{t("profile.personal_info_title")}</h3>
+                <p className="text-xs text-[#556A60]">{t("profile.personal_info_desc")}</p>
               </div>
             </div>
 
@@ -313,7 +342,9 @@ export default function ProfilePage() {
 
             <form onSubmit={handleUpdateName} className="space-y-4">
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#2D3E35]">Full Name</label>
+                <label className="block text-xs font-bold text-[#2D3E35]">
+                  {t("profile.full_name_label")}
+                </label>
                 <input
                   type="text"
                   required
@@ -324,7 +355,9 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#2D3E35]">Email Address</label>
+                <label className="block text-xs font-bold text-[#2D3E35]">
+                  {t("profile.email_label")}
+                </label>
                 <input
                   type="email"
                   disabled
@@ -332,7 +365,7 @@ export default function ProfilePage() {
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#F0F4F1] border border-[#DEE7DF] text-[#6B8075] cursor-not-allowed"
                 />
                 <p className="text-[10.5px] text-[#8EA096]">
-                  Email address is verified through Supabase Auth.
+                  {t("profile.email_note")}
                 </p>
               </div>
 
@@ -344,10 +377,10 @@ export default function ProfilePage() {
                 {isUpdatingName ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Saving...</span>
+                    <span>{t("profile.saving")}</span>
                   </>
                 ) : (
-                  <span>Save Changes</span>
+                  <span>{t("profile.save_changes")}</span>
                 )}
               </button>
             </form>
@@ -360,8 +393,8 @@ export default function ProfilePage() {
                 <KeyRound className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-[#11231B]">Security & Password</h3>
-                <p className="text-xs text-[#556A60]">Update your login password</p>
+                <h3 className="text-sm font-bold text-[#11231B]">{t("profile.security_title")}</h3>
+                <p className="text-xs text-[#556A60]">{t("profile.security_desc")}</p>
               </div>
             </div>
 
@@ -383,11 +416,13 @@ export default function ProfilePage() {
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#2D3E35]">New Password</label>
+                <label className="block text-xs font-bold text-[#2D3E35]">
+                  {t("profile.new_password")}
+                </label>
                 <input
                   type="password"
                   required
-                  placeholder="Minimum 6 characters"
+                  placeholder={t("profile.new_password_placeholder")}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F]"
@@ -395,11 +430,13 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#2D3E35]">Confirm New Password</label>
+                <label className="block text-xs font-bold text-[#2D3E35]">
+                  {t("profile.confirm_new_password")}
+                </label>
                 <input
                   type="password"
                   required
-                  placeholder="Repeat new password"
+                  placeholder={t("profile.confirm_password_placeholder")}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F]"
@@ -414,10 +451,10 @@ export default function ProfilePage() {
                 {isUpdatingPassword ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Updating...</span>
+                    <span>{t("profile.updating_password")}</span>
                   </>
                 ) : (
-                  <span>Update Password</span>
+                  <span>{t("profile.update_password")}</span>
                 )}
               </button>
             </form>
@@ -427,7 +464,7 @@ export default function ProfilePage() {
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075] border-t border-[#EEF3EF]">
-        &copy; {new Date().getFullYear()} Clause Inc. Supabase Authentication Active.
+        &copy; {new Date().getFullYear()} {t("footer.copyright")}
       </footer>
     </div>
   );

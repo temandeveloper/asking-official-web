@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { ClauseLogo } from "../components/Navbar";
+import { AsKingLogo } from "../components/Navbar";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   User,
   Mail,
@@ -18,10 +19,13 @@ import {
   Loader2,
   Sparkles,
   Inbox,
+  Globe,
 } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t, language, toggleLanguage } = useTranslation();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,25 +44,25 @@ export default function SignupPage() {
 
     // Validation
     if (!fullName.trim()) {
-      setError("Please enter your full name.");
+      setError(language === "id" ? "Silakan masukkan nama lengkap Anda." : "Please enter your full name.");
       return;
     }
     if (!email.trim() || !email.includes("@")) {
-      setError("Please enter a valid email address.");
+      setError(language === "id" ? "Silakan masukkan alamat email yang valid." : "Please enter a valid email address.");
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      setError(language === "id" ? "Kata sandi minimal 6 karakter." : "Password must be at least 6 characters long.");
       return;
     }
     if (password !== repeatPassword) {
-      setError("Passwords do not match. Please re-enter.");
+      setError(language === "id" ? "Konfirmasi kata sandi tidak cocok." : "Passwords do not match. Please re-enter.");
       return;
     }
 
     if (!isSupabaseConfigured()) {
       setError(
-        "Supabase credentials are not configured yet in `.env.local`. Please update NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable live authentication."
+        "Supabase credentials are not configured yet in `.env.local`."
       );
       return;
     }
@@ -83,14 +87,18 @@ export default function SignupPage() {
         throw signUpError;
       }
 
-      // Check if user is immediately confirmed or requires email verification
+      // Check if user already exists
       if (data?.user?.identities?.length === 0) {
-        setError("An account with this email address already exists. Please log in.");
+        setError(
+          language === "id"
+            ? "Akun dengan email ini sudah terdaftar. Silakan masuk."
+            : "An account with this email address already exists. Please log in."
+        );
       } else {
         setSignupSuccess(true);
       }
     } catch (err) {
-      setError(err.message || "Failed to create account. Please try again.");
+      setError(err.message || (language === "id" ? "Gagal membuat akun." : "Failed to create account."));
     } finally {
       setLoading(false);
     }
@@ -131,16 +139,29 @@ export default function SignupPage() {
       {/* Header Bar */}
       <header className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 flex items-center justify-between">
         <Link href="/" className="group flex items-center">
-          <ClauseLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
+          <AsKingLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
         </Link>
-        <div className="text-xs sm:text-sm font-medium text-[#4A5F54]">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="font-bold text-[#12281F] hover:underline ml-1"
+        <div className="flex items-center gap-4 text-xs sm:text-sm font-medium text-[#4A5F54]">
+          {/* Language Switcher Pill */}
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EBF1EB] hover:bg-[#DDE7DE] border border-[#CFE2D3] text-xs font-bold text-[#184530] transition-all cursor-pointer shadow-2xs"
+            title="Toggle Language"
           >
-            Log in
-          </Link>
+            <Globe className="w-3.5 h-3.5 text-[#184530]" />
+            <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
+          </button>
+
+          <div>
+            {t("auth.have_account_text")}{" "}
+            <Link
+              href="/login"
+              className="font-bold text-[#12281F] hover:underline ml-1"
+            >
+              {t("nav.login")}
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -157,26 +178,24 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
-                  Confirmation Email Sent
+                  <span>{t("auth.email_verified_title")}</span>
                 </span>
                 <h1 className="text-2xl font-black text-[#11231B] tracking-tight">
-                  Verify your email
+                  {t("auth.verification_sent_title")}
                 </h1>
                 <p className="text-xs text-[#556A60] leading-relaxed">
-                  We sent a verification link to{" "}
-                  <strong className="text-[#11231B] font-semibold">{email}</strong>.
-                  Please click the link in your email to activate your account.
+                  {t("auth.verification_sent_desc", { email })}
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-left space-y-2 text-xs text-[#4A5F54]">
                 <p className="font-bold text-[#11231B] flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#184530]" /> Next steps:
+                  <Sparkles className="w-4 h-4 text-[#184530]" /> {t("auth.next_steps_title")}
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-[11px] leading-relaxed">
-                  <li>Check your inbox (or spam folder)</li>
-                  <li>Click on the confirmation button</li>
-                  <li>You will be redirected straight to your Profile</li>
+                  <li>{t("auth.next_step_1")}</li>
+                  <li>{t("auth.next_step_2")}</li>
+                  <li>{t("auth.next_step_3")}</li>
                 </ol>
               </div>
 
@@ -188,15 +207,15 @@ export default function SignupPage() {
                   className="w-full py-3 rounded-full border border-[#DEE7DF] bg-white hover:bg-[#F2F7F3] disabled:opacity-50 text-xs font-bold text-[#11231B] transition-all cursor-pointer shadow-xs"
                 >
                   {resendCooldown > 0
-                    ? `Resend available in ${resendCooldown}s`
-                    : "Resend confirmation email"}
+                    ? t("auth.resend_cooldown", { seconds: resendCooldown })
+                    : t("auth.resend_email_btn")}
                 </button>
 
                 <Link
                   href="/login"
                   className="block w-full py-3 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-sm transition-all text-center border border-[#234235]"
                 >
-                  Back to Login
+                  {t("auth.back_to_login")}
                 </Link>
               </div>
             </div>
@@ -205,13 +224,13 @@ export default function SignupPage() {
             <div className="rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-xl p-8 sm:p-10 space-y-6 animate-in fade-in duration-150">
               <div className="space-y-2 text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-                  <span>✨ Get started with Clause</span>
+                  <span>{t("auth.secure_badge")}</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
-                  Create your account
+                  {t("auth.signup_title")}
                 </h1>
                 <p className="text-xs text-[#556A60]">
-                  Streamline agreements and contracts in minutes.
+                  {t("auth.signup_subtitle")}
                 </p>
               </div>
 
@@ -227,14 +246,14 @@ export default function SignupPage() {
                 {/* Full Name */}
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-[#2D3E35]">
-                    Full Name <span className="text-rose-500">*</span>
+                    {t("auth.full_name_label")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Samantha Brooks"
+                      placeholder={t("auth.full_name_placeholder")}
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -245,14 +264,14 @@ export default function SignupPage() {
                 {/* Email Address */}
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-[#2D3E35]">
-                    Work Email <span className="text-rose-500">*</span>
+                    {t("auth.email_label")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
                     <input
                       type="email"
                       required
-                      placeholder="name@company.com"
+                      placeholder={t("auth.email_placeholder")}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -263,14 +282,14 @@ export default function SignupPage() {
                 {/* Password */}
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-[#2D3E35]">
-                    Password <span className="text-rose-500">*</span>
+                    {t("auth.password_label")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
                     <input
                       type={showPassword ? "text" : "password"}
                       required
-                      placeholder="Minimum 6 characters"
+                      placeholder={t("auth.password_placeholder")}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full pl-10 pr-10 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -292,14 +311,14 @@ export default function SignupPage() {
                 {/* Repeat Password */}
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-[#2D3E35]">
-                    Repeat Password <span className="text-rose-500">*</span>
+                    {t("auth.repeat_password_label")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <ShieldCheck className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
                     <input
                       type={showRepeatPassword ? "text" : "password"}
                       required
-                      placeholder="Re-enter your password"
+                      placeholder={t("auth.repeat_password_placeholder")}
                       value={repeatPassword}
                       onChange={(e) => setRepeatPassword(e.target.value)}
                       className="w-full pl-10 pr-10 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors"
@@ -320,7 +339,14 @@ export default function SignupPage() {
 
                 {/* Terms disclaimer */}
                 <p className="text-[11px] text-[#6B8075] leading-relaxed pt-1">
-                  By creating an account, you agree to our Terms of Service and Privacy Policy.
+                  {t("auth.terms_agree_prefix")}{" "}
+                  <Link href="/term" className="underline font-semibold text-[#11231B]">
+                    {t("auth.terms_link")}
+                  </Link>{" "}
+                  {t("auth.and_word")}{" "}
+                  <Link href="/privacy" className="underline font-semibold text-[#11231B]">
+                    {t("auth.privacy_link")}
+                  </Link>.
                 </p>
 
                 {/* Submit Button */}
@@ -332,11 +358,11 @@ export default function SignupPage() {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin text-[#B8F55C]" />
-                      <span>Creating account...</span>
+                      <span>{t("auth.creating_account")}</span>
                     </>
                   ) : (
                     <>
-                      <span>Create Account</span>
+                      <span>{t("auth.btn_signup")}</span>
                       <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
                     </>
                   )}
@@ -344,12 +370,12 @@ export default function SignupPage() {
               </form>
 
               <div className="pt-2 text-center text-xs text-[#556A60]">
-                Already registered?{" "}
+                {t("auth.have_account_text")}{" "}
                 <Link
                   href="/login"
                   className="font-bold text-[#12281F] hover:underline"
                 >
-                  Sign in to your account
+                  {t("auth.sign_in_link")}
                 </Link>
               </div>
             </div>
@@ -359,7 +385,7 @@ export default function SignupPage() {
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075]">
-        &copy; {new Date().getFullYear()} Clause Inc. All rights reserved.
+        &copy; {new Date().getFullYear()} {t("footer.copyright")}
       </footer>
     </div>
   );

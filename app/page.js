@@ -1,10 +1,12 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import LogoCloud from "./components/LogoCloud";
-import FeaturesBento from "./components/FeaturesBento";
-import IntegrationSection from "./components/IntegrationSection";
 import Testimonial from "./components/Testimonial";
 import StatsBanner from "./components/StatsBanner";
+import DataPrivacySection from "./components/DataPrivacySection";
+import FeaturesBento from "./components/FeaturesBento";
+import InteractiveAppExplorer from "./components/InteractiveAppExplorer";
+import NodeWorkflowSection from "./components/NodeWorkflowSection";
+import PricingSection from "./components/PricingSection";
 import CtaBanner from "./components/CtaBanner";
 import Footer from "./components/Footer";
 
@@ -14,11 +16,13 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <LogoCloud />
-        <FeaturesBento />
-        <IntegrationSection />
         <Testimonial />
         <StatsBanner />
+        <DataPrivacySection />
+        <FeaturesBento />
+        <InteractiveAppExplorer />
+        <NodeWorkflowSection />
+        <PricingSection />
         <CtaBanner />
       </main>
       <Footer />

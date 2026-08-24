@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { ClauseLogo } from "@/app/components/Navbar";
+import { AsKingLogo } from "@/app/components/Navbar";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   Sparkles,
   CheckCircle2,
@@ -14,11 +15,14 @@ import {
   Laptop,
   ArrowRight,
   ShieldCheck,
+  Globe,
 } from "lucide-react";
 
 function DesktopAuthBridge() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
+
   const [status, setStatus] = useState("checking"); // 'checking' | 'authorizing' | 'success' | 'unauthenticated' | 'error'
   const [user, setUser] = useState(null);
   const [deepLinkUrl, setDeepLinkUrl] = useState("");
@@ -83,6 +87,8 @@ function DesktopAuthBridge() {
     }
   };
 
+  const userName = user?.user_metadata?.full_name || user?.email || "User";
+
   return (
     <div className="w-full max-w-md rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-2xl p-8 sm:p-10 space-y-6 text-center animate-in zoom-in-95 duration-200">
       {/* Icon Badge */}
@@ -95,13 +101,13 @@ function DesktopAuthBridge() {
         <div className="space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-[#184530]" />
-            Authorizing AsKing Desktop
+            {t("auth.desktop_bridge_badge")}
           </span>
           <h1 className="text-2xl font-black text-[#11231B] tracking-tight">
-            Connecting to Desktop App...
+            {t("auth.desktop_bridge_title")}
           </h1>
           <p className="text-xs text-[#556A60] leading-relaxed">
-            Please wait while we verify your credentials and launch the desktop application.
+            {t("auth.desktop_bridge_desc")}
           </p>
         </div>
       )}
@@ -111,14 +117,14 @@ function DesktopAuthBridge() {
         <div className="space-y-4">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
-            Authentication Dispatched
+            {t("auth.desktop_bridge_success")}
           </span>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-black text-[#11231B] tracking-tight">
-              Ready on AsKing Desktop!
+              {t("auth.desktop_ready_title")}
             </h1>
             <p className="text-xs text-[#556A60] leading-relaxed">
-              Logged in as <strong className="text-[#11231B]">{user?.user_metadata?.full_name || user?.email}</strong>. If your browser asks for permission, click <strong>&quot;Open AsKing&quot;</strong>.
+              {t("auth.desktop_ready_desc", { user: userName })}
             </p>
           </div>
 
@@ -128,7 +134,7 @@ function DesktopAuthBridge() {
               onClick={handleManualOpen}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-md transition-all active:scale-98 cursor-pointer border border-[#234235]"
             >
-              <span>Open AsKing Desktop App</span>
+              <span>{t("auth.open_desktop_btn")}</span>
               <ExternalLink className="w-4 h-4 text-[#B8F55C]" />
             </button>
 
@@ -136,7 +142,7 @@ function DesktopAuthBridge() {
               href="/profile"
               className="block w-full py-2.5 rounded-full border border-[#DEE7DF] bg-white hover:bg-[#F8FAF7] text-xs font-bold text-[#4A5F54] hover:text-[#11231B] transition-colors"
             >
-              Go to Web Profile
+              {t("auth.go_to_profile")}
             </Link>
           </div>
         </div>
@@ -147,14 +153,14 @@ function DesktopAuthBridge() {
         <div className="space-y-4">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-            Authentication Required
+            {t("auth.login_required_badge")}
           </span>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-black text-[#11231B] tracking-tight">
-              Sign In to Continue
+              {t("auth.login_required_title")}
             </h1>
             <p className="text-xs text-[#556A60] leading-relaxed">
-              To connect your AsKing desktop application with your cloud workspace, please log in with your account first.
+              {t("auth.login_required_desc")}
             </p>
           </div>
 
@@ -163,7 +169,7 @@ function DesktopAuthBridge() {
               href="/login?next=/auth/desktop"
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-md transition-all text-center border border-[#234235]"
             >
-              <span>Log In with Email</span>
+              <span>{t("auth.login_with_email_btn")}</span>
               <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
             </Link>
 
@@ -171,7 +177,7 @@ function DesktopAuthBridge() {
               href="/signup?next=/auth/desktop"
               className="block w-full py-2.5 rounded-full border border-[#DEE7DF] bg-white hover:bg-[#F8FAF7] text-xs font-bold text-[#11231B] transition-colors"
             >
-              Create New Account
+              {t("auth.create_account_btn")}
             </Link>
           </div>
         </div>
@@ -186,7 +192,7 @@ function DesktopAuthBridge() {
           </span>
           <div className="space-y-1.5">
             <h1 className="text-xl font-bold text-[#11231B]">
-              Connection Failed
+              {t("auth.connection_failed_title")}
             </h1>
             <p className="text-xs text-rose-600 leading-relaxed font-medium">
               {errorMessage || "Unable to authorize desktop app."}
@@ -198,7 +204,7 @@ function DesktopAuthBridge() {
               href="/login"
               className="block w-full py-3 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-md transition-all text-center border border-[#234235]"
             >
-              Back to Login
+              {t("auth.back_to_login")}
             </Link>
           </div>
         </div>
@@ -208,6 +214,8 @@ function DesktopAuthBridge() {
 }
 
 export default function DesktopAuthPage() {
+  const { t, language, toggleLanguage } = useTranslation();
+
   return (
     <div className="min-h-screen bg-[#F8FAF7] flex flex-col justify-between hero-grid relative overflow-hidden text-[#11231B]">
       {/* Glow Orbs */}
@@ -216,11 +224,24 @@ export default function DesktopAuthPage() {
       {/* Header */}
       <header className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 flex items-center justify-between">
         <Link href="/" className="group flex items-center">
-          <ClauseLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
+          <AsKingLogo className="w-9 h-9 group-hover:scale-105 transition-transform" />
         </Link>
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-          <Sparkles className="w-3.5 h-3.5 text-[#184530]" />
-          <span>Desktop SSO Bridge</span>
+        <div className="flex items-center gap-3">
+          {/* Language Switcher Pill */}
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EBF1EB] hover:bg-[#DDE7DE] border border-[#CFE2D3] text-xs font-bold text-[#184530] transition-all cursor-pointer shadow-2xs"
+            title="Toggle Language"
+          >
+            <Globe className="w-3.5 h-3.5 text-[#184530]" />
+            <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
+          </button>
+
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
+            <Sparkles className="w-3.5 h-3.5 text-[#184530]" />
+            <span>Desktop SSO Bridge</span>
+          </div>
         </div>
       </header>
 
@@ -240,7 +261,7 @@ export default function DesktopAuthPage() {
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075]">
-        &copy; {new Date().getFullYear()} Clause Inc. AsKing Desktop Single Sign-On.
+        &copy; {new Date().getFullYear()} {t("footer.copyright")}
       </footer>
     </div>
   );
