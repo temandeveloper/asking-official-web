@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { AsKingLogo } from "../components/Navbar";
+import ContactSupportModal from "../components/ContactSupportModal";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   User,
@@ -20,6 +21,7 @@ import {
   Sparkles,
   Inbox,
   Globe,
+  Headphones,
 } from "lucide-react";
 
 export default function SignupPage() {
@@ -37,6 +39,7 @@ export default function SignupPage() {
   const [error, setError] = useState(null);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -152,16 +155,6 @@ export default function SignupPage() {
             <Globe className="w-3.5 h-3.5 text-[#184530]" />
             <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
           </button>
-
-          <div>
-            {t("auth.have_account_text")}{" "}
-            <Link
-              href="/login"
-              className="font-bold text-[#12281F] hover:underline ml-1"
-            >
-              {t("nav.login")}
-            </Link>
-          </div>
         </div>
       </header>
 
@@ -211,6 +204,19 @@ export default function SignupPage() {
                     : t("auth.resend_email_btn")}
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() => setIsSupportModalOpen(true)}
+                  className="w-full py-2.5 px-4 rounded-full bg-[#E5EFE7] hover:bg-[#D5E6D8] text-[#184530] text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Headphones className="w-3.5 h-3.5 text-[#184530]" />
+                  <span>
+                    {language === "en"
+                      ? "Email not received? Contact Support"
+                      : "Email tidak masuk? Hubungi Support"}
+                  </span>
+                </button>
+
                 <Link
                   href="/login"
                   className="block w-full py-3 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-sm transition-all text-center border border-[#234235]"
@@ -223,9 +229,6 @@ export default function SignupPage() {
             /* SIGNUP FORM */
             <div className="rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-xl p-8 sm:p-10 space-y-6 animate-in fade-in duration-150">
               <div className="space-y-2 text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-                  <span>{t("auth.secure_badge")}</span>
-                </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
                   {t("auth.signup_title")}
                 </h1>
@@ -369,19 +372,55 @@ export default function SignupPage() {
                 </button>
               </form>
 
-              <div className="pt-2 text-center text-xs text-[#556A60]">
-                {t("auth.have_account_text")}{" "}
-                <Link
-                  href="/login"
-                  className="font-bold text-[#12281F] hover:underline"
-                >
-                  {t("auth.sign_in_link")}
-                </Link>
+              <div className="pt-2 text-center text-xs text-[#556A60] space-y-2">
+                <div>
+                  {t("auth.have_account_text")}{" "}
+                  <Link
+                    href="/login"
+                    className="font-bold text-[#12281F] hover:underline"
+                  >
+                    {t("auth.sign_in_link")}
+                  </Link>
+                </div>
+
+                <div className="pt-1 border-t border-[#EBF1EB]">
+                  <button
+                    type="button"
+                    onClick={() => setIsSupportModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-xs text-[#4A5F54] hover:text-[#184530] font-semibold transition-colors cursor-pointer"
+                  >
+                    <Headphones className="w-3.5 h-3.5 text-[#184530]" />
+                    <span>
+                      {language === "en"
+                        ? "Need help with registration? Contact Support"
+                        : "Butuh bantuan mendaftar? Hubungi Tim Support"}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
       </main>
+
+      {/* Floating Support Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          type="button"
+          onClick={() => setIsSupportModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#12281F] hover:bg-[#18362B] text-[#B8F55C] text-xs font-bold shadow-xl border border-[#2A5241] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <Headphones className="w-4 h-4 text-[#B8F55C]" />
+          <span>{language === "en" ? "Need Help?" : "Butuh Bantuan?"}</span>
+        </button>
+      </div>
+
+      <ContactSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        context="signup"
+        user={email ? { email, user_metadata: { full_name: fullName } } : null}
+      />
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075]">

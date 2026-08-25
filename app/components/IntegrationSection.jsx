@@ -18,7 +18,7 @@ export default function IntegrationSection() {
   const { t } = useTranslation();
 
   const integrations = [
-    { name: "WhatsApp", icon: MessageSquare, category: "Messaging Channel", desc: "Baileys Protocol" },
+    { name: "WhatsApp", icon: MessageSquare, category: "Messaging Channel", desc: "Protocol" },
     { name: "Telegram", icon: MessageSquare, category: "Messaging Channel", desc: "Bot API" },
     { name: "Google Gemini", icon: Sparkles, category: "AI Engine", desc: "2.5-Flash & Lite" },
     { name: "Ollama LLM", icon: Cpu, category: "Local AI Engine", desc: "Offline Inference" },

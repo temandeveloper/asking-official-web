@@ -3,6 +3,7 @@
 import { Check, Sparkles, Zap, ShieldCheck, ArrowRight, Building2, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { PRICING_CONFIG } from "@/lib/config/pricing";
 
 export default function PricingSection() {
   const { t, language } = useTranslation();
@@ -10,6 +11,10 @@ export default function PricingSection() {
   const trialFeatures = t("pricing.trial_features") || [];
   const proFeatures = t("pricing.pro_features") || [];
   const advanceFeatures = t("pricing.advance_features") || [];
+
+  const displayOriginalPrice = language === "en" ? "$9.99" : `Rp ${PRICING_CONFIG.proOriginalPrice}`;
+  const displayPrice = language === "en" ? "$4.99" : `Rp ${PRICING_CONFIG.proPrice}`;
+  const displayDiscount = `${PRICING_CONFIG.proDiscountPercent}%`;
 
   return (
     <section id="pricing" className="py-24 px-6 sm:px-8 bg-[#F2F7F3] border-t border-[#DEE7DF] relative overflow-hidden">
@@ -122,15 +127,15 @@ export default function PricingSection() {
               <div className="pt-2 pb-4 border-b border-[#234235]">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="text-sm font-semibold text-[#8EA096] line-through">
-                    {t("pricing.pro_original_price")}
+                    {displayOriginalPrice}
                   </span>
                   <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500 text-white shadow-xs uppercase tracking-wider">
-                    Hemat 50%
+                    {language === "id" ? `Hemat ${displayDiscount}` : `Save ${displayDiscount}`}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-4xl sm:text-5xl font-black text-[#B8F55C] tracking-tight">
-                    {t("pricing.pro_price")}
+                    {displayPrice}
                   </span>
                   <span className="text-xs font-semibold text-[#A1B8AC]">
                     {t("pricing.pro_period")}

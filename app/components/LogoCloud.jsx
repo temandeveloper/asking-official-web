@@ -7,7 +7,7 @@ export default function LogoCloud() {
   const { t } = useTranslation();
 
   const technologies = [
-    { name: "WhatsApp Engine", icon: MessageSquare, desc: "Baileys Protocol" },
+    { name: "WhatsApp Engine", icon: MessageSquare, desc: "Protocol" },
     { name: "Google Gemini", icon: Sparkles, desc: "Streaming AI Engine" },
     { name: "Local IndexedDB", icon: HardDrive, desc: "On-Device Storage" },
     { name: "Supabase SSO", icon: ShieldCheck, desc: "Cloud Auth Bridge" },

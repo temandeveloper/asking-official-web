@@ -237,11 +237,6 @@ export default function DesktopAuthPage() {
             <Globe className="w-3.5 h-3.5 text-[#184530]" />
             <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
           </button>
-
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-            <Sparkles className="w-3.5 h-3.5 text-[#184530]" />
-            <span>Desktop SSO Bridge</span>
-          </div>
         </div>
       </header>
 

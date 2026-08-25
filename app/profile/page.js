@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { AsKingLogo } from "../components/Navbar";
+import ContactSupportModal from "../components/ContactSupportModal";
+import { PRICING_CONFIG } from "@/lib/config/pricing";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -32,6 +34,7 @@ import {
   Building2,
   QrCode,
   Send,
+  Headphones,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -41,6 +44,10 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState(false);
+
+  // Support Modal State
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [supportContext, setSupportContext] = useState("general"); // 'general' | 'payment'
 
   // Billing / Payment state
   const [paymentData, setPaymentData] = useState(null);
@@ -353,13 +360,6 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               <Globe className="w-3.5 h-3.5 text-[#184530]" />
               <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
             </button>
-
-            <Link
-              href="/"
-              className="hidden sm:inline-flex text-xs font-semibold text-[#4A5F54] hover:text-[#11231B] px-3 py-2 transition-colors"
-            >
-              {t("profile.view_landing")}
-            </Link>
             <button
               onClick={handleSignOut}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-rose-200 bg-rose-50/80 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-all shadow-2xs cursor-pointer"
@@ -685,282 +685,330 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
             </form>
           </div>
         </div>
-      </main>
+      </main >
 
       {/* ========================================================================= */}
       {/* UPGRADE MODAL POPUP */}
       {/* ========================================================================= */}
-      {isUpgradeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-xl bg-white rounded-3xl border border-[#DEE7DF] shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="bg-[#12281F] text-white p-6 sm:p-7 flex items-center justify-between border-b border-[#234235]">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#B8F55C]" />
-                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                    {t("profile.modal_upgrade_title")}
-                  </h3>
+      {
+        isUpgradeModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto">
+            <div className="relative w-full max-w-xl bg-white rounded-3xl border border-[#DEE7DF] shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
+              {/* Modal Header */}
+              <div className="bg-[#12281F] text-white p-6 sm:p-7 flex items-center justify-between border-b border-[#234235]">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#B8F55C]" />
+                    <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                      {t("profile.modal_upgrade_title")}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#A5B8AD] leading-relaxed">
+                    {t("profile.modal_upgrade_subtitle")}
+                  </p>
                 </div>
-                <p className="text-xs text-[#A5B8AD] leading-relaxed">
-                  {t("profile.modal_upgrade_subtitle")}
-                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setIsUpgradeModalOpen(false)}
+                  className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                  title="Tutup Modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsUpgradeModalOpen(false)}
-                className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
-                title="Tutup Modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+              {/* Modal Body */}
+              <div className="p-6 sm:p-7 space-y-6 max-h-[75vh] overflow-y-auto">
+                {!showQrConfirmation ? (
+                  <>
+                    {/* Step 1: Select Plan */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
+                        {t("profile.modal_select_plan")}
+                      </h4>
 
-            {/* Modal Body */}
-            <div className="p-6 sm:p-7 space-y-6 max-h-[75vh] overflow-y-auto">
-              {!showQrConfirmation ? (
-                <>
-                  {/* Step 1: Select Plan */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
-                      {t("profile.modal_select_plan")}
-                    </h4>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                      {/* Pro Business Option */}
-                      <div
-                        onClick={() => setSelectedPlan("pro")}
-                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro"
-                          ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
-                          : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-                          <span className="text-xs font-black text-[#11231B]">
-                            {t("profile.modal_pro_title")}
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
-                            🔥 {t("profile.modal_pro_discount_badge")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-[#8FA599] line-through font-medium">
-                            {t("profile.modal_pro_original_price")}
-                          </span>
-                          <span className="text-lg font-black text-[#184530]">
-                            {t("profile.modal_pro_price")}
-                            <span className="text-xs font-normal text-[#556A60]">
-                              {t("profile.modal_pro_period")}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        {/* Pro Business Option */}
+                        <div
+                          onClick={() => setSelectedPlan("pro")}
+                          className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro"
+                            ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
+                            : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
+                            }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                            <span className="text-xs font-black text-[#11231B]">
+                              {t("profile.modal_pro_title")}
                             </span>
-                          </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
+                              🔥 {t("profile.modal_pro_discount_badge")}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-[#8FA599] line-through font-medium">
+                              {t("profile.modal_pro_original_price")}
+                            </span>
+                            <span className="text-lg font-black text-[#184530]">
+                              {t("profile.modal_pro_price")}
+                              <span className="text-xs font-normal text-[#556A60]">
+                                {t("profile.modal_pro_period")}
+                              </span>
+                            </span>
+                          </div>
+                          <ul className="text-[11px] text-[#556A60] mt-2 space-y-1">
+                            <li className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                              <span>1 Akun Desktop Penuh</span>
+                            </li>
+                            <li className="flex items-center gap-1.5">
+                              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                              <span>AI Customer Agent Otomatis</span>
+                            </li>
+                          </ul>
                         </div>
-                        <ul className="text-[11px] text-[#556A60] mt-2 space-y-1">
-                          <li className="flex items-center gap-1.5">
-                            <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                            <span>1 Akun Desktop Penuh</span>
-                          </li>
-                          <li className="flex items-center gap-1.5">
-                            <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                            <span>AI Customer Agent Otomatis</span>
-                          </li>
-                        </ul>
-                      </div>
 
-                      {/* Advance Business Option (Coming Soon) */}
-                      <div className="p-4 rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75 relative cursor-not-allowed">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-black text-[#6B8075]">
-                            {t("profile.modal_advance_title")}
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
+                        {/* Advance Business Option (Coming Soon) */}
+                        <div className="p-4 rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75 relative cursor-not-allowed">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-black text-[#6B8075]">
+                              {t("profile.modal_advance_title")}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
+                              Coming Soon
+                            </span>
+                          </div>
+                          <div className="text-sm font-bold text-[#8FA599] mt-1">
                             Coming Soon
-                          </span>
+                          </div>
+                          <p className="text-[11px] text-[#8FA599] mt-2">
+                            Multi-user, custom Gemini API key & integrasi internal.
+                          </p>
                         </div>
-                        <div className="text-sm font-bold text-[#8FA599] mt-1">
-                          Coming Soon
-                        </div>
-                        <p className="text-[11px] text-[#8FA599] mt-2">
-                          Multi-user, custom Gemini API key & integrasi internal.
-                        </p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Step 2: Payment Method Accordion */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
-                      {t("profile.modal_payment_method")}
-                    </h4>
+                    {/* Step 2: Payment Method Accordion */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
+                        {t("profile.modal_payment_method")}
+                      </h4>
 
-                    {/* Accordion 1: BCA Transfer (Active) */}
-                    <div className="rounded-2xl border border-[#DEE7DF] overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentAccordion("bca")}
-                        className="w-full p-4 bg-[#F8FAF7] hover:bg-[#F2F7F3] flex items-center justify-between text-left transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-xs">
-                            BCA
-                          </div>
-                          <div>
-                            <span className="text-xs font-bold text-[#11231B] block">
-                              {t("profile.modal_bca_title")}
-                            </span>
-                            <span className="text-[10px] text-[#556A60]">
-                              Transfer Manual & Verifikasi Cepat
-                            </span>
-                          </div>
-                        </div>
-                        <ChevronDown
-                          className={`w-4 h-4 text-[#556A60] transition-transform ${paymentAccordion === "bca" ? "rotate-180" : ""
-                            }`}
-                        />
-                      </button>
-
-                      {paymentAccordion === "bca" && (
-                        <div className="p-4 bg-white border-t border-[#DEE7DF] space-y-3">
-                          <div className="p-3.5 rounded-xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-2">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-[#556A60] font-medium">
-                                {t("profile.modal_bca_acc_num")}:
+                      {/* Accordion 1: BCA Transfer (Active) */}
+                      <div className="rounded-2xl border border-[#DEE7DF] overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setPaymentAccordion("bca")}
+                          className="w-full p-4 bg-[#F8FAF7] hover:bg-[#F2F7F3] flex items-center justify-between text-left transition-colors cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-xs">
+                              BCA
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-[#11231B] block">
+                                {t("profile.modal_bca_title")}
                               </span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono font-black text-[#11231B] text-sm sm:text-base">
-                                  2631261801
+                              <span className="text-[10px] text-[#556A60]">
+                                Transfer Manual & Verifikasi Cepat
+                              </span>
+                            </div>
+                          </div>
+                          <ChevronDown
+                            className={`w-4 h-4 text-[#556A60] transition-transform ${paymentAccordion === "bca" ? "rotate-180" : ""
+                              }`}
+                          />
+                        </button>
+
+                        {paymentAccordion === "bca" && (
+                          <div className="p-4 bg-white border-t border-[#DEE7DF] space-y-3">
+                            <div className="p-3.5 rounded-xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-[#556A60] font-medium">
+                                  {t("profile.modal_bca_acc_num")}:
                                 </span>
-                                <button
-                                  type="button"
-                                  onClick={handleCopyBca}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#DEE7DF] hover:bg-[#EAF3EC] text-[#184530] text-[11px] font-bold transition-all shadow-2xs cursor-pointer"
-                                >
-                                  {copiedBca ? (
-                                    <>
-                                      <Check className="w-3 h-3 text-emerald-600" />
-                                      <span>{t("profile.modal_bca_copied")}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Copy className="w-3 h-3" />
-                                      <span>{t("profile.modal_bca_copy_btn")}</span>
-                                    </>
-                                  )}
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono font-black text-[#11231B] text-sm sm:text-base">
+                                    2631261801
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={handleCopyBca}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#DEE7DF] hover:bg-[#EAF3EC] text-[#184530] text-[11px] font-bold transition-all shadow-2xs cursor-pointer"
+                                  >
+                                    {copiedBca ? (
+                                      <>
+                                        <Check className="w-3 h-3 text-emerald-600" />
+                                        <span>{t("profile.modal_bca_copied")}</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className="w-3 h-3" />
+                                        <span>{t("profile.modal_bca_copy_btn")}</span>
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between text-xs pt-1 border-t border-[#DEE7DF]">
+                                <span className="text-[#556A60] font-medium">
+                                  {t("profile.modal_bca_acc_name")}:
+                                </span>
+                                <span className="font-bold text-[#11231B]">
+                                  Ahmad Fadil
+                                </span>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs pt-1 border-t border-[#DEE7DF]">
-                              <span className="text-[#556A60] font-medium">
-                                {t("profile.modal_bca_acc_name")}:
+                            {/* Important Account Verification Note */}
+                            <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2">
+                              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                              <span>{t("profile.modal_bca_note")}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Accordion 2: QRIS (Coming Soon) */}
+                      <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75">
+                        <div className="w-full p-4 flex items-center justify-between text-left">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center font-bold text-xs">
+                              <QrCode className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-[#11231B] block">
+                                {t("profile.modal_qris_title")}
                               </span>
-                              <span className="font-bold text-[#11231B]">
-                                Ahmad Fadil
+                              <span className="text-[10px] text-[#556A60]">
+                                Pembayaran Otomatis GoPay, OVO, ShopeePay
                               </span>
                             </div>
                           </div>
-
-                          {/* Important Account Verification Note */}
-                          <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2">
-                            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                            <span>{t("profile.modal_bca_note")}</span>
-                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
+                            {t("profile.modal_qris_coming_soon")}
+                          </span>
                         </div>
-                      )}
-                    </div>
-
-                    {/* Accordion 2: QRIS (Coming Soon) */}
-                    <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75">
-                      <div className="w-full p-4 flex items-center justify-between text-left">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center font-bold text-xs">
-                            <QrCode className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <span className="text-xs font-bold text-[#11231B] block">
-                              {t("profile.modal_qris_title")}
-                            </span>
-                            <span className="text-[10px] text-[#556A60]">
-                              Pembayaran Otomatis GoPay, OVO, ShopeePay
-                            </span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
-                          {t("profile.modal_qris_coming_soon")}
-                        </span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Confirmation Button */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowQrConfirmation(true)}
-                      className="w-full py-3.5 px-6 rounded-2xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>{t("profile.modal_confirm_btn")}</span>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                /* STEP 3: QR CODE CONFIRMATION SCREEN */
-                <div className="space-y-6 text-center py-2">
-                  <div className="space-y-2">
-                    <h4 className="text-base font-black text-[#11231B]">
-                      {t("profile.modal_qr_title")}
-                    </h4>
-                    <p className="text-xs text-[#556A60] max-w-md mx-auto leading-relaxed">
-                      {t("profile.modal_qr_desc")}
-                    </p>
-                  </div>
+                    {/* Payment Help Callout Banner */}
+                    <div className="p-3.5 rounded-2xl bg-[#E5EFE7] border border-[#CFE2D3] flex items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2.5 text-[#184530]">
+                        <Headphones className="w-4 h-4 text-[#184530] shrink-0" />
+                        <span className="font-semibold text-[11px] leading-tight">
+                          {language === "en"
+                            ? "Encountering payment issues?"
+                            : "Mengalami kendala pembayaran?"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSupportContext("payment");
+                          setIsSupportModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-[11px] font-bold shrink-0 cursor-pointer"
+                      >
+                        {language === "en" ? "Chat CS" : "Hubungi CS"}
+                      </button>
+                    </div>
 
-                  {/* QR Code Graphic */}
-                  <div className="flex justify-center my-4">
-                    <div className="p-4 rounded-3xl bg-white border-2 border-[#184530] shadow-lg inline-block">
-                      <QRCodeSVG
-                        value={whatsappUrl}
-                        size={210}
-                        level="M"
-                        includeMargin={true}
-                        className="w-48 h-48 sm:w-52 sm:h-52"
-                      />
+                    {/* Confirmation Button */}
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowQrConfirmation(true)}
+                        className="w-full py-3.5 px-6 rounded-2xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
+                      >
+                        <Send className="w-4 h-4" />
+                        <span>{t("profile.modal_confirm_btn")}</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* STEP 3: QR CODE CONFIRMATION SCREEN */
+                  <div className="space-y-6 text-center py-2">
+                    <div className="space-y-2">
+                      <h4 className="text-base font-black text-[#11231B]">
+                        {t("profile.modal_qr_title")}
+                      </h4>
+                      <p className="text-xs text-[#556A60] max-w-md mx-auto leading-relaxed">
+                        {t("profile.modal_qr_desc")}
+                      </p>
+                    </div>
+
+                    {/* QR Code Graphic */}
+                    <div className="flex justify-center my-4">
+                      <div className="p-4 rounded-3xl bg-white border-2 border-[#184530] shadow-lg inline-block">
+                        <QRCodeSVG
+                          value={whatsappUrl}
+                          size={210}
+                          level="M"
+                          includeMargin={true}
+                          className="w-48 h-48 sm:w-52 sm:h-52"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Direct WhatsApp Link Button */}
+                    <div className="space-y-3 pt-2">
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3.5 px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-98"
+                      >
+                        <Send className="w-4 h-4" />
+                        <span>{t("profile.modal_open_wa_btn")}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowQrConfirmation(false)}
+                        className="text-xs font-semibold text-[#556A60] hover:text-[#11231B] underline cursor-pointer"
+                      >
+                        ← Kembali ke Pilihan Pembayaran
+                      </button>
                     </div>
                   </div>
-
-                  {/* Direct WhatsApp Link Button */}
-                  <div className="space-y-3 pt-2">
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-3.5 px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-98"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>{t("profile.modal_open_wa_btn")}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowQrConfirmation(false)}
-                      className="text-xs font-semibold text-[#556A60] hover:text-[#11231B] underline cursor-pointer"
-                    >
-                      ← Kembali ke Pilihan Pembayaran
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
+
+      {/* Floating Support Button */}
+      <div className="fixed bottom-6 right-6 z-30">
+        <button
+          type="button"
+          onClick={() => {
+            setSupportContext("general");
+            setIsSupportModalOpen(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#12281F] hover:bg-[#18362B] text-[#B8F55C] text-xs font-bold shadow-xl border border-[#2A5241] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <Headphones className="w-4 h-4 text-[#B8F55C]" />
+          <span>{language === "en" ? "Need Help?" : "Butuh Bantuan?"}</span>
+        </button>
+      </div>
+
+      <ContactSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        context={supportContext}
+        user={user}
+        planName={selectedPlan === "pro" ? "Pro Business" : "Advance Business"}
+        amount={PRICING_CONFIG.proPrice}
+      />
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075] border-t border-[#EEF3EF]">
         &copy; {new Date().getFullYear()} {t("footer.copyright")}
       </footer>
-    </div>
+    </div >
   );
 }

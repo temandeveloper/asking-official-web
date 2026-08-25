@@ -55,11 +55,10 @@ export default function InteractiveAppExplorer() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  isActive
+                className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${isActive
                     ? "bg-[#12281F] text-[#B8F55C] shadow-md scale-102 border border-[#234235]"
                     : "bg-[#F2F7F3] text-[#3D5247] hover:bg-[#E5EFE7] border border-[#DEE7DF]"
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -159,7 +158,7 @@ export default function InteractiveAppExplorer() {
                         <span className="text-rose-400 font-bold">URGENT</span>
                         <span className="text-[#8EA096]">#TCK-1002</span>
                       </div>
-                      <div className="text-xs font-bold text-[#F2F7F4]">Setup Baileys Multi-Device</div>
+                      <div className="text-xs font-bold text-[#F2F7F4]">Setup Multi-Device</div>
                       <div className="text-[10px] text-[#A5B8AD]">Customer: PT Berkah Jaya</div>
                     </div>
                   </div>

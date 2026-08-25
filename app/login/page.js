@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { AsKingLogo } from "../components/Navbar";
+import ContactSupportModal from "../components/ContactSupportModal";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
   Mail,
@@ -17,13 +18,14 @@ import {
   CheckCircle2,
   Globe,
   Check,
+  Headphones,
 } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isVerified = searchParams.get("verified") === "true";
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,6 +34,7 @@ function LoginForm() {
   const [error, setError] = useState(null);
   const [resendStatus, setResendStatus] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -145,9 +148,6 @@ function LoginForm() {
   return (
     <div className="w-full max-w-md rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-xl p-8 sm:p-10 space-y-6 animate-in fade-in duration-150">
       <div className="space-y-2 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E5EFE7] text-[#184530] text-xs font-bold border border-[#CFE2D3]">
-          <span>{t("auth.secure_badge")}</span>
-        </div>
         <h1 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
           {t("auth.login_title")}
         </h1>
@@ -268,21 +268,46 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="pt-2 text-center text-xs text-[#556A60]">
-        {t("auth.no_account_text")}{" "}
-        <Link
-          href="/signup"
-          className="font-bold text-[#12281F] hover:underline"
-        >
-          {t("auth.start_free_trial")}
-        </Link>
+      <div className="pt-2 text-center text-xs text-[#556A60] space-y-2">
+        <div>
+          {t("auth.no_account_text")}{" "}
+          <Link
+            href="/signup"
+            className="font-bold text-[#12281F] hover:underline"
+          >
+            {t("auth.start_free_trial")}
+          </Link>
+        </div>
+
+        <div className="pt-1 border-t border-[#EBF1EB]">
+          <button
+            type="button"
+            onClick={() => setIsSupportModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs text-[#4A5F54] hover:text-[#184530] font-semibold transition-colors cursor-pointer"
+          >
+            <Headphones className="w-3.5 h-3.5 text-[#184530]" />
+            <span>
+              {language === "en"
+                ? "Having trouble logging in? Contact Support"
+                : "Mengalami kendala login? Hubungi Tim Support"}
+            </span>
+          </button>
+        </div>
       </div>
+
+      <ContactSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        context="login"
+        user={email ? { email } : null}
+      />
     </div>
   );
 }
 
 export default function LoginPage() {
   const { t, language, toggleLanguage } = useTranslation();
+  const [isGlobalSupportOpen, setIsGlobalSupportOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F8FAF7] flex flex-col justify-between hero-grid relative overflow-hidden text-[#11231B]">
@@ -305,16 +330,6 @@ export default function LoginPage() {
             <Globe className="w-3.5 h-3.5 text-[#184530]" />
             <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
           </button>
-
-          <div>
-            {t("auth.no_account_text")}{" "}
-            <Link
-              href="/signup"
-              className="font-bold text-[#12281F] hover:underline ml-1"
-            >
-              {t("nav.signup")}
-            </Link>
-          </div>
         </div>
       </header>
 
@@ -331,6 +346,24 @@ export default function LoginPage() {
           <LoginForm />
         </Suspense>
       </main>
+
+      {/* Floating Support Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          type="button"
+          onClick={() => setIsGlobalSupportOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#12281F] hover:bg-[#18362B] text-[#B8F55C] text-xs font-bold shadow-xl border border-[#2A5241] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <Headphones className="w-4 h-4 text-[#B8F55C]" />
+          <span>{language === "en" ? "Need Help?" : "Butuh Bantuan?"}</span>
+        </button>
+      </div>
+
+      <ContactSupportModal
+        isOpen={isGlobalSupportOpen}
+        onClose={() => setIsGlobalSupportOpen(false)}
+        context="login"
+      />
 
       {/* Footer */}
       <footer className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 text-center text-xs text-[#6B8075]">
