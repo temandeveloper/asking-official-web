@@ -17,6 +17,14 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 export default function Hero() {
   const { t } = useTranslation();
 
+  function WindowsIcon({ className = "w-4 h-4" }) {
+    return (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.802" />
+      </svg>
+    );
+  }
+
   return (
     <section className="relative overflow-hidden pt-10 pb-20 md:pt-16 md:pb-28 hero-grid">
       {/* Decorative radial lighting glow behind center */}
@@ -143,7 +151,7 @@ export default function Hero() {
               href="#download"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] font-bold text-[15px] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 border border-[#234235]"
             >
-              <Laptop className="w-4 h-4" />
+              <WindowsIcon className="w-4 h-4 fill-current" />
               <span>{t("hero.cta_primary")}</span>
             </a>
             <a

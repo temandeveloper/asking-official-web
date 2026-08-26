@@ -1,39 +1,139 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  LayoutDashboard,
   MessageSquare,
   Kanban,
-  Sparkles,
   Bot,
+  Radio,
+  CalendarClock,
+  FileText,
+  Users,
+  DatabaseBackup,
+  Maximize2,
+  ChevronLeft,
+  ChevronRight,
+  X,
   CheckCircle2,
-  Clock,
-  Send,
-  User,
-  ShieldCheck,
   Zap,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
+const SCREENSHOT_MODULES = [
+  {
+    id: "dashboard",
+    icon: LayoutDashboard,
+    image: "/screenshots/dashboard.png",
+    route: "asking://app/dashboard",
+    tag: "Analytics",
+  },
+  {
+    id: "messages",
+    icon: MessageSquare,
+    image: "/screenshots/messages.png",
+    route: "asking://app/messages",
+    tag: "Omnichannel",
+  },
+  {
+    id: "tikets",
+    icon: Kanban,
+    image: "/screenshots/tikets.png",
+    route: "asking://app/tickets",
+    tag: "Workflow",
+  },
+  {
+    id: "scheduler",
+    icon: CalendarClock,
+    image: "/screenshots/scheduler.png",
+    route: "asking://app/scheduler",
+    tag: "Automation",
+  },
+  {
+    id: "templates",
+    icon: FileText,
+    image: "/screenshots/templates.png",
+    route: "asking://app/templates",
+    tag: "Productivity",
+  },
+  {
+    id: "contacts",
+    icon: Users,
+    image: "/screenshots/contacts.png",
+    route: "asking://app/contacts",
+    tag: "Directory",
+  },
+  {
+    id: "customer_agent",
+    icon: Bot,
+    image: "/screenshots/customer agent.png",
+    route: "asking://app/agent",
+    tag: "AI Automation",
+  },
+  {
+    id: "channels",
+    icon: Radio,
+    image: "/screenshots/message channels.png",
+    route: "asking://app/channels",
+    tag: "Connectivity",
+  },
+  {
+    id: "backup",
+    icon: DatabaseBackup,
+    image: "/screenshots/backup and restore.png",
+    route: "asking://app/backup",
+    tag: "Local-First",
+  },
+];
+
 export default function InteractiveAppExplorer() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("messages"); // "messages" | "kanban" | "assistant" | "agent"
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const tabs = [
-    { id: "messages", label: t("demo.tab_messages"), icon: MessageSquare },
-    { id: "kanban", label: t("demo.tab_kanban"), icon: Kanban },
-    { id: "assistant", label: t("demo.tab_assistant"), icon: Sparkles },
-    { id: "agent", label: t("demo.tab_agent"), icon: Bot },
-  ];
+  const currentIndex = SCREENSHOT_MODULES.findIndex((m) => m.id === activeTab);
+  const currentModule = SCREENSHOT_MODULES[currentIndex] || SCREENSHOT_MODULES[0];
+
+  const goToPrev = useCallback(() => {
+    const prevIdx = (currentIndex - 1 + SCREENSHOT_MODULES.length) % SCREENSHOT_MODULES.length;
+    setActiveTab(SCREENSHOT_MODULES[prevIdx].id);
+  }, [currentIndex]);
+
+  const goToNext = useCallback(() => {
+    const nextIdx = (currentIndex + 1) % SCREENSHOT_MODULES.length;
+    setActiveTab(SCREENSHOT_MODULES[nextIdx].id);
+  }, [currentIndex]);
+
+  // Handle keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isLightboxOpen) return;
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") goToNext();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, goToPrev, goToNext]);
 
   return (
-    <section id="omnichannel" className="py-20 md:py-28 bg-white border-b border-[#DEE7DF] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        {/* Header */}
+    <section
+      id="omnichannel"
+      className="py-20 md:py-28 bg-[#F8FAF7] border-b border-[#DEE7DF] relative overflow-hidden"
+    >
+      {/* Subtle Background Glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-[#B8F55C]/5 blur-[120px] pointer-events-none rounded-full" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E5EFE7] border border-[#CFE2D3] text-xs font-bold text-[#184530]">
-            <Zap className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-[#2C6E49]" />
             <span>{t("demo.tag")}</span>
           </div>
 
@@ -46,236 +146,248 @@ export default function InteractiveAppExplorer() {
           </p>
         </div>
 
-        {/* Tab Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10 max-w-3xl mx-auto">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer ${isActive
-                    ? "bg-[#12281F] text-[#B8F55C] shadow-md scale-102 border border-[#234235]"
-                    : "bg-[#F2F7F3] text-[#3D5247] hover:bg-[#E5EFE7] border border-[#DEE7DF]"
-                  }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        {/* Tab Navigation Pill Bar */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 overflow-x-auto pb-3 sm:pb-0 sm:flex-wrap sm:justify-center no-scrollbar px-1">
+            {SCREENSHOT_MODULES.map((module, idx) => {
+              const Icon = module.icon;
+              const isActive = activeTab === module.id;
+              const tabLabel = t(`demo.tabs.${module.id}`);
+
+              return (
+                <button
+                  key={module.id}
+                  onClick={() => setActiveTab(module.id)}
+                  className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 cursor-pointer select-none ${isActive
+                    ? "bg-[#12281F] text-[#B8F55C] shadow-md border border-[#234235] ring-2 ring-[#B8F55C]/20"
+                    : "bg-white text-[#3D5247] hover:bg-[#EAEFEA] hover:text-[#11241C] border border-[#DEE7DF]"
+                    }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? "text-[#B8F55C]" : "text-[#526B5D]"}`} />
+                  <span>{tabLabel}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${isActive
+                      ? "bg-[#1B3A2C] text-[#B8F55C]"
+                      : "bg-[#F0F5F1] text-[#6A8174]"
+                      }`}
+                  >
+                    0{idx + 1}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Tab Content Window */}
-        <div className="max-w-5xl mx-auto rounded-3xl bg-[#0C1712] border border-[#234235] shadow-2xl p-4 sm:p-8 text-left overflow-hidden min-h-[460px] flex flex-col justify-between">
-          <AnimatePresence mode="wait">
-            {/* Tab 1: Messages */}
-            {activeTab === "messages" && (
+        {/* Desktop App Window Container */}
+        <div className="max-w-6xl mx-auto rounded-3xl bg-[#0C1712] border border-[#234235] shadow-2xl overflow-hidden transition-all duration-300">
+          {/* Screenshot Showcase Main Area */}
+          <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            <AnimatePresence mode="wait">
               <motion.div
-                key="messages"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
+                key={activeTab}
+                initial={{ opacity: 0, scale: 0.99, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.99, y: -8 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between pb-3 border-b border-[#1F382B]">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-emerald-900 text-emerald-300 flex items-center justify-center font-bold text-xs">
-                      WA
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-[#F2F7F4]">Budi Santoso (Retail Store Jakarta)</div>
-                      <div className="text-[10px] text-emerald-400 font-medium">WhatsApp Connected • Online</div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#18362B] text-[#B8F55C] font-bold border border-[#234235]">
-                    Local Storage OK
-                  </span>
-                </div>
-
-                <div className="space-y-3 py-4 max-w-2xl">
-                  <div className="p-3.5 rounded-2xl bg-[#18362B] text-xs text-[#D1DDD6] leading-relaxed max-w-md">
-                    Halo CS AsKing, kami tertarik pesan paket Custom Enterprise untuk integrasi 15 CS & bot auto-reply WhatsApp. Apakah ada live demo besok?
+                {/* Screenshot Frame with Zoom Overlay */}
+                <div
+                  onClick={() => setIsLightboxOpen(true)}
+                  className="group relative rounded-2xl overflow-hidden bg-[#070D0A] border border-[#1F382B] shadow-inner cursor-pointer"
+                >
+                  <div className="relative w-full aspect-[16/10] sm:aspect-[16/9.5] max-h-[560px]">
+                    <Image
+                      src={currentModule.image}
+                      alt={t(`demo.modules.${currentModule.id}.title`)}
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
+                      className="object-contain sm:object-cover sm:object-top transition-transform duration-500 group-hover:scale-[1.01]"
+                    />
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-[#12241C] border border-[#234235] text-xs text-[#B8F55C] leading-relaxed max-w-md ml-auto space-y-1">
-                    <div className="flex items-center gap-1 text-[10px] text-[#A5B8AD] font-semibold">
-                      <Bot className="w-3 h-3 text-[#B8F55C]" />
-                      <span>AsKing AI Agent (Auto-Response)</span>
-                    </div>
-                    <p className="text-[#F2F7F4]">
-                      Halo Pak Budi! Tentu ada. Tim kami siap mendemokan fitur Kanban tiket, isolasi database on-device, dan custom persona AI jam 10.00 WIB besok. Link calendar sudah dikirimkan ya! 🚀
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-[#1F382B] flex items-center gap-3">
-                  <input
-                    type="text"
-                    disabled
-                    value="Ketik pesan balasan manual atau gunakan saran AI..."
-                    className="flex-1 bg-[#12241C] border border-[#1F382B] rounded-xl px-4 py-2.5 text-xs text-[#8EA096] focus:outline-none"
-                  />
-                  <button className="px-4 py-2.5 rounded-xl bg-[#B8F55C] text-[#12281F] font-bold text-xs flex items-center gap-1.5 cursor-default">
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Kirim</span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Tab 2: Kanban */}
-            {activeTab === "kanban" && (
-              <motion.div
-                key="kanban"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-[#1F382B]">
-                  <div className="text-xs font-bold text-[#F2F7F4]">
-                    Kanban Customer Ticket Board (Real-time View)
-                  </div>
-                  <span className="text-[10px] text-amber-400 font-bold bg-amber-950/60 border border-amber-800/40 px-2.5 py-0.5 rounded-full">
-                    SLA Guarantee: 99.8%
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                  {/* Column 1: Open */}
-                  <div className="rounded-2xl bg-[#12241C] border border-[#1F382B] p-3 space-y-2.5">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#A5B8AD] pb-1 border-b border-[#1F382B]">
-                      <span>Open Tickets</span>
-                      <span className="px-2 py-0.5 rounded-full bg-[#18362B] text-xs font-bold text-[#B8F55C]">2</span>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-[#18362B] border border-[#234235] space-y-1.5">
-                      <div className="flex justify-between text-[10px]">
-                        <span className="text-rose-400 font-bold">URGENT</span>
-                        <span className="text-[#8EA096]">#TCK-1002</span>
+                  {/* Hover Floating Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4 sm:p-6 pointer-events-none">
+                    <div className="space-y-1">
+                      {/* Module Details & Key Highlights Card */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+                        {/* Left Column: Title & Tagline */}
+                        <div className="lg:col-span-5 space-y-2.5">
+                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#18362B] border border-[#234235] text-[11px] font-bold text-[#B8F55C]">
+                            <Zap className="w-3 h-3 text-[#B8F55C]" />
+                            <span>{t(`demo.modules.${currentModule.id}.badge`)}</span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-black text-[#F2F7F4] tracking-tight">
+                            {t(`demo.modules.${currentModule.id}.title`)}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-[#A5B8AD] leading-relaxed">
+                            {t(`demo.modules.${currentModule.id}.tagline`)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-xs font-bold text-[#F2F7F4]">Setup Multi-Device</div>
-                      <div className="text-[10px] text-[#A5B8AD]">Customer: PT Berkah Jaya</div>
-                    </div>
-                  </div>
-
-                  {/* Column 2: In Progress */}
-                  <div className="rounded-2xl bg-[#12241C] border border-[#1F382B] p-3 space-y-2.5">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#A5B8AD] pb-1 border-b border-[#1F382B]">
-                      <span>In Progress</span>
-                      <span className="px-2 py-0.5 rounded-full bg-[#18362B] text-xs font-bold text-[#B8F55C]">3</span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-[#18362B] border border-[#234235] space-y-1.5">
-                      <div className="flex justify-between text-[10px]">
-                        <span className="text-amber-400 font-bold">HIGH</span>
-                        <span className="text-[#8EA096]">#TCK-1003</span>
-                      </div>
-                      <div className="text-xs font-bold text-[#F2F7F4]">Knowledge Base Verification</div>
-                      <div className="text-[10px] text-[#A5B8AD]">Customer: Sarah Cosmetics</div>
-                    </div>
-                  </div>
-
-                  {/* Column 3: Resolved */}
-                  <div className="rounded-2xl bg-[#12241C] border border-[#1F382B] p-3 space-y-2.5">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#A5B8AD] pb-1 border-b border-[#1F382B]">
-                      <span>Resolved</span>
-                      <span className="px-2 py-0.5 rounded-full bg-[#18362B] text-xs font-bold text-[#B8F55C]">18</span>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-[#18362B]/50 border border-[#234235] space-y-1.5 opacity-80">
-                      <div className="flex justify-between text-[10px]">
-                        <span className="text-emerald-400 font-bold">DONE</span>
-                        <span className="text-[#8EA096]">#TCK-0998</span>
-                      </div>
-                      <div className="text-xs font-bold text-[#D1DDD6]">Broadcast Campaign Schedule</div>
-                      <div className="text-[10px] text-[#8EA096]">Completed via WhatsApp</div>
+                    <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#12281F]/90 border border-[#B8F55C]/40 text-[#B8F55C] text-xs font-bold backdrop-blur-md shadow-lg">
+                      <Maximize2 className="w-4 h-4" />
                     </div>
                   </div>
                 </div>
               </motion.div>
-            )}
+            </AnimatePresence>
 
-            {/* Tab 3: AI Assistant */}
-            {activeTab === "assistant" && (
-              <motion.div
-                key="assistant"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-[#1F382B]">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#B8F55C]" />
-                    <span className="text-xs font-bold text-[#F2F7F4]">AsKing AI Executive Manager</span>
-                  </div>
-                  <span className="text-[10px] text-[#B8F55C] bg-[#18362B] px-2.5 py-0.5 rounded-full font-bold border border-[#234235]">
-                    Real-time Data Intelligence
-                  </span>
-                </div>
-
-                <div className="space-y-3 py-3">
-                  <div className="p-4 rounded-2xl bg-[#18362B] border border-[#234235] space-y-2">
-                    <div className="text-xs font-bold text-[#B8F55C] flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5" />
-                      <span>Ringkasan & Arahan Operasional Hari Ini:</span>
-                    </div>
-                    <ul className="text-xs text-[#D1DDD6] space-y-1.5 list-disc list-inside leading-relaxed">
-                      <li><strong>2 Tiket Urgent:</strong> Perlu eskalasi ke lead tech sebelum pukul 15.00 WIB.</li>
-                      <li><strong>Pola Pesan Pelanggan:</strong> 64% pertanyaan mengenai promo onboarding kuartal ini.</li>
-                      <li><strong>Rekomendasi Tindakan:</strong> Aktifkan template jawaban cepat WhatsApp untuk mempercepat respon rata-rata di bawah 30 detik.</li>
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Tab 4: Agent */}
-            {activeTab === "agent" && (
-              <motion.div
-                key="agent"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-[#1F382B]">
-                  <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-[#B8F55C]" />
-                    <span className="text-xs font-bold text-[#F2F7F4]">Autonomous AI Customer Agent Simulator</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2.5 py-0.5 rounded-full font-bold">
-                    Guardrails Active
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-[#12241C] border border-[#1F382B] space-y-3">
-                  <div className="text-[11px] text-[#A5B8AD] font-semibold">
-                    Simulasi Pertanyaan Pelanggan:
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#18362B] text-xs text-[#D1DDD6]">
-                    "Bagaimana cara memastikan data chat saya tidak disimpan di server AsKing?"
-                  </div>
-
-                  <div className="text-[11px] text-[#B8F55C] font-semibold pt-1">
-                    Jawaban AI Agent (Grounded in Verified Policy):
-                  </div>
-                  <div className="p-3 rounded-xl bg-[#09130E] border border-[#234235] text-xs text-[#F2F7F4] leading-relaxed">
-                    "AsKing dirancang secara fundamental dengan arsitektur <strong>Local-First</strong>. Seluruh riwayat percakapan WhatsApp Anda disimpan langsung di IndexedDB komputer lokal Anda. Server kami tidak pernah menerima atau menyimpan konten chat pelanggan Anda."
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            {/* Bottom Quick Thumbnail Strip */}
+            <div className="pt-4 border-t border-[#1F382B]">
+              <div className="flex items-center justify-between mb-3 text-xs font-bold text-[#8EA096]">
+                <span>Eksplorasi Screenshot Lengkap</span>
+                <span className="text-[#A5B8AD] font-mono">
+                  {currentIndex + 1} / {SCREENSHOT_MODULES.length}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
+                {SCREENSHOT_MODULES.map((item, idx) => {
+                  const isSelected = item.id === activeTab;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`relative aspect-[16/10] rounded-xl overflow-hidden border transition-all duration-200 group cursor-pointer text-left ${isSelected
+                        ? "border-[#B8F55C] ring-2 ring-[#B8F55C]/40 scale-105 shadow-md shadow-black/60 z-10"
+                        : "border-[#1F382B] opacity-60 hover:opacity-100 hover:border-[#2C523F]"
+                        }`}
+                    >
+                      <Image
+                        src={item.image}
+                        alt={t(`demo.tabs.${item.id}`)}
+                        fill
+                        sizes="120px"
+                        className="object-cover object-top"
+                      />
+                      <div
+                        className={`absolute inset-0 transition-colors ${isSelected
+                          ? "bg-transparent"
+                          : "bg-[#0C1712]/40 group-hover:bg-transparent"
+                          }`}
+                      />
+                      <span className="absolute bottom-1 left-1 right-1 text-[9px] font-bold text-white bg-black/80 px-1 py-0.5 rounded truncate text-center backdrop-blur-xs">
+                        {t(`demo.tabs.${item.id}`)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Lightbox / Fullscreen Modal */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-6xl w-full max-h-[95vh] flex flex-col bg-[#0C1712] border border-[#234235] rounded-3xl overflow-hidden shadow-2xl"
+            >
+              {/* Lightbox Header */}
+              <div className="px-4 sm:px-6 py-3.5 bg-[#08100C] border-b border-[#1F382B] flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#18362B] text-[#B8F55C] flex items-center justify-center font-bold">
+                    <currentModule.icon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-bold text-[#F2F7F4] truncate">
+                      {t(`demo.modules.${currentModule.id}.title`)}
+                    </h4>
+                    <p className="text-[11px] text-[#8EA096] truncate">{currentModule.route}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsLightboxOpen(false)}
+                    className="p-2 rounded-xl bg-[#18362B] text-[#D1DDD6] hover:text-white hover:bg-[#204738] transition-colors cursor-pointer"
+                    aria-label={t("demo.close_preview")}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Lightbox Body / Image Preview */}
+              <div className="relative flex-1 min-h-[360px] max-h-[68vh] overflow-auto p-2 sm:p-4 bg-[#050B08] flex items-center justify-center">
+                <div className="relative w-full h-[64vh] max-w-5xl">
+                  <Image
+                    src={currentModule.image}
+                    alt={t(`demo.modules.${currentModule.id}.title`)}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-contain rounded-xl"
+                  />
+                </div>
+
+                {/* Left & Right Float Arrows */}
+                <button
+                  onClick={goToPrev}
+                  aria-label="Previous"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-2xl bg-black/70 hover:bg-[#12281F] text-white hover:text-[#B8F55C] border border-white/10 transition-all cursor-pointer backdrop-blur-md"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={goToNext}
+                  aria-label="Next"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-2xl bg-black/70 hover:bg-[#12281F] text-white hover:text-[#B8F55C] border border-white/10 transition-all cursor-pointer backdrop-blur-md"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Lightbox Footer with Mini Thumbnails */}
+              <div className="px-4 sm:px-6 py-3 bg-[#08100C] border-t border-[#1F382B] flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-2 shrink-0">
+                  {SCREENSHOT_MODULES.map((item) => {
+                    const isSelected = item.id === activeTab;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`relative w-14 h-9 rounded-lg overflow-hidden border transition-all cursor-pointer ${isSelected
+                          ? "border-[#B8F55C] ring-2 ring-[#B8F55C]/50 scale-105"
+                          : "border-[#1F382B] opacity-50 hover:opacity-100"
+                          }`}
+                      >
+                        <Image
+                          src={item.image}
+                          alt={t(`demo.tabs.${item.id}`)}
+                          fill
+                          sizes="60px"
+                          className="object-cover object-top"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="text-xs text-[#8EA096] shrink-0 hidden sm:block">
+                  <span>Gunakan tombol panah ◄ ► atau Esc untuk navigasi</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

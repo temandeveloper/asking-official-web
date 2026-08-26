@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Col 1: Brand & Contacts */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#18362B] p-1 border border-[#234235] shadow-xs shrink-0">
+              <div className="w-8 h-8 shrink-0">
                 <img
                   src="/logo.png"
                   alt="AsKing Logo"
