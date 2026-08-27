@@ -12,8 +12,8 @@ export default function PricingSection() {
   const proFeatures = t("pricing.pro_features") || [];
   const advanceFeatures = t("pricing.advance_features") || [];
 
-  const displayOriginalPrice = language === "en" ? "$9.99" : `Rp ${PRICING_CONFIG.proOriginalPrice}`;
-  const displayPrice = language === "en" ? "$4.99" : `Rp ${PRICING_CONFIG.proPrice}`;
+  const displayOriginalPrice = t("pricing.pro_original_price") || `Rp ${PRICING_CONFIG.proOriginalPrice}`;
+  const displayPrice = t("pricing.pro_price") || `Rp ${PRICING_CONFIG.proPrice}`;
   const displayDiscount = `${PRICING_CONFIG.proDiscountPercent}%`;
 
   return (
@@ -224,7 +224,7 @@ export default function PricingSection() {
             {/* CTA Button */}
             <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
               <a
-                href="mailto:support@godiscus.com?subject=Inquiry%20Advance%20Business%20Plan%20AsKing"
+                href="mailto:asking@godiscus.com?subject=Inquiry%20Advance%20Business%20Plan%20AsKing"
                 className="w-full py-3.5 px-6 rounded-2xl bg-white border border-[#CFE2D3] hover:bg-[#F2F7F3] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
               >
                 <span>{t("pricing.advance_cta")}</span>
@@ -257,8 +257,8 @@ export default function PricingSection() {
             {language === "id"
               ? "Pertanyaan seputar paket? "
               : "Questions about plans? "}
-            <a href="mailto:support@godiscus.com" className="text-[#184530] font-bold underline">
-              support@godiscus.com
+            <a href="mailto:asking@godiscus.com" className="text-[#184530] font-bold underline">
+              asking@godiscus.com
             </a>
           </div>
         </div>

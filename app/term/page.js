@@ -259,7 +259,7 @@ export default function TermsPage() {
                     </span>
                     Pernyataan Penyangkalan (Disclaimer) & Batasan Tanggung Jawab
                   </h2>
-                  
+
                   <div className="p-5 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2 text-xs text-amber-950">
                     <p className="font-bold uppercase tracking-wider text-[11px] text-amber-900">
                       Pemberitahuan Hukum Penting (As-Is Basis)
@@ -328,10 +328,10 @@ export default function TermsPage() {
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
-                        href="mailto:support@godiscus.com"
+                        href="mailto:asking@godiscus.com"
                         className="text-[#184530] font-bold underline"
                       >
-                        support@godiscus.com
+                        asking@godiscus.com
                       </a>
                     </p>
                   </div>
@@ -607,10 +607,10 @@ export default function TermsPage() {
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
-                        href="mailto:support@godiscus.com"
+                        href="mailto:asking@godiscus.com"
                         className="text-[#184530] font-bold underline"
                       >
-                        support@godiscus.com
+                        asking@godiscus.com
                       </a>
                     </p>
                   </div>

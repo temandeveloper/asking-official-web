@@ -109,7 +109,7 @@ export default function PrivacyPage() {
                     </span>
                     Prinsip Utama Privasi AsKing
                   </h2>
-                  
+
                   <div className="space-y-3">
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
@@ -148,7 +148,7 @@ export default function PrivacyPage() {
                     </span>
                     Klasifikasi Penyimpanan Informasi
                   </h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
@@ -297,10 +297,10 @@ export default function PrivacyPage() {
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
-                        href="mailto:support@godiscus.com"
+                        href="mailto:asking@godiscus.com"
                         className="text-[#184530] font-bold underline"
                       >
-                        support@godiscus.com
+                        asking@godiscus.com
                       </a>
                     </p>
                   </div>
@@ -330,7 +330,7 @@ export default function PrivacyPage() {
                     </span>
                     Core Privacy Principles
                   </h2>
-                  
+
                   <div className="space-y-3">
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
@@ -369,7 +369,7 @@ export default function PrivacyPage() {
                     </span>
                     Information Storage Classification
                   </h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
@@ -518,10 +518,10 @@ export default function PrivacyPage() {
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
-                        href="mailto:support@godiscus.com"
+                        href="mailto:asking@godiscus.com"
                         className="text-[#184530] font-bold underline"
                       >
-                        support@godiscus.com
+                        asking@godiscus.com
                       </a>
                     </p>
                   </div>

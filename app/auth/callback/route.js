@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { PRICING_CONFIG } from "@/lib/config/pricing";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
@@ -71,6 +72,10 @@ async function ensureUserPayment(supabase, userId) {
     if (!data && !error) {
       const nowMs = Date.now();
       const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
+      const basePrice = Number(String(PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || 199000;
+      const discount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
+      const price = Number(PRICING_CONFIG.proRawAmount) || 79000;
+
       await supabase.from("tb_payment").insert({
         uid: userId,
         jenis_plan: 0,
@@ -79,6 +84,9 @@ async function ensureUserPayment(supabase, userId) {
         datetime_expired: expiredMs,
         request_budget: 50,
         status: "active",
+        base_price: basePrice,
+        discount: discount,
+        price: price,
       });
     }
   } catch (err) {

@@ -39,11 +39,11 @@ export default function Footer() {
 
             <div className="space-y-2 pt-2 text-xs sm:text-sm">
               <a
-                href="mailto:support@godiscus.com"
+                href="mailto:asking@godiscus.com"
                 className="flex items-center gap-2.5 text-[#9CB0A4] hover:text-[#B8F55C] transition-colors"
               >
                 <Mail className="w-4 h-4 text-[#B8F55C]" />
-                <span>support@godiscus.com</span>
+                <span>asking@godiscus.com</span>
               </a>
             </div>
           </div>

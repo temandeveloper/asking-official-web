@@ -105,9 +105,13 @@ export default function ProfilePage() {
           if (payment) {
             setPaymentData(payment);
           } else {
-            // Auto initialize default Free Trial record
+            // Auto initialize default Free Trial record with dynamic PRICING_CONFIG
             const nowMs = Date.now();
             const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
+            const basePrice = Number(String(PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || 199000;
+            const discount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
+            const price = Number(PRICING_CONFIG.proRawAmount) || 79000;
+
             const newPayment = {
               uid: currentUser.id,
               jenis_plan: 0,
@@ -116,6 +120,9 @@ export default function ProfilePage() {
               datetime_expired: expiredMs,
               request_budget: 50,
               status: "active",
+              base_price: basePrice,
+              discount: discount,
+              price: price,
             };
 
             const { data: inserted } = await supabase
@@ -311,10 +318,22 @@ export default function ProfilePage() {
 
   const requestBudget = paymentData?.request_budget ?? 50;
 
+  // Dynamic price setup from user tb_payment record with PRICING_CONFIG fallbacks
+  const fallbackBasePrice = Number(String(PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || 199000;
+  const fallbackDiscount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
+  const fallbackPrice = Number(PRICING_CONFIG.proRawAmount) || 79000;
+
+  const userBasePrice = paymentData?.base_price ?? fallbackBasePrice;
+  const userDiscount = paymentData?.discount ?? fallbackDiscount; // percentage
+  const userPrice = paymentData?.price ?? fallbackPrice;
+
+  const formattedBasePrice = Number(userBasePrice).toLocaleString("id-ID");
+  const formattedPrice = Number(userPrice).toLocaleString("id-ID");
+
   // WhatsApp Message Payload & URL
-  const whatsappNumber = "6287769005240";
+  const whatsappNumber = "6287769005244";
   const selectedPlanTitle = selectedPlan === "pro" ? "Pro Business (1 Bulan)" : "Advance Business";
-  const selectedPlanPrice = selectedPlan === "pro" ? "Rp 74.500 (Diskon 50% Promo Terbatas)" : "Coming Soon";
+  const selectedPlanPrice = selectedPlan === "pro" ? `Rp ${formattedPrice}` : "Coming Soon";
   const customerName = fullName || user?.user_metadata?.full_name || "User AsKing";
   const customerEmail = user?.email || "";
   const paymentDateStr = new Date().toLocaleDateString("id-ID", {
@@ -737,33 +756,41 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                             : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
                             }`}
                         >
-                          <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-                            <span className="text-xs font-black text-[#11231B]">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-black text-[#11231B]">
                               {t("profile.modal_pro_title")}
                             </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">
-                              🔥 {t("profile.modal_pro_discount_badge")}
-                            </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#8FA599] line-through font-medium">
-                              {t("profile.modal_pro_original_price")}
-                            </span>
-                            <span className="text-lg font-black text-[#184530]">
-                              {t("profile.modal_pro_price")}
-                              <span className="text-xs font-normal text-[#556A60]">
-                                {t("profile.modal_pro_period")}
+
+                          {/* Price & Breakdown */}
+                          <div className="space-y-1.5 py-1">
+                            <div className="flex items-baseline justify-between text-xs text-[#556A60]">
+                              <span>Base Price:</span>
+                              <span className="font-mono text-[#8FA599] line-through font-medium">
+                                Rp {formattedBasePrice}
                               </span>
-                            </span>
+                            </div>
+                            <div className="flex items-baseline justify-between text-xs text-[#556A60]">
+                              <span>Discount:</span>
+                              <span className="font-mono text-emerald-700 font-bold">
+                                -{userDiscount}%
+                              </span>
+                            </div>
+                            <div className="flex items-baseline justify-between pt-1.5 border-t border-[#DEE7DF]">
+                              <span className="text-xs font-bold text-[#11231B]">Total Price:</span>
+                              <span className="text-lg font-black text-[#184530]">
+                                Rp {formattedPrice}
+                                <span className="text-xs font-normal text-[#556A60]">
+                                  {t("profile.modal_pro_period")}
+                                </span>
+                              </span>
+                            </div>
                           </div>
-                          <ul className="text-[11px] text-[#556A60] mt-2 space-y-1">
+
+                          <ul className="text-[11px] text-[#556A60] mt-3 space-y-1 border-t border-[#E5EFE7] pt-2">
                             <li className="flex items-center gap-1.5">
                               <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                              <span>1 Akun Desktop Penuh</span>
-                            </li>
-                            <li className="flex items-center gap-1.5">
-                              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                              <span>AI Customer Agent Otomatis</span>
+                              <span>Flat Payment</span>
                             </li>
                           </ul>
                         </div>

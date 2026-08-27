@@ -26,7 +26,7 @@ export default function ContactSupportModal({
 
   if (!isOpen) return null;
 
-  const supportNumber = PRICING_CONFIG.supportPhone || "6287769005240";
+  const supportNumber = PRICING_CONFIG.supportPhone || "6287769005244";
   const userName = user?.user_metadata?.full_name || user?.email || "Pengguna AsKing";
   const userEmail = user?.email || "-";
   const userId = user?.id || "-";
@@ -114,7 +114,7 @@ Pertanyaan / Kendala: `;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150 select-none">
       <div className="relative w-full max-w-lg bg-white dark:bg-[#12241C] rounded-3xl border border-[#DEE7DF] dark:border-[#1F382B] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200">
-        
+
         {/* Modal Header */}
         <div className="bg-[#12281F] text-white p-6 flex items-center justify-between border-b border-[#234235]">
           <div className="flex items-center gap-3">

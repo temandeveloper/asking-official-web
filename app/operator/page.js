@@ -27,6 +27,25 @@ import {
   Loader2,
 } from "lucide-react";
 
+function msToDatetimeLocal(ms) {
+  if (!ms || isNaN(Number(ms))) return "";
+  const d = new Date(Number(ms));
+  if (isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function datetimeLocalToMs(dtStr) {
+  if (!dtStr) return 0;
+  const d = new Date(dtStr);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
 export default function OperatorDashboardPage() {
   const router = useRouter();
 
@@ -194,6 +213,9 @@ export default function OperatorDashboardPage() {
           datetime_expired: Number(editingRecord.datetime_expired),
           request_budget: Number(editingRecord.request_budget),
           status: editingRecord.status,
+          base_price: Number(editingRecord.base_price ?? 199000),
+          discount: Number(editingRecord.discount ?? 60),
+          price: Number(editingRecord.price ?? 79000),
         }),
       });
 
@@ -479,6 +501,7 @@ export default function OperatorDashboardPage() {
                 <tr>
                   <th className="py-4 px-5">UID & Pelanggan</th>
                   <th className="py-4 px-5">Jenis Plan</th>
+                  <th className="py-4 px-5">Harga & Diskon</th>
                   <th className="py-4 px-5">Tgl Payment</th>
                   <th className="py-4 px-5">Masa Berlaku (Expired)</th>
                   <th className="py-4 px-5">Request Budget</th>
@@ -581,6 +604,23 @@ export default function OperatorDashboardPage() {
                           >
                             {planBadge.label}
                           </span>
+                        </td>
+
+                        {/* Price & Discount Setup */}
+                        <td className="py-4 px-5">
+                          <div className="space-y-0.5">
+                            <span className="font-mono font-black text-[#184530] text-xs block">
+                              Rp {(row.price ?? 79000).toLocaleString("id-ID")}
+                            </span>
+                            <div className="flex items-center gap-1.5 text-[10px] text-[#6B8075] font-mono">
+                              <span className="line-through text-[#8FA599]">
+                                Rp {(row.base_price ?? 199000).toLocaleString("id-ID")}
+                              </span>
+                              <span className="text-emerald-700 font-bold">
+                                (-{row.discount ?? 60}%)
+                              </span>
+                            </div>
+                          </div>
                         </td>
 
                         {/* Payment Date */}
@@ -773,12 +813,61 @@ export default function OperatorDashboardPage() {
                 />
               </div>
 
-              {/* Dates with Helpers */}
+              {/* Pricing & Discount Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-[#2D3E35] text-[11px]">Base Price (Rp)</label>
+                  <input
+                    type="number"
+                    value={editingRecord.base_price ?? 199000}
+                    onChange={(e) => {
+                      const bp = Number(e.target.value);
+                      const discPercent = Number(editingRecord.discount ?? 60);
+                      setEditingRecord({
+                        ...editingRecord,
+                        base_price: bp,
+                        price: Math.max(0, Math.round(bp * (1 - discPercent / 100))),
+                      });
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] font-mono focus:outline-none focus:border-[#12281F]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-[#2D3E35] text-[11px]">Discount (%)</label>
+                  <input
+                    type="number"
+                    value={editingRecord.discount ?? 60}
+                    onChange={(e) => {
+                      const discPercent = Number(e.target.value);
+                      const bp = Number(editingRecord.base_price ?? 199000);
+                      setEditingRecord({
+                        ...editingRecord,
+                        discount: discPercent,
+                        price: Math.max(0, Math.round(bp * (1 - discPercent / 100))),
+                      });
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] font-mono focus:outline-none focus:border-[#12281F]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-[#2D3E35] text-[11px]">Final Price (Rp)</label>
+                  <input
+                    type="number"
+                    value={editingRecord.price ?? 79000}
+                    onChange={(e) =>
+                      setEditingRecord({ ...editingRecord, price: Number(e.target.value) })
+                    }
+                    className="w-full px-3 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#184530] font-black font-mono focus:outline-none focus:border-[#12281F]"
+                  />
+                </div>
+              </div>
+
+              {/* Dates with Datetime-Local Picker & Quick Presets */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Datetime Payment */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-[#2D3E35]">Tgl Payment (MS)</label>
+                    <label className="font-bold text-[#2D3E35]">Tgl Payment</label>
                     <button
                       type="button"
                       onClick={() => setEditingRecord({ ...editingRecord, datetime_payment: Date.now() })}
@@ -788,27 +877,38 @@ export default function OperatorDashboardPage() {
                     </button>
                   </div>
                   <input
-                    type="number"
-                    value={editingRecord.datetime_payment || 0}
-                    onChange={(e) => setEditingRecord({ ...editingRecord, datetime_payment: Number(e.target.value) })}
-                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] font-mono focus:outline-none focus:border-[#12281F]"
+                    type="datetime-local"
+                    value={msToDatetimeLocal(editingRecord.datetime_payment)}
+                    onChange={(e) =>
+                      setEditingRecord({
+                        ...editingRecord,
+                        datetime_payment: datetimeLocalToMs(e.target.value),
+                      })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F] cursor-pointer"
                   />
-                  <span className="text-[10px] text-[#6B8075]">
-                    {editingRecord.datetime_payment ? new Date(Number(editingRecord.datetime_payment)).toLocaleString("id-ID") : "-"}
+                  <span className="text-[10px] text-[#6B8075] block">
+                    {editingRecord.datetime_payment
+                      ? new Date(Number(editingRecord.datetime_payment)).toLocaleString("id-ID", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })
+                      : "-"}
                   </span>
                 </div>
 
                 {/* Datetime Expired */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-[#2D3E35]">Tgl Expired (MS)</label>
+                    <label className="font-bold text-[#2D3E35]">Tgl Expired</label>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() =>
                           setEditingRecord({
                             ...editingRecord,
-                            datetime_expired: (editingRecord.datetime_expired || Date.now()) + 30 * 86400000,
+                            datetime_expired:
+                              (Number(editingRecord.datetime_expired) || Date.now()) + 30 * 86400000,
                           })
                         }
                         className="text-[10.5px] font-bold text-[#184530] hover:underline cursor-pointer"
@@ -820,7 +920,8 @@ export default function OperatorDashboardPage() {
                         onClick={() =>
                           setEditingRecord({
                             ...editingRecord,
-                            datetime_expired: (editingRecord.datetime_expired || Date.now()) + 365 * 86400000,
+                            datetime_expired:
+                              (Number(editingRecord.datetime_expired) || Date.now()) + 365 * 86400000,
                           })
                         }
                         className="text-[10.5px] font-bold text-[#184530] hover:underline cursor-pointer"
@@ -830,13 +931,23 @@ export default function OperatorDashboardPage() {
                     </div>
                   </div>
                   <input
-                    type="number"
-                    value={editingRecord.datetime_expired || 0}
-                    onChange={(e) => setEditingRecord({ ...editingRecord, datetime_expired: Number(e.target.value) })}
-                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] font-mono focus:outline-none focus:border-[#12281F]"
+                    type="datetime-local"
+                    value={msToDatetimeLocal(editingRecord.datetime_expired)}
+                    onChange={(e) =>
+                      setEditingRecord({
+                        ...editingRecord,
+                        datetime_expired: datetimeLocalToMs(e.target.value),
+                      })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F] cursor-pointer"
                   />
-                  <span className="text-[10px] text-[#6B8075]">
-                    {editingRecord.datetime_expired ? new Date(Number(editingRecord.datetime_expired)).toLocaleString("id-ID") : "-"}
+                  <span className="text-[10px] text-[#6B8075] block">
+                    {editingRecord.datetime_expired
+                      ? new Date(Number(editingRecord.datetime_expired)).toLocaleString("id-ID", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })
+                      : "-"}
                   </span>
                 </div>
               </div>

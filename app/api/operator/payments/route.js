@@ -137,6 +137,9 @@ export async function PUT(request) {
       request_budget,
       status,
       note_plan,
+      base_price,
+      discount,
+      price,
     } = body;
 
     if (!uid) {
@@ -155,22 +158,30 @@ export async function PUT(request) {
       p_datetime_expired: datetime_expired !== undefined ? Number(datetime_expired) : null,
       p_request_budget: request_budget !== undefined ? Number(request_budget) : null,
       p_status: status !== undefined ? String(status).toLowerCase() : null,
+      p_base_price: base_price !== undefined ? Number(base_price) : null,
+      p_discount: discount !== undefined ? Number(discount) : null,
+      p_price: price !== undefined ? Number(price) : null,
     });
 
     if (error) {
       console.error("[Operator Payments PUT] Error:", error.message);
       // Fallback direct update
+      const updatePayload = {
+        jenis_plan: Number(jenis_plan),
+        datetime_payment: Number(datetime_payment),
+        datetime_expired: Number(datetime_expired),
+        request_budget: Number(request_budget),
+        status: String(status).toLowerCase(),
+        note_plan: String(note_plan),
+        updated_at: new Date().toISOString(),
+      };
+      if (base_price !== undefined) updatePayload.base_price = Number(base_price);
+      if (discount !== undefined) updatePayload.discount = Number(discount);
+      if (price !== undefined) updatePayload.price = Number(price);
+
       const { data: fallbackUpdated, error: fallbackError } = await supabase
         .from("tb_payment")
-        .update({
-          jenis_plan: Number(jenis_plan),
-          datetime_payment: Number(datetime_payment),
-          datetime_expired: Number(datetime_expired),
-          request_budget: Number(request_budget),
-          status: String(status).toLowerCase(),
-          note_plan: String(note_plan),
-          updated_at: new Date().toISOString(),
-        })
+        .update(updatePayload)
         .eq("uid", uid)
         .select()
         .maybeSingle();
