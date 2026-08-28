@@ -41,7 +41,7 @@ export default function PricingSection() {
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
 
-          {/* 1. FREE TRIAL 14 HARI */}
+          {/* 1. FREE TRIAL 15 HARI */}
           <div className="rounded-3xl bg-white border border-[#DEE7DF] p-8 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#CFE2D3] transition-all relative">
             <div className="space-y-6">
               {/* Badge & Title */}

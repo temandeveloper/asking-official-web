@@ -5,13 +5,8 @@ import {
   MessageSquare,
   Bot,
   Zap,
-  Kanban,
-  CheckCircle2,
-  Calendar,
-  Layers,
-  ArrowRight,
-  Clock,
-  Sparkles,
+  Unplug,
+  ShieldCheck,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
@@ -69,8 +64,8 @@ export default function NodeWorkflowSection() {
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-[#11231B]">WhatsApp</div>
-                    <div className="text-[10px] text-emerald-700 font-medium">Online • Connected</div>
+                    <div className="text-xs font-bold text-[#11231B]">Abdullah</div>
+                    <div className="text-[10px] text-emerald-700 font-medium">typing...</div>
                   </div>
                 </div>
               </div>
@@ -118,16 +113,12 @@ export default function NodeWorkflowSection() {
                 className="w-full py-4 px-3.5 rounded-2xl bg-[#12281F] text-white border border-[#234235] shadow-md text-center space-y-1.5"
               >
                 <div className="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-[#18362B] text-[#B8F55C] border border-[#2A5241] mx-auto">
-                  <Zap className="w-3.5 h-3.5" />
+                  <Unplug className="w-3.5 h-3.5" />
                 </div>
 
                 <div className="text-xs font-bold text-[#B8F55C] leading-snug">
                   {t("integration.node2_action")}
                 </div>
-
-                <p className="text-[10px] text-[#A5B8AD] leading-tight">
-                  {t("integration.node2_desc")}
-                </p>
               </motion.div>
             </div>
 
@@ -199,7 +190,7 @@ export default function NodeWorkflowSection() {
 
           {/* Bottom Note */}
           <div className="mt-8 text-center text-xs text-[#556A60] flex items-center justify-center gap-2 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>
               {language === "id"
                 ? "Seluruh tiket dan pesan pelanggan tersimpan secara Local-First di komputer Anda tanpa pihak ketiga."

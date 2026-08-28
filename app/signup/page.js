@@ -382,21 +382,6 @@ export default function SignupPage() {
                     {t("auth.sign_in_link")}
                   </Link>
                 </div>
-
-                <div className="pt-1 border-t border-[#EBF1EB]">
-                  <button
-                    type="button"
-                    onClick={() => setIsSupportModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-xs text-[#4A5F54] hover:text-[#184530] font-semibold transition-colors cursor-pointer"
-                  >
-                    <Headphones className="w-3.5 h-3.5 text-[#184530]" />
-                    <span>
-                      {language === "en"
-                        ? "Need help with registration? Contact Support"
-                        : "Butuh bantuan mendaftar? Hubungi Tim Support"}
-                    </span>
-                  </button>
-                </div>
               </div>
             </div>
           )}

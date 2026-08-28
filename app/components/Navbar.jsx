@@ -84,6 +84,13 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-7 text-[14px] font-semibold text-[#3D5247]">
+          <a
+            href="/#concern"
+            className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#184530]" />
+            <span>{t("nav.data_privacy")}</span>
+          </a>
           {/* Solutions Dropdown */}
           <div className="relative group">
             <button
@@ -136,14 +143,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          <a
-            href="/#concern"
-            className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
-          >
-            <ShieldCheck className="w-4 h-4 text-[#184530]" />
-            <span>{t("nav.data_privacy")}</span>
-          </a>
 
           <a
             href="/#appshowcase"
@@ -292,18 +291,11 @@ export default function Navbar() {
         <div className="md:hidden bg-white/95 backdrop-blur-xl border-b border-[#DEE7DF] px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-200">
           <nav className="flex flex-col space-y-3 font-semibold text-sm text-[#3D5247]">
             <a
-              href="/#omnichannel"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 hover:text-[#11231B]"
-            >
-              Omnichannel Messaging (WhatsApp, Telegram)
-            </a>
-            <a
-              href="/#privacy"
+              href="/#concern"
               onClick={() => setMobileMenuOpen(false)}
               className="py-1.5 hover:text-[#11231B] text-[#184530] font-bold"
             >
-              {t("nav.data_privacy")} (Local-First)
+              <span>{t("nav.data_privacy")}</span>
             </a>
             <a
               href="/#features"
@@ -311,6 +303,13 @@ export default function Navbar() {
               className="py-1.5 hover:text-[#11231B]"
             >
               {t("nav.solutions")}
+            </a>
+            <a
+              href="/#appshowcase"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-1.5 hover:text-[#11231B]"
+            >
+              <span>{t("nav.app_showcase")}</span>
             </a>
             <a
               href="/#pricing"

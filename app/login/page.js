@@ -278,21 +278,6 @@ function LoginForm() {
             {t("auth.start_free_trial")}
           </Link>
         </div>
-
-        <div className="pt-1 border-t border-[#EBF1EB]">
-          <button
-            type="button"
-            onClick={() => setIsSupportModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs text-[#4A5F54] hover:text-[#184530] font-semibold transition-colors cursor-pointer"
-          >
-            <Headphones className="w-3.5 h-3.5 text-[#184530]" />
-            <span>
-              {language === "en"
-                ? "Having trouble logging in? Contact Support"
-                : "Mengalami kendala login? Hubungi Tim Support"}
-            </span>
-          </button>
-        </div>
       </div>
 
       <ContactSupportModal
