@@ -6,7 +6,7 @@ export default function Testimonial() {
   const { t } = useTranslation();
 
   return (
-    <section id="testimonials" className="py-20 md:py-28 bg-[#F8FAF7] border-b border-[#DEE7DF]">
+    <section id="concern" className="py-20 md:py-28 bg-[#F8FAF7] border-b border-[#DEE7DF]">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 text-center">
         {/* Quote Icon */}
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#E5EFE7] text-[#184530] mb-8 shadow-2xs">

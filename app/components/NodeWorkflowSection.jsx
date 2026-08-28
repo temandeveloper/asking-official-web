@@ -176,7 +176,7 @@ export default function NodeWorkflowSection() {
                     {t("integration.ticket_priority")}
                   </span>
                   <span className="inline-flex items-center gap-1 text-[#556A60] bg-white px-2 py-0.5 rounded border border-[#DEE7DF] text-[10px]">
-                    📅 {t("integration.ticket_date")}
+                    {t("integration.ticket_date")}
                   </span>
                 </div>
 

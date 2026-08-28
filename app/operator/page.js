@@ -535,8 +535,8 @@ export default function OperatorDashboardPage() {
                     const statusBadge =
                       row.status === "active"
                         ? { label: "Active", bg: "bg-emerald-50 text-emerald-800 border-emerald-200" }
-                        : row.status === "pending"
-                          ? { label: "Pending", bg: "bg-amber-50 text-amber-800 border-amber-200" }
+                        : row.status === "suspended"
+                          ? { label: "Suspended", bg: "bg-amber-50 text-amber-800 border-amber-200" }
                           : { label: "Expired", bg: "bg-rose-50 text-rose-800 border-rose-200" };
 
                     const paymentDate = row.datetime_payment
@@ -777,7 +777,6 @@ export default function OperatorDashboardPage() {
                     className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F] cursor-pointer"
                   >
                     <option value="active">Active</option>
-                    <option value="pending">Pending</option>
                     <option value="expired">Expired</option>
                     <option value="suspended">Suspended</option>
                   </select>
@@ -890,9 +889,9 @@ export default function OperatorDashboardPage() {
                   <span className="text-[10px] text-[#6B8075] block">
                     {editingRecord.datetime_payment
                       ? new Date(Number(editingRecord.datetime_payment)).toLocaleString("id-ID", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
                       : "-"}
                   </span>
                 </div>
@@ -944,9 +943,9 @@ export default function OperatorDashboardPage() {
                   <span className="text-[10px] text-[#6B8075] block">
                     {editingRecord.datetime_expired
                       ? new Date(Number(editingRecord.datetime_expired)).toLocaleString("id-ID", {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
                       : "-"}
                   </span>
                 </div>

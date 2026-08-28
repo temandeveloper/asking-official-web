@@ -8,7 +8,7 @@ import {
   Sparkles,
   Bot,
   CalendarClock,
-  CheckCircle2,
+  ThumbsUp,
   Clock,
   ShieldCheck,
   Zap,
@@ -25,7 +25,7 @@ export default function FeaturesBento() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E5EFE7] border border-[#CFE2D3] text-xs font-bold text-[#184530]">
-            <Sparkles className="w-3.5 h-3.5" />
+            <ThumbsUp className="w-3.5 h-3.5" />
             <span>{t("features.tag")}</span>
           </div>
 
@@ -40,7 +40,7 @@ export default function FeaturesBento() {
 
         {/* Bento Grid (Balanced 3-Column Layout: Row 1: 2+1, Row 2: 1+1+1) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-          
+
           {/* ========================================================================= */}
           {/* ROW 1: Card 1 (Span 2) + Card 2 (Span 1) */}
           {/* ========================================================================= */}
@@ -68,7 +68,7 @@ export default function FeaturesBento() {
             {/* Channels Grid with Rounded-Square App Tiles */}
             <div className="space-y-4 pt-2">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                
+
                 {/* 1. WhatsApp Channel Tile */}
                 <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all space-y-3 shadow-2xs group">
                   <div className="flex items-center justify-between">

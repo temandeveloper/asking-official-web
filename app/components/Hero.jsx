@@ -4,11 +4,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Sparkles,
+  UserShield,
   ShieldCheck,
   MessageSquare,
   Lock,
-  Laptop,
   Bot,
   Ticket,
 } from "lucide-react";
@@ -110,7 +109,7 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E5EFE7] border border-[#CFE2D3] text-xs font-bold text-[#184530] shadow-2xs mb-6"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#184530]" />
+            <UserShield className="w-3.5 h-3.5 text-[#184530]" />
             <span>{t("hero.badge")}</span>
           </motion.div>
 

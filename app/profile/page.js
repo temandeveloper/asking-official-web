@@ -301,8 +301,30 @@ export default function ProfilePage() {
   const startMs = paymentData?.datetime_payment ? Number(paymentData.datetime_payment) : Date.now();
   const expiredMs = paymentData?.datetime_expired ? Number(paymentData.datetime_expired) : Date.now() + 15 * 24 * 60 * 60 * 1000;
   const nowMs = Date.now();
-  const isExpired = nowMs > expiredMs;
-  const daysRemaining = Math.max(0, Math.ceil((expiredMs - nowMs) / (1000 * 60 * 60 * 24)));
+
+  // Actual database status evaluation
+  const rawStatus = String(paymentData?.status || "active").trim().toLowerCase();
+  const isSuspended = rawStatus === "suspended";
+  const isExpired = rawStatus === "expired" || (!isSuspended && (nowMs > expiredMs));
+  const daysRemaining = (isExpired || isSuspended) ? 0 : Math.max(0, Math.ceil((expiredMs - nowMs) / (1000 * 60 * 60 * 24)));
+
+  const statusBadge = isSuspended
+    ? {
+      label: language === "id" ? "Ditangguhkan" : "Suspended",
+      badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+      dotClass: "bg-amber-500",
+    }
+    : isExpired
+      ? {
+        label: language === "id" ? "Kedaluwarsa" : "Expired",
+        badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
+        dotClass: "bg-rose-500",
+      }
+      : {
+        label: language === "id" ? "Aktif" : "Active",
+        badgeClass: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
+        dotClass: "bg-emerald-500 animate-pulse",
+      };
 
   const startDateFormatted = new Date(startMs).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
     year: "numeric",
@@ -480,7 +502,7 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               }}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#B8F55C]" />
+              <CreditCard className="w-3.5 h-3.5 text-[#B8F55C]" />
               <span>{isPro ? t("profile.renew_plan_btn") : t("profile.upgrade_plan_btn")}</span>
             </button>
           </div>
@@ -497,9 +519,9 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                   {planName}
                 </span>
               </div>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100/80 text-emerald-800 border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                {isExpired ? t("profile.plan_status_expired") : t("profile.plan_status_active")}
+              <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge.badgeClass}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dotClass}`} />
+                {statusBadge.label}
               </span>
             </div>
 
@@ -541,14 +563,20 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                 <span>{expiredDateFormatted}</span>
               </div>
               <span
-                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${isExpired
-                  ? "bg-rose-100 text-rose-700"
-                  : "bg-purple-100 text-purple-800"
+                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${isSuspended
+                  ? "bg-amber-100 text-amber-800"
+                  : isExpired
+                    ? "bg-rose-100 text-rose-700"
+                    : "bg-purple-100 text-purple-800"
                   }`}
               >
-                {isExpired
-                  ? t("profile.plan_expired_badge")
-                  : t("profile.plan_remaining_days", { days: daysRemaining })}
+                {isSuspended
+                  ? language === "id"
+                    ? "Akun Ditangguhkan"
+                    : "Account Suspended"
+                  : isExpired
+                    ? t("profile.plan_expired_badge")
+                    : t("profile.plan_remaining_days", { days: daysRemaining })}
               </span>
             </div>
           </div>

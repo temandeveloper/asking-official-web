@@ -6,7 +6,7 @@ import {
   ChevronDown,
   Menu,
   X,
-  User,
+  GalleryThumbnails,
   Globe,
   Download,
   Sparkles,
@@ -138,11 +138,19 @@ export default function Navbar() {
           </div>
 
           <a
-            href="/#privacy"
+            href="/#concern"
             className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
           >
             <ShieldCheck className="w-4 h-4 text-[#184530]" />
             <span>{t("nav.data_privacy")}</span>
+          </a>
+
+          <a
+            href="/#appshowcase"
+            className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
+          >
+            <GalleryThumbnails className="w-4 h-4 text-[#184530]" />
+            <span>{t("nav.app_showcase")}</span>
           </a>
 
           <a
@@ -188,8 +196,8 @@ export default function Navbar() {
                     setLangDropdownOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "id"
-                      ? "bg-[#12281F] text-[#B8F55C]"
-                      : "text-[#3D5247] hover:bg-[#F2F7F3]"
+                    ? "bg-[#12281F] text-[#B8F55C]"
+                    : "text-[#3D5247] hover:bg-[#F2F7F3]"
                     }`}
                 >
                   <div className="flex items-center gap-2">
@@ -206,8 +214,8 @@ export default function Navbar() {
                     setLangDropdownOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "en"
-                      ? "bg-[#12281F] text-[#B8F55C]"
-                      : "text-[#3D5247] hover:bg-[#F2F7F3]"
+                    ? "bg-[#12281F] text-[#B8F55C]"
+                    : "text-[#3D5247] hover:bg-[#F2F7F3]"
                     }`}
                 >
                   <div className="flex items-center gap-2">
