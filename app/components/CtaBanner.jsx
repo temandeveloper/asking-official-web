@@ -43,7 +43,7 @@ export default function CtaBanner() {
           {/* Right Action Buttons */}
           <div className="relative z-10 flex flex-col items-center lg:items-end gap-3.5 w-full lg:w-auto">
             <Link
-              href="/signup"
+              href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
               className="relative w-full flex items-center justify-between gap-4 px-6 py-4.5 rounded-2xl bg-[#B8F55C] text-[#11281F] font-black shadow-xl hover:bg-[#A8EB4B] transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
             >
               <div className="flex items-center gap-3.5 text-left">

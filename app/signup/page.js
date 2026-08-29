@@ -32,6 +32,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
@@ -60,6 +61,10 @@ export default function SignupPage() {
     }
     if (password !== repeatPassword) {
       setError(language === "id" ? "Konfirmasi kata sandi tidak cocok." : "Passwords do not match. Please re-enter.");
+      return;
+    }
+    if (!termsAccepted) {
+      setError(t("auth.terms_required_error"));
       return;
     }
 
@@ -340,17 +345,17 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                {/* Terms disclaimer */}
-                <p className="text-[11px] text-[#6B8075] leading-relaxed pt-1">
-                  {t("auth.terms_agree_prefix")}{" "}
-                  <Link href="/term" className="underline font-semibold text-[#11231B]">
-                    {t("auth.terms_link")}
-                  </Link>{" "}
-                  {t("auth.and_word")}{" "}
-                  <Link href="/privacy" className="underline font-semibold text-[#11231B]">
-                    {t("auth.privacy_link")}
-                  </Link>.
-                </p>
+                {/* Required legal consent */}
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input id="signup-terms-consent" type="checkbox" required checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} aria-invalid={Boolean(error && !termsAccepted)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#12281F] cursor-pointer" />
+                  <label htmlFor="signup-terms-consent" className="text-[11px] text-[#6B8075] leading-relaxed cursor-pointer">
+                    {t("auth.terms_checkbox_prefix")} {" "}
+                    <Link href="/term" className="underline font-semibold text-[#11231B]">{t("auth.terms_link")}</Link>{" "}
+                    {t("auth.and_word")}{" "}
+                    <Link href="/privacy" className="underline font-semibold text-[#11231B]">{t("auth.privacy_link")}</Link>{" "}
+                    {t("auth.terms_checkbox_suffix")}
+                  </label>
+                </div>
 
                 {/* Submit Button */}
                 <button

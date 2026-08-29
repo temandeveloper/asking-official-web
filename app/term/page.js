@@ -63,8 +63,8 @@ export default function TermsPage() {
               </h1>
               <p className="text-xs text-[#556A60]">
                 {language === "id"
-                  ? "Terakhir Diperbarui: 24 Agustus 2026"
-                  : "Last Updated: August 24, 2026"}
+                  ? "Terakhir Diperbarui: 29 Agustus 2026"
+                  : "Last Updated: August 29, 2026"}
               </p>
             </div>
 
@@ -175,8 +175,17 @@ export default function TermsPage() {
                       <span>Pemberitahuan Penting: Integrasi Saluran WhatsApp</span>
                     </div>
                     <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed font-medium">
-                      Channel ini menggunakan unofficial WhatsApp gateway. Kami menggunakan teknik khusus untuk mengurangi potensi ban terhadap nomor yang terhubung, tapi potensi ban akan tetap ada. Pengguna bertanggung jawab penuh atas aktivitas pengiriman pesan, kepatuhan terhadap kebijakan anti-spam WhatsApp, dan regulasi perlindungan data pelanggan yang berlaku. Oleh karena itu gunakan secara bijak, kami menghimbau untuk tidak menggunakan nomor WhatsApp pribadi utama untuk disambungkan. Segala bentuk ban atau pemblokiran nomor yang terjadi bukan merupakan tanggung jawab kami.
+                      Channel ini menggunakan <b>Unofficial WhatsApp gateway</b>. Official WhatsApp Business API dapat mengenakan biaya yang cukup tinggi untuk setiap pesan, sehingga AsKing menggunakan gateway alternatif yang lebih terjangkau dan didukung oleh komunitas pengembang global yang besar. Gateway ini bukan produk resmi, tidak berafiliasi dengan atau didukung oleh Meta, dan tidak menjamin nomor bebas dari pemblokiran. Pengguna tetap bertanggung jawab atas aktivitas pengiriman pesan, persetujuan penerima, kepatuhan terhadap kebijakan anti-spam WhatsApp, dan regulasi perlindungan data yang berlaku. Gunakan nomor khusus bisnis secara bijak; kami tidak menyarankan menghubungkan nomor WhatsApp pribadi utama. Segala bentuk ban atau pembatasan nomor yang terjadi bukan merupakan tanggung jawab kami.
                     </p>
+                    <div className="text-xs sm:text-sm text-amber-900/90 leading-relaxed">
+                      <p className="font-bold mb-1">Tips penggunaan untuk mengurangi risiko pembatasan:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Lakukan warm-up nomor baru selama 3–7 hari dengan interaksi manual dua arah yang wajar, termasuk percakapan personal, grup aktif, dan panggilan suara/video.</li>
+                        <li>Batasi nomor baru sekitar 20–50 pesan per hari. Untuk nomor yang sudah matang, naikkan secara bertahap hingga sekitar 80–200 pesan per hari.</li>
+                        <li>Hindari lonjakan trafik atau burst traffic mendadak karena dapat memicu peninjauan otomatis dari sistem Meta.</li>
+                      </ul>
+                      <p className="mt-2">Panduan ini hanya mengurangi risiko dan bukan jaminan bahwa akun tidak akan dibatasi atau diblokir.</p>
+                    </div>
                   </div>
                 </section>
 
@@ -229,6 +238,10 @@ export default function TermsPage() {
                       <p>
                         Anda memegang hak kepemilikan penuh atas basis pengetahuan perusahaan, data kontak, dan tiket yang Anda kelola di dalam AsKing.
                       </p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">Batas Penggunaan AI</h3>
+                      <p>Kuota AI mengikuti periode paket atau akses yang berlaku. Sisa kuota akan hangus saat periode berakhir dan di-reset pada periode berikutnya. Kuota tidak bersifat akumulatif dan tidak dapat dibawa ke periode berikutnya, kecuali dinyatakan lain pada informasi paket yang berlaku.</p>
                     </div>
                   </div>
                 </section>
@@ -285,6 +298,20 @@ export default function TermsPage() {
                   <p>
                     Aplikasi AsKing, termasuk desain antarmuka, logo, kode sumber aplikasi, nama merek, dan dokumentasi dilindungi oleh undang-undang hak kekayaan intelektual. Seluruh hak yang tidak diberikan secara tegas dalam Ketentuan ini tetap menjadi hak eksklusif dari AsKing Project by GoDiscus.
                   </p>
+                </section>
+
+                {/* Section 8: Refund & Subscription Cancellation */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">8</span>Kebijakan Refund & Pembatalan Langganan</h2>
+                  <p>Anda dapat membatalkan langganan kapan saja. Pembatalan menghentikan perpanjangan berikutnya, sedangkan akses berbayar tetap tersedia sampai akhir periode pembayaran yang telah dibayar.</p>
+                  <ul className="list-disc list-inside space-y-1.5 pl-2">
+                    <li>Untuk pembatalan biasa (Ordinary cancellation), kami tidak memberikan refund prorata atas sisa waktu. Akses berbayar tetap tersedia sampai akhir periode yang telah dibayar.</li>
+                    <li>Masa tenggang refund selama 14 hari berlaku sejak pembayaran pertama untuk langganan baru, baik paket bulanan maupun tahunan, dengan mempertimbangkan apakah layanan telah digunakan secara material, aturan payment provider, dan hukum yang berlaku.</li>
+                    <li>Untuk perpanjangan otomatis tahunan, masa tenggang refund 14 hari dihitung sejak tanggal perpanjangan dan tetap tunduk pada peninjauan penggunaan, aturan payment provider, dan hukum yang berlaku.</li>
+                    <li>Refund dapat ditinjau untuk tagihan ganda, kegagalan aktivasi atau provisioning, transaksi tidak sah, atau keadaan lain yang diwajibkan hukum.</li>
+                    <li>Ajukan permintaan refund ke <a href="mailto:asking@godiscus.com" className="text-[#184530] font-bold underline">asking@godiscus.com</a> dengan informasi akun dan transaksi yang relevan.</li>
+                  </ul>
+                  <p>Permintaan di luar kondisi tersebut ditinjau berdasarkan kasus per kasus. Ketentuan ini tidak mengurangi hak konsumen yang tidak dapat dikesampingkan berdasarkan hukum yang berlaku.</p>
                 </section>
 
                 {/* Section 9: Termination */}
@@ -454,8 +481,17 @@ export default function TermsPage() {
                       <span>Important Notice: WhatsApp Channel Integration</span>
                     </div>
                     <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed font-medium">
-                      This channel utilizes an unofficial WhatsApp gateway. We employ specialized techniques to minimize the risk of number bans; however, the possibility of a ban remains. Users assume full responsibility for all messaging activities, adherence to WhatsApp's anti-spam policies, and compliance with applicable customer data privacy laws. Please use responsibly. We strongly advise against connecting your primary personal WhatsApp phone number. Any bans or restrictions imposed on connected numbers are strictly outside our liability.
+                      This channel uses an <b>Unofficial WhatsApp Gateway</b>. The official WhatsApp Business API may involve substantial per-message costs, so AsKing uses an alternative gateway that is more affordable and supported by a large global developer community. This gateway is not an official Meta product, is not affiliated with or endorsed by Meta, and cannot guarantee that a connected number will avoid restrictions. Users remain responsible for messaging activity, recipient consent, WhatsApp anti-spam compliance, and applicable data-protection laws. Use a dedicated business number responsibly; we strongly advise against connecting your primary personal WhatsApp number. Any bans or restrictions imposed on connected numbers are outside our liability.
                     </p>
+                    <div className="text-xs sm:text-sm text-amber-900/90 leading-relaxed">
+                      <p className="font-bold mb-1">Risk-reduction guidance:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Warm up a new number for 3–7 days through normal two-way manual activity, including legitimate conversations, active groups, and reasonable voice or video calls.</li>
+                        <li>Limit a new number to approximately 20–50 messages per day. For a warmed number, increase gradually toward approximately 80–200 messages per day.</li>
+                        <li>Avoid sudden traffic spikes or burst traffic, as abrupt high-volume activity may trigger automated review by Meta systems.</li>
+                      </ul>
+                      <p className="mt-2">This guidance only reduces risk and is not a guarantee against account restrictions or bans.</p>
+                    </div>
                   </div>
                 </section>
 
@@ -508,6 +544,10 @@ export default function TermsPage() {
                       <p>
                         You retain total ownership over your company knowledge base, customer contacts, and tickets managed within AsKing.
                       </p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">AI Usage Limits</h3>
+                      <p>AI quotas apply to the applicable plan or access period. Unused quota expires when that period ends and resets at the beginning of the next period. Quotas do not accumulate and cannot be rolled over, unless the applicable plan information expressly states otherwise.</p>
                     </div>
                   </div>
                 </section>
@@ -564,6 +604,20 @@ export default function TermsPage() {
                   <p>
                     The AsKing application, interface designs, branding, logos, codebases, and documentation are protected by copyright and intellectual property laws. All rights not expressly granted herein remain the exclusive property of AsKing Project by GoDiscus.
                   </p>
+                </section>
+
+                {/* Section 8: Refund & Subscription Cancellation */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">8</span>Refund & Subscription Cancellation Policy</h2>
+                  <p>You may cancel your subscription at any time. Cancellation stops the next renewal, while paid access remains available until the end of the already-paid billing period.</p>
+                  <ul className="list-disc list-inside space-y-1.5 pl-2">
+                    <li>Ordinary cancellations are not eligible for prorated refunds for unused time. Paid access remains available until the end of the period already paid for.</li>
+                    <li>A 14-day refund grace period applies from the first payment for a new subscription, whether monthly or annual, subject to material usage, payment-provider rules, and applicable law.</li>
+                    <li>For an annual auto-renewal, the 14-day refund grace period begins on the renewal date and remains subject to usage review, payment-provider rules, and applicable law.</li>
+                    <li>Refunds may be reviewed for duplicate charges, failed activation or provisioning, unauthorized transactions, or other circumstances required by law.</li>
+                    <li>Submit refund requests to <a href="mailto:asking@godiscus.com" className="text-[#184530] font-bold underline">asking@godiscus.com</a> with the relevant account and transaction details.</li>
+                  </ul>
+                  <p>Requests outside these conditions are assessed case by case. Nothing in this policy limits non-waivable consumer rights under applicable law.</p>
                 </section>
 
                 {/* Section 9: Termination */}
