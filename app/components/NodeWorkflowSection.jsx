@@ -92,6 +92,10 @@ export default function NodeWorkflowSection() {
                     "{t("integration.ai_reply")}"
                   </p>
                 </div>
+                {/* warning AI response for representation */}
+                <small className="text-[10px] text-[#6B8075] italic leading-relaxed pt-2 border-t border-[#DEE7DF]">
+                  {t("integration.ai_disclaimer")}
+                </small>
               </div>
             </motion.div>
 
