@@ -191,11 +191,6 @@ Pertanyaan / Kendala: `;
               <Phone className="w-3.5 h-3.5 text-emerald-600" />
               <span>WhatsApp Support: {formattedPhone}</span>
             </div>
-            <p className="text-[11px] text-[#7A9386]">
-              {language === "en"
-                ? "Active Daily • Response time < 5 mins"
-                : "Aktif Setiap Hari • Respon Cepat < 5 Menit"}
-            </p>
           </div>
 
           {/* Action Buttons */}
