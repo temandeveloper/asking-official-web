@@ -426,7 +426,7 @@ export default function OperatorDashboardPage() {
             <div className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
               {metrics.totalAiBudget.toLocaleString("id-ID")}
             </div>
-            <p className="text-[11px] text-[#6B8075]">Alokasi request AI aktif di sistem</p>
+            <p className="text-[11px] text-[#6B8075]">Alokasi credit AI aktif di sistem</p>
           </div>
         </div>
 
