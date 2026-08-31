@@ -38,6 +38,14 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
+  function WindowsIcon({ className = "w-4 h-4" }) {
+    return (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.802" />
+      </svg>
+    );
+  }
+
   const router = useRouter();
   const { t, language, toggleLanguage } = useTranslation();
 
@@ -465,11 +473,22 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
 
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
             <Link
-              href="/#features"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs"
+              href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
+              className="relative w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
             >
-              <span>{t("profile.explore_features")}</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2.5 text-left">
+                <div className="w-8 h-8 rounded-full bg-[#11281F] text-[#B8F55C] flex items-center justify-center shrink-0">
+                  <WindowsIcon className="w-4 h-4 fill-current" />
+                </div>
+                <div>
+                  <div className="text-[9px] uppercase tracking-wider font-extrabold text-[#193F2D] flex items-center gap-1">
+                    <span>{t("cta.ms_store_desc")}</span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-black text-[#0B1A13] tracking-tight leading-tight">
+                    {t("cta.btn_download")}
+                  </div>
+                </div>
+              </div>
             </Link>
           </div>
         </div>
