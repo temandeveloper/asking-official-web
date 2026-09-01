@@ -448,10 +448,6 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               </p>
 
               <div className="flex items-center gap-4 text-[11px] text-[#8EA096] pt-1 flex-wrap">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {t("profile.member_since", { date: createdDate })}
-                </span>
                 <span className="flex items-center gap-1 font-mono">
                   <Fingerprint className="w-3 h-3" />
                   {t("profile.user_id")}: {user?.id?.slice(0, 8)}...
@@ -770,7 +766,7 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               <div className="bg-[#12281F] text-white p-6 sm:p-7 flex items-center justify-between border-b border-[#234235]">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#B8F55C]" />
+                    <CreditCard className="w-4 h-4 text-[#B8F55C]" />
                     <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
                       {t("profile.modal_upgrade_title")}
                     </h3>

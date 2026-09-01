@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Sparkles,
+  Info,
   Inbox,
   Globe,
   Headphones,
@@ -190,7 +190,7 @@ export default function SignupPage() {
 
               <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-left space-y-2 text-xs text-[#4A5F54]">
                 <p className="font-bold text-[#11231B] flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#184530]" /> {t("auth.next_steps_title")}
+                  <Info className="w-4 h-4 text-[#184530]" /> {t("auth.next_steps_title")}
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-[11px] leading-relaxed">
                   <li>{t("auth.next_step_1")}</li>

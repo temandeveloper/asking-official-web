@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Sparkles, Zap, ShieldCheck, ArrowRight, Building2, HelpCircle } from "lucide-react";
+import { Check, ThumbsUp, Zap, ShieldCheck, ArrowRight, Building2, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
@@ -113,7 +113,7 @@ export default function PricingSection() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-[11px] font-bold text-[#B8F55C]">
-                    <Sparkles className="w-3.5 h-3.5 text-[#B8F55C]" />
+                    <ThumbsUp className="w-3.5 h-3.5 text-[#B8F55C]" />
                     <span>{language === "id" ? "Rekomendasi Utama" : "Best Value"}</span>
                   </div>
                   <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-[11px] font-bold text-rose-300">
