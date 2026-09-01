@@ -4,7 +4,7 @@ import { Check, Sparkles, Zap, ShieldCheck, ArrowRight, Building2, HelpCircle } 
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
-import { trackMetaCustomEvent } from "@/lib/metaPixel";
+import { trackMetaLinkEvent } from "@/lib/metaPixel";
 
 export default function PricingSection() {
   const { t, language } = useTranslation();
@@ -93,7 +93,10 @@ export default function PricingSection() {
             <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
               <Link
                 href="/signup"
-                onClick={() => trackMetaCustomEvent("StartSignup", { plan: "free_trial", placement: "pricing" })}
+                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
+                  content_name: "AsKing Free Trial",
+                  content_category: "pricing",
+                })}
                 className="w-full py-3.5 px-6 rounded-2xl bg-[#EBF1EB] hover:bg-[#DDE7DE] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
               >
                 <span>{t("pricing.trial_cta")}</span>
@@ -168,7 +171,12 @@ export default function PricingSection() {
             <div className="pt-8 mt-6 border-t border-[#234235]">
               <Link
                 href="/signup"
-                onClick={() => trackMetaCustomEvent("StartSignup", { plan: "pro_business", placement: "pricing" })}
+                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
+                  content_name: "AsKing Pro Business",
+                  content_category: "pricing",
+                  currency: "IDR",
+                  value: PRICING_CONFIG.proRawAmount,
+                })}
                 className="w-full py-4 px-6 rounded-2xl bg-[#B8F55C] hover:bg-[#A6EA47] text-[#11281F] font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl cursor-pointer group"
               >
                 <span>{t("pricing.pro_cta")}</span>
