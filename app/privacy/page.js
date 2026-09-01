@@ -176,6 +176,13 @@ export default function PrivacyPage() {
                       </ul>
                     </div>
                   </div>
+
+                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
+                    <h3 className="mb-1.5 font-bold text-[#11231B]">Pengukuran Website dan Pemasaran</h3>
+                    <p>
+                      Situs web kami menggunakan Meta Pixel untuk mengukur kunjungan halaman, interaksi dengan paket, pendaftaran akun yang berhasil, dan klik menuju Microsoft Store. Meta dapat menerima pengenal browser/perangkat serta aktivitas pada situs web ini sesuai kebijakan privasinya. Kami tidak mengirim isi pesan pelanggan, kontak, tiket, atau data bisnis lokal aplikasi Anda melalui Meta Pixel.
+                    </p>
+                  </div>
                 </section>
 
                 {/* Section 4: AI Processing via Gemini */}
@@ -396,6 +403,13 @@ export default function PrivacyPage() {
                         <li>Desktop app single sign-on (SSO) session status</li>
                       </ul>
                     </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
+                    <h3 className="mb-1.5 font-bold text-[#11231B]">Website Measurement and Marketing</h3>
+                    <p>
+                      Our website uses Meta Pixel to measure page visits, pricing interactions, successful account registrations, and clicks to Microsoft Store. Meta may receive browser/device identifiers and activity on this website under its privacy policy. We do not send customer message content, contacts, tickets, or your app&apos;s local business data through Meta Pixel.
+                    </p>
                   </div>
                 </section>
 

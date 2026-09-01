@@ -8,6 +8,7 @@ import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { trackMetaCustomEvent } from "@/lib/metaPixel";
 import { QRCodeSVG } from "qrcode.react";
 import {
   User,
@@ -474,6 +475,7 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
             <Link
               href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
+              onClick={() => trackMetaCustomEvent("ClickMicrosoftStore", { placement: "profile_download" })}
               className="relative w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
             >
               <div className="flex items-center gap-2.5 text-left">
@@ -516,6 +518,10 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
             <button
               type="button"
               onClick={() => {
+                trackMetaCustomEvent("StartUpgrade", {
+                  action: isPro ? "renew" : "upgrade",
+                  current_plan: isPro ? "pro_business" : "free_trial",
+                });
                 setShowQrConfirmation(false);
                 setIsUpgradeModalOpen(true);
               }}
@@ -993,7 +999,13 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                     <div className="pt-1">
                       <button
                         type="button"
-                        onClick={() => setShowQrConfirmation(true)}
+                        onClick={() => {
+                          trackMetaCustomEvent("SubmitPaymentConfirmation", {
+                            plan: selectedPlan === "pro" ? "pro_business" : "advance_business",
+                            payment_method: "bca_transfer",
+                          });
+                          setShowQrConfirmation(true);
+                        }}
                         className="w-full py-3.5 px-6 rounded-2xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
                       >
                         <Send className="w-4 h-4" />

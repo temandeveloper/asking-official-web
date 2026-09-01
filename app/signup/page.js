@@ -7,6 +7,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { trackMetaEvent } from "@/lib/metaPixel";
 import {
   User,
   Mail,
@@ -103,6 +104,7 @@ export default function SignupPage() {
             : "An account with this email address already exists. Please log in."
         );
       } else {
+        trackMetaEvent("CompleteRegistration", { content_name: "AsKing account" });
         setSignupSuccess(true);
       }
     } catch (err) {

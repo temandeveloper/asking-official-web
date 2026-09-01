@@ -1,6 +1,9 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import MetaPixel from "./components/MetaPixel";
+
+const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1555283875673178";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,6 +31,7 @@ export default function RootLayout({ children }) {
     <html lang="id" className={`${plusJakartaSans.variable} font-sans scroll-smooth`}>
       <body className="bg-[#F8FAF7] text-[#11231B] antialiased selection:bg-[#B8F55C] selection:text-[#11281F]">
         <LanguageProvider>{children}</LanguageProvider>
+        <MetaPixel pixelId={metaPixelId} />
       </body>
     </html>
   );
