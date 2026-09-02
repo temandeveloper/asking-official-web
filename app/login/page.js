@@ -25,6 +25,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isVerified = searchParams.get("verified") === "true";
+  const passwordWasReset = searchParams.get("reset") === "true";
   const { t, language } = useTranslation();
 
   const [email, setEmail] = useState("");
@@ -169,6 +170,13 @@ function LoginForm() {
         </div>
       )}
 
+      {passwordWasReset && (
+        <div className="flex items-start gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 animate-in slide-in-from-top-2 duration-150">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]" />
+          <div><p className="font-bold">{t("auth.password_reset_success_title")}</p><p className="mt-0.5 text-[11px] text-emerald-700">{t("auth.password_reset_success_desc")}</p></div>
+        </div>
+      )}
+
       {/* Error Alert */}
       {error && (
         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs space-y-2 animate-in slide-in-from-top-2 duration-150">
@@ -223,6 +231,9 @@ function LoginForm() {
             <label className="block text-xs font-bold text-[#2D3E35]">
               {t("auth.password_label")}
             </label>
+            <Link href="/auth/forgot-password" className="text-[11px] font-bold text-[#184530] hover:underline">
+              {t("auth.forgot_password_link")}
+            </Link>
           </div>
           <div className="relative">
             <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
@@ -297,7 +308,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#F8FAF7] flex flex-col justify-between hero-grid relative overflow-hidden text-[#11231B]">
       {/* Glow Orbs */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-radial from-[#B8F55C]/20 via-[#B8F55C]/5 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-10 left-1/2 h-87.5 w-150 -translate-x-1/2 -z-10 bg-radial from-[#B8F55C]/20 via-[#B8F55C]/5 to-transparent blur-3xl pointer-events-none" />
 
       {/* Header Bar */}
       <header className="max-w-7xl w-full mx-auto px-6 sm:px-8 py-6 flex items-center justify-between">
