@@ -15,7 +15,7 @@ const BANNERS = [
     type: "intro",
     eyebrow: "CUSTOMER MANAGER LOCAL-FIRST",
     title: "Data Bisnis Anda Tidak\nAkan Pernah Lagi\nMeninggalkan Perangkat Anda",
-    description: "Kelola pesan WhatsApp, Telegram, tiket, dan pelanggan dalam satu aplikasi desktop yang cepat, rapi, dan lebih privat.",
+    description: "Kelola pesan WhatsApp, Telegram, tiket pelayanan, dan pelanggan dalam satu aplikasi desktop yang cepat, rapi, dan lebih privat.",
     accent: "#B8F55C",
   },
   {
