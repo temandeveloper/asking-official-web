@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.tb_payment (
     note_plan TEXT DEFAULT 'free trial',
     datetime_payment BIGINT,
     datetime_expired BIGINT,
-    request_budget INT DEFAULT 50,
+    request_budget INT DEFAULT 300,
     status TEXT DEFAULT 'active', -- 'active' | 'pending' | 'expired' | 'suspended'
     base_price BIGINT, -- Inisialisasi dinamis dari PRICING_CONFIG.proOriginalPrice
     discount INT,      -- Persentase diskon dinamis dari PRICING_CONFIG.proDiscountPercent (e.g. 60)

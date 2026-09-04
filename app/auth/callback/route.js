@@ -107,7 +107,7 @@ async function ensureUserPayment(supabase, userId) {
         note_plan: "free trial",
         datetime_payment: nowMs,
         datetime_expired: expiredMs,
-        request_budget: 50,
+        request_budget: 300,
         status: "active",
         base_price: basePrice,
         discount: discount,
