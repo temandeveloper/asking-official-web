@@ -166,7 +166,7 @@ function PriceBlock({ compact = false }) {
       </div>
       <div className="flex flex-col items-start gap-1">
         <span className="mb-1 rounded-full bg-[#B8F55C] px-3 py-1.5 text-xs font-black text-[#11281F]">Hemat {PRICING_CONFIG.proDiscountPercent}%</span>
-        <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-[11px] font-bold text-rose-300">
+        <div className="inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-full border border-rose-500/40 bg-rose-500/20 px-2.5 py-1 text-[11px] font-bold text-rose-300">
           <span>🔥 Harga Flat, Promo Terbatas</span>
         </div>
       </div>
@@ -190,6 +190,7 @@ function waitForImages(node) {
 
 export default function AdBannerStudio() {
   const [activeId, setActiveId] = useState(BANNERS[0].id);
+  const [aspectRatio, setAspectRatio] = useState("portrait");
   const [exporting, setExporting] = useState(null);
   const [exportError, setExportError] = useState("");
   const bannerRef = useRef(null);
@@ -203,12 +204,13 @@ export default function AdBannerStudio() {
 
     const { toPng } = await import("html-to-image");
     const width = bannerRef.current.getBoundingClientRect().width;
+    const exportHeight = aspectRatio === "portrait" ? 1920 : 1080;
 
     return toPng(bannerRef.current, {
       cacheBust: true,
       pixelRatio: 1080 / width,
       canvasWidth: 1080,
-      canvasHeight: 1080,
+      canvasHeight: exportHeight,
       backgroundColor: "#0B1713",
     });
   }
@@ -229,13 +231,14 @@ export default function AdBannerStudio() {
         link.click();
       } else {
         const { jsPDF } = await import("jspdf");
+        const exportHeight = aspectRatio === "portrait" ? 1920 : 1080;
         const pdf = new jsPDF({
           orientation: "portrait",
           unit: "px",
-          format: [1080, 1080],
+          format: [1080, exportHeight],
           hotfixes: ["px_scaling"],
         });
-        pdf.addImage(dataUrl, "PNG", 0, 0, 1080, 1080, undefined, "FAST");
+        pdf.addImage(dataUrl, "PNG", 0, 0, 1080, exportHeight, undefined, "FAST");
         pdf.save(`${filename}.pdf`);
       }
     } catch (error) {
@@ -258,13 +261,13 @@ export default function AdBannerStudio() {
               Banner ads yang menjual satu ide dengan jelas.
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#556A60]">
-              Pilih konsep, review di kanvas 1:1, lalu unduh materi siap pakai untuk Meta Ads.
+              Pilih konsep, gunakan kanvas konten 1:1, lalu ekspor sebagai banner square atau portrait 9:16.
             </p>
           </div>
           <div className="rounded-2xl border border-[#CFE2D3] bg-white px-4 py-3 text-xs text-[#556A60] shadow-sm">
-            <span className="font-bold text-[#184530]">1080 x 1080 px</span>
+            <span className="font-bold text-[#184530]">{aspectRatio === "portrait" ? "1080 x 1920 px" : "1080 x 1080 px"}</span>
             <span className="mx-2 text-[#A5B8AD]">/</span>
-            Satu pesan, satu bukti, satu CTA
+            Konten tetap 1:1
           </div>
         </div>
 
@@ -272,12 +275,16 @@ export default function AdBannerStudio() {
           <div className="mx-auto w-full max-w-180">
             <div
               ref={bannerRef}
-              className="relative aspect-square w-full overflow-hidden bg-[#0B1713] p-[6.5%] text-white shadow-2xl ring-1 ring-[#234235]"
-              style={{ "--banner-accent": activeBanner.accent }}
+              className="relative w-full overflow-hidden bg-[#0B1713] text-white shadow-2xl ring-1 ring-[#234235]"
+              style={{ "--banner-accent": activeBanner.accent, aspectRatio: aspectRatio === "portrait" ? "9 / 16" : "1 / 1", background: "linear-gradient(180deg, #0B1713 0%, #07110D 100%)" }}
             >
+              <div
+                contentEditable="true"
+                suppressContentEditableWarning
+                className={`relative left-0 w-full aspect-square p-[6.5%] ${aspectRatio === "portrait" ? "absolute top-1/2 -translate-y-1/2" : ""}`}
+              >
               {/* corner glow effect */}
               <div className="absolute right-[-12%] top-[-15%] h-[48%] w-[55%] rounded-full bg-(--banner-accent) opacity-10 blur-3xl" />
-              <div className="absolute bottom-0 left-0 h-[42%] w-full bg-linear-to-t from-[#07110D] to-transparent" />
 
               <div className="relative z-10 flex h-full flex-col">
                 <div className="flex items-center justify-between">
@@ -310,6 +317,8 @@ export default function AdBannerStudio() {
                     </div>
                     <div className="max-w-[88%]">
                       <p className="mt-5 max-w-155 text-[clamp(0.78rem,1.6vw,1.05rem)] font-medium leading-relaxed text-[#C4D2C9]">{activeBanner.description}</p>
+                    </div>
+                    <div className="max-w-[100%]">
                       <PriceBlock />
                     </div>
                   </div>
@@ -392,6 +401,7 @@ export default function AdBannerStudio() {
                   </div>
                 )}
               </div>
+              </div>
             </div>
           </div>
 
@@ -416,6 +426,32 @@ export default function AdBannerStudio() {
                       <span className="block text-xs font-bold text-[#11231B]">{banner.label}</span>
                       <span className="mt-0.5 block text-[10px] text-[#6B8075]">{isActive ? "Sedang dipreview" : "Gunakan konsep ini"}</span>
                     </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="my-5 h-px bg-[#EEF3EF]" />
+            <div className="mb-3">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#6B8075]">Rasio export</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#6B8075]">Konten banner selalu dipertahankan dalam proporsi 1:1.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              {[
+                { id: "square", label: "Square", size: "1080 x 1080" },
+                { id: "portrait", label: "Portrait", size: "1080 x 1920" },
+              ].map((option) => {
+                const isSelected = aspectRatio === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => setAspectRatio(option.id)}
+                    className={`rounded-xl border px-3 py-2.5 text-left transition-all focus:outline-none focus:ring-2 focus:ring-[#B8F55C] focus:ring-offset-2 ${isSelected ? "border-[#184530] bg-[#F2F7F3]" : "border-[#DEE7DF] bg-white hover:border-[#AFC8B6]"}`}
+                  >
+                    <span className="block text-xs font-bold text-[#11231B]">{option.label}</span>
+                    <span className="mt-0.5 block text-[10px] text-[#6B8075]">{option.size} px</span>
                   </button>
                 );
               })}
