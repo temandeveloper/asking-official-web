@@ -359,6 +359,7 @@ export default function ProfilePage() {
   const fallbackDiscount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
   const fallbackPrice = Number(PRICING_CONFIG.proRawAmount) || 79000;
 
+  const hasPaidPlan = isPro || isProPlus;
   const userBasePrice = paymentData?.base_price ?? fallbackBasePrice;
   const userDiscount = paymentData?.discount ?? fallbackDiscount; // percentage
   const userPrice = paymentData?.price ?? fallbackPrice;
@@ -522,16 +523,17 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               type="button"
               onClick={() => {
                 trackMetaCustomEvent("StartUpgrade", {
-                  action: isPro ? "renew" : "upgrade",
-                  current_plan: isPro ? "pro_business" : "free_trial",
+                  action: hasPaidPlan ? "renew" : "upgrade",
+                  current_plan: isProPlus ? "pro_plus_business" : isPro ? "pro_business" : "free_trial",
                 });
+                setSelectedPlan(isProPlus ? "pro_plus" : "pro");
                 setShowQrConfirmation(false);
                 setIsUpgradeModalOpen(true);
               }}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer shrink-0"
             >
               <CreditCard className="w-3.5 h-3.5 text-[#B8F55C]" />
-              <span>{isPro ? t("profile.renew_plan_btn") : t("profile.upgrade_plan_btn")}</span>
+              <span>{hasPaidPlan ? t("profile.renew_plan_btn") : t("profile.upgrade_plan_btn")}</span>
             </button>
           </div>
 
@@ -803,82 +805,86 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                         {t("profile.modal_select_plan")}
                       </h4>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className={`grid grid-cols-1 gap-3.5 ${!hasPaidPlan ? "sm:grid-cols-2" : ""}`}>
                         {/* Pro Business Option */}
-                        <div
-                          onClick={() => setSelectedPlan("pro")}
-                          className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro"
-                            ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
-                            : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
-                            }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-black text-[#11231B]">
-                              {t("profile.modal_pro_title")}
-                            </span>
-                          </div>
+                        {!isProPlus && (
+                          <div
+                            onClick={() => setSelectedPlan("pro")}
+                            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro"
+                              ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
+                              : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
+                              }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-black text-[#11231B]">
+                                {t("profile.modal_pro_title")}
+                              </span>
+                            </div>
 
-                          {/* Price & Breakdown */}
-                          <div className="space-y-1.5 py-1">
-                            <div className="flex items-baseline justify-between text-xs text-[#556A60]">
-                              <span>Base Price:</span>
-                              <span className="font-mono text-[#8FA599] line-through font-medium">
-                                Rp {formattedBasePrice}
-                              </span>
-                            </div>
-                            <div className="flex items-baseline justify-between text-xs text-[#556A60]">
-                              <span>Discount:</span>
-                              <span className="font-mono text-emerald-700 font-bold">
-                                -{userDiscount}%
-                              </span>
-                            </div>
-                            <div className="flex items-baseline justify-between pt-1.5 border-t border-[#DEE7DF]">
-                              <span className="text-xs font-bold text-[#11231B]">Total Price:</span>
-                              <span className="text-lg font-black text-[#184530]">
-                                Rp {formattedPrice}
-                                <span className="text-xs font-normal text-[#556A60]">
-                                  {t("profile.modal_pro_period")}
+                            {/* Price & Breakdown */}
+                            <div className="space-y-1.5 py-1">
+                              <div className="flex items-baseline justify-between text-xs text-[#556A60]">
+                                <span>Base Price:</span>
+                                <span className="font-mono text-[#8FA599] line-through font-medium">
+                                  Rp {isPro ? formattedBasePrice : PRICING_CONFIG.proOriginalPrice}
                                 </span>
-                              </span>
+                              </div>
+                              <div className="flex items-baseline justify-between text-xs text-[#556A60]">
+                                <span>Discount:</span>
+                                <span className="font-mono text-emerald-700 font-bold">
+                                  -{isPro ? userDiscount : PRICING_CONFIG.proDiscountPercent}%
+                                </span>
+                              </div>
+                              <div className="flex items-baseline justify-between pt-1.5 border-t border-[#DEE7DF]">
+                                <span className="text-xs font-bold text-[#11231B]">Total Price:</span>
+                                <span className="text-lg font-black text-[#184530]">
+                                  Rp {isPro ? formattedPrice : PRICING_CONFIG.proPrice}
+                                  <span className="text-xs font-normal text-[#556A60]">
+                                    {t("profile.modal_pro_period")}
+                                  </span>
+                                </span>
+                              </div>
                             </div>
-                          </div>
 
-                          <ul className="text-[11px] text-[#556A60] mt-3 space-y-1 border-t border-[#E5EFE7] pt-2">
-                            <li className="flex items-center gap-1.5">
-                              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                              <span>Flat Payment</span>
-                            </li>
-                          </ul>
-                        </div>
+                            <ul className="text-[11px] text-[#556A60] mt-3 space-y-1 border-t border-[#E5EFE7] pt-2">
+                              <li className="flex items-center gap-1.5">
+                                <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                                <span>Flat Payment</span>
+                              </li>
+                            </ul>
+                          </div>
+                        )}
 
                         {/* Pro+ Business One-Time Option */}
-                        <div
-                          onClick={() => setSelectedPlan("pro_plus")}
-                          className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro_plus"
-                            ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
-                            : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
-                            }`}
-                        >
-                          <div className="flex items-center justify-between mb-1 gap-2">
-                            <span className="text-sm font-black text-[#11231B]">
-                              {t("profile.modal_pro_plus_title")}
-                            </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530] whitespace-nowrap">
-                              {t("profile.modal_pro_plus_badge")}
-                            </span>
+                        {!isPro && (
+                          <div
+                            onClick={() => setSelectedPlan("pro_plus")}
+                            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro_plus"
+                              ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
+                              : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
+                              }`}
+                          >
+                            <div className="flex items-center justify-between mb-1 gap-2">
+                              <span className="text-sm font-black text-[#11231B]">
+                                {t("profile.modal_pro_plus_title")}
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530] whitespace-nowrap">
+                                {t("profile.modal_pro_plus_badge")}
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-2 mt-2">
+                              <span className="text-sm font-semibold text-[#8FA599] line-through">
+                                Rp {PRICING_CONFIG.proPlusOriginalPrice}
+                              </span>
+                              <span className="text-xl font-black text-[#184530]">
+                                Rp {PRICING_CONFIG.proPlusPrice}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-[#556A60] mt-2 leading-relaxed">
+                              {t("profile.modal_pro_plus_desc")}
+                            </p>
                           </div>
-                          <div className="flex items-baseline gap-2 mt-2">
-                            <span className="text-sm font-semibold text-[#8FA599] line-through">
-                              Rp {PRICING_CONFIG.proPlusOriginalPrice}
-                            </span>
-                            <span className="text-xl font-black text-[#184530]">
-                              Rp {PRICING_CONFIG.proPlusPrice}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-[#556A60] mt-2 leading-relaxed">
-                            {t("profile.modal_pro_plus_desc")}
-                          </p>
-                        </div>
+                        )}
                       </div>
                     </div>
 
