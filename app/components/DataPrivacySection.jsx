@@ -99,7 +99,7 @@ export default function DataPrivacySection() {
               </div>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#18362B] text-[#B8F55C] text-xs font-bold border border-[#234235]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#B8F55C]" />
-                100% Data On-Device
+                {t("privacy.asking_badge")}
               </span>
             </div>
 

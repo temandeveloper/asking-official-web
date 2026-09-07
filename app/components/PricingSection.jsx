@@ -11,11 +11,16 @@ export default function PricingSection() {
 
   const trialFeatures = t("pricing.trial_features") || [];
   const proFeatures = t("pricing.pro_features") || [];
-  const advanceFeatures = t("pricing.advance_features") || [];
+  const proPlusFeatures = t("pricing.pro_plus_features") || [];
 
   const displayOriginalPrice = t("pricing.pro_original_price") || `Rp ${PRICING_CONFIG.proOriginalPrice}`;
   const displayPrice = t("pricing.pro_price") || `Rp ${PRICING_CONFIG.proPrice}`;
   const displayDiscount = `${PRICING_CONFIG.proDiscountPercent}%`;
+  const displayProPlusOriginalPrice =
+    t("pricing.pro_plus_original_price") || `Rp ${PRICING_CONFIG.proPlusOriginalPrice}`;
+  const displayProPlusPrice =
+    t("pricing.pro_plus_price") || `Rp ${PRICING_CONFIG.proPlusPrice}`;
+  const displayProPlusDiscount = `${PRICING_CONFIG.proPlusDiscountPercent}%`;
 
   return (
     <section id="pricing" className="py-24 px-6 sm:px-8 bg-[#F2F7F3] border-t border-[#DEE7DF] relative overflow-hidden">
@@ -105,9 +110,88 @@ export default function PricingSection() {
             </div>
           </div>
 
-          {/* 2. PRO BUSINESS (FEATURED CARD) */}
-          <div className="rounded-3xl bg-[#12281F] border-2 border-[#B8F55C] p-8 shadow-xl flex flex-col justify-between relative transform lg:-translate-y-2 text-white">
+          {/* 2. PRO BUSINESS (MONTHLY) */}
+          <div className="rounded-3xl bg-white border border-[#DEE7DF] p-8 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#CFE2D3] transition-all relative">
 
+            <div className="space-y-6">
+              {/* Badge & Title */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-[11px] font-bold text-rose-700">
+                    <span>🔥 {t("pricing.pro_discount_badge")}</span>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-black text-[#11231B] tracking-tight">
+                  {t("pricing.pro_title")}
+                </h3>
+                <p className="text-xs text-[#556A60] leading-relaxed min-h-[36px]">
+                  {t("pricing.pro_desc")}
+                </p>
+              </div>
+
+              {/* Price */}
+              <div className="pt-2 pb-4 border-b border-[#EBF1EB]">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-sm font-semibold text-[#8FA599] line-through">
+                    {displayOriginalPrice}
+                  </span>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs uppercase tracking-wider">
+                    {language === "id" ? `Hemat ${displayDiscount}` : `Save ${displayDiscount}`}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl sm:text-5xl font-black text-[#11231B] tracking-tight">
+                    {displayPrice}
+                  </span>
+                  <span className="text-xs font-semibold text-[#556A60]">
+                    {t("pricing.pro_period")}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[11px] font-bold text-[#184530]">
+                {t("pricing.trial_payment_note")}
+              </p>
+
+              {/* Features List */}
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
+                  {language === "id" ? "Seluruh Fitur Unggulan:" : "Everything Included:"}
+                </div>
+                <ul className="space-y-2.5">
+                  {Array.isArray(proFeatures) &&
+                    proFeatures.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#4B6055]">
+                        <div className="w-4 h-4 rounded-full bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 mt-0.5 font-black text-[10px]">
+                          ✓
+                        </div>
+                        <span className="leading-tight">{feat}</span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
+              <Link
+                href="/signup?plan=pro"
+                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
+                  content_name: "AsKing Pro Business",
+                  content_category: "pricing",
+                  currency: "IDR",
+                  value: PRICING_CONFIG.proRawAmount,
+                })}
+                className="w-full py-3.5 px-6 rounded-2xl bg-[#EBF1EB] hover:bg-[#DDE7DE] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
+              >
+                <span>{t("pricing.pro_cta")}</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* 3. PRO+ BUSINESS (FEATURED ONE-TIME PAYMENT) */}
+          <div className="rounded-3xl bg-[#12281F] border-2 border-[#B8F55C] p-8 shadow-xl flex flex-col justify-between relative transform lg:-translate-y-2 text-white">
             <div className="space-y-6 pt-2">
               {/* Badge & Title */}
               <div className="space-y-3">
@@ -117,14 +201,14 @@ export default function PricingSection() {
                     <span>{language === "id" ? "Rekomendasi Utama" : "Best Value"}</span>
                   </div>
                   <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-[11px] font-bold text-rose-300">
-                    <span>🔥 {t("pricing.pro_discount_badge")}</span>
+                    <span>🔥 {language === "id" ? `Promo Terbatas • ${PRICING_CONFIG.proPlusPromoLimit}` : `Limited Promo • First ${PRICING_CONFIG.proPlusPromoLimit.replace(/\D/g, "")} Customers`}</span>
                   </div>
                 </div>
                 <h3 className="text-3xl font-black text-white tracking-tight">
-                  {t("pricing.pro_title")}
+                  {t("pricing.pro_plus_title")}
                 </h3>
                 <p className="text-xs text-[#A1B8AC] leading-relaxed min-h-[36px]">
-                  {t("pricing.pro_desc")}
+                  {t("pricing.pro_plus_desc")}
                 </p>
               </div>
 
@@ -132,33 +216,36 @@ export default function PricingSection() {
               <div className="pt-2 pb-4 border-b border-[#234235]">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="text-sm font-semibold text-[#8EA096] line-through">
-                    {displayOriginalPrice}
+                    {displayProPlusOriginalPrice}
                   </span>
                   <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500 text-white shadow-xs uppercase tracking-wider">
-                    {language === "id" ? `Hemat ${displayDiscount}` : `Save ${displayDiscount}`}
+                    {language === "id" ? `Hemat ${displayProPlusDiscount}` : `Save ${displayProPlusDiscount}`}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-4xl sm:text-5xl font-black text-[#B8F55C] tracking-tight">
-                    {displayPrice}
-                  </span>
-                  <span className="text-xs font-semibold text-[#A1B8AC]">
-                    {t("pricing.pro_period")}
+                    {displayProPlusPrice}
                   </span>
                 </div>
+                <div className="mt-2 text-[11px] font-semibold text-[#A1B8AC] flex items-center gap-1">
+                  <Building2 className="w-3 h-3 text-[#B8F55C]" />
+                  <span>{t("pricing.pro_plus_period")}</span>
+                </div>
               </div>
-
+              <p className="text-[11px] font-bold text-[#B8F55C]">
+                {t("pricing.trial_payment_note")}
+              </p>
               {/* Features List */}
               <div className="space-y-3 pt-2">
                 <div className="text-xs font-bold uppercase tracking-wider text-white">
-                  {language === "id" ? "Seluruh Fitur Unggulan:" : "Everything Included:"}
+                  {language === "id" ? "Fitur Pro+ Business:" : "Pro+ Business Benefits:"}
                 </div>
                 <ul className="space-y-2.5">
-                  {Array.isArray(proFeatures) &&
-                    proFeatures.map((feat, idx) => (
+                  {Array.isArray(proPlusFeatures) &&
+                    proPlusFeatures.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs text-[#DEE7DF]">
-                        <div className="w-4 h-4 rounded-full bg-[#B8F55C] text-[#11281F] flex items-center justify-center shrink-0 mt-0.5 font-black text-[10px]">
-                          ✓
+                        <div className="w-4 h-4 rounded-full bg-[#B8F55C] text-[#11281F] flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">
+                          +
                         </div>
                         <span className="leading-tight">{feat}</span>
                       </li>
@@ -170,77 +257,18 @@ export default function PricingSection() {
             {/* CTA Button */}
             <div className="pt-8 mt-6 border-t border-[#234235]">
               <Link
-                href="/signup"
+                href="/signup?plan=pro_plus"
                 onClick={(event) => trackMetaLinkEvent(event, "Lead", {
-                  content_name: "AsKing Pro Business",
+                  content_name: "AsKing Pro+ Business",
                   content_category: "pricing",
                   currency: "IDR",
-                  value: PRICING_CONFIG.proRawAmount,
+                  value: PRICING_CONFIG.proPlusRawAmount,
                 })}
                 className="w-full py-4 px-6 rounded-2xl bg-[#B8F55C] hover:bg-[#A6EA47] text-[#11281F] font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl cursor-pointer group"
               >
-                <span>{t("pricing.pro_cta")}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 3. ADVANCE BUSINESS (COMING SOON) */}
-          <div className="rounded-3xl bg-white border border-[#DEE7DF] p-8 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#CFE2D3] transition-all relative">
-            <div className="space-y-6">
-              {/* Badge & Title */}
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-800">
-                  <span>{t("pricing.advance_badge")}</span>
-                </div>
-                <h3 className="text-2xl font-black text-[#11231B] tracking-tight">
-                  {t("pricing.advance_title")}
-                </h3>
-                <p className="text-xs text-[#556A60] leading-relaxed min-h-[36px]">
-                  {t("pricing.advance_desc")}
-                </p>
-              </div>
-
-              {/* Price */}
-              <div className="pt-2 pb-4 border-b border-[#EBF1EB]">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl sm:text-4xl font-black text-[#11231B] tracking-tight">
-                    {t("pricing.advance_price")}
-                  </span>
-                </div>
-                <div className="mt-2 text-[11px] font-semibold text-[#556A60] flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-[#184530]" />
-                  <span>{t("pricing.advance_period")}</span>
-                </div>
-              </div>
-              {/* Features List */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
-                  {language === "id" ? "Fitur Advance & Kolaborasi:" : "Advance Capabilities:"}
-                </div>
-                <ul className="space-y-2.5">
-                  {Array.isArray(advanceFeatures) &&
-                    advanceFeatures.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#4B6055]">
-                        <div className="w-4 h-4 rounded-full bg-emerald-100 text-[#184530] flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">
-                          +
-                        </div>
-                        <span className="leading-tight">{feat}</span>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
-              <a
-                href="mailto:asking@godiscus.com?subject=Inquiry%20Advance%20Business%20Plan%20AsKing"
-                className="w-full py-3.5 px-6 rounded-2xl bg-white border border-[#CFE2D3] hover:bg-[#F2F7F3] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
-              >
-                <span>{t("pricing.advance_cta")}</span>
+                <span>{t("pricing.pro_plus_cta")}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -254,12 +282,12 @@ export default function PricingSection() {
             </div>
             <div>
               <div className="text-sm font-bold text-[#11231B]">
-                {language === "id" ? "100% Kedaulatan Data Lokal" : "100% Local Data Sovereignty"}
+                {language === "id" ? "Data Operasional Lokal" : "Local Operational Data"}
               </div>
               <div className="text-xs text-[#556A60]">
                 {language === "id"
-                  ? "Seluruh data pelanggan Anda tersimpan di komputer sendiri. Tidak ada biaya pesan tersembunyi."
-                  : "All customer records reside on your machine. Zero hidden per-message cloud fees."}
+                  ? "Data operasional utama dikelola di perangkat Anda. Tidak ada biaya pesan tersembunyi."
+                  : "Core operational data is managed on your device. No hidden per-message fees."}
               </div>
             </div>
           </div>

@@ -9,7 +9,7 @@ import {
   Bot,
   CalendarClock,
   ThumbsUp,
-  Clock,
+  Mail,
   ShieldCheck,
   Zap,
   Radio,
@@ -67,7 +67,7 @@ export default function FeaturesBento() {
 
             {/* Channels Grid with Rounded-Square App Tiles */}
             <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
 
                 {/* 1. WhatsApp Channel Tile */}
                 <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all space-y-3 shadow-2xs group">
@@ -107,15 +107,29 @@ export default function FeaturesBento() {
                   </div>
                 </div>
 
+                {/* 4. E-Mail Channel Tile */}
+                <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all space-y-3 shadow-2xs group opacity-90 hover:opacity-100">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-2xl bg-white border border-[#DEE7DF] shadow-xs flex items-center justify-center text-purple-600 group-hover:scale-105 transition-transform">
+                      <Mail className="w-6 h-6 text-[#5B6B8A]" />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#11231B]">
+                      {t("features.omnichannel_name_email")}
+                    </h4>
+                    <p className="text-[10px] text-[#556A60] mt-0.5 leading-snug">
+                      {t("features.omnichannel_desc_email")}
+                    </p>
+                  </div>
+                </div>
+
                 {/* 3. Live Chat Widget Channel Tile */}
                 <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all space-y-3 shadow-2xs group opacity-90 hover:opacity-100">
                   <div className="flex items-center justify-between">
                     <div className="w-11 h-11 rounded-2xl bg-white border border-[#DEE7DF] shadow-xs flex items-center justify-center text-purple-600 group-hover:scale-105 transition-transform">
                       <MessageCircle className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-semibold text-[#556A60] bg-[#EBF1EB] px-2.5 py-0.5 rounded-full">
-                      {t("features.omnichannel_status_chat")}
-                    </span>
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-[#11231B]">
@@ -126,6 +140,8 @@ export default function FeaturesBento() {
                     </p>
                   </div>
                 </div>
+
+
 
               </div>
 

@@ -49,7 +49,7 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Floating Interactive Badge 2: Top-Right (100% Local Data Ownership) */}
+        {/* Floating Interactive Badge 2: Top-Right (Local Operational Data) */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,10 +61,10 @@ export default function Hero() {
           </div>
           <div className="text-left pr-2">
             <div className="text-[11px] font-bold text-[#B8F55C] flex items-center gap-1">
-              <span>100% Local-First</span>
+              <span>{t("hero.badge_local_data")}</span>
               <Lock className="w-3 h-3 text-[#B8F55C]" />
             </div>
-            <p className="text-[10px] text-[#A5B8AD]">Data Stays On Your Device</p>
+            <p className="text-[10px] text-[#A5B8AD]">Local-first operational data</p>
           </div>
         </motion.div>
 
@@ -146,13 +146,13 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
-            <a
-              href="#download"
+            <Link
+              href="/signup"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] font-bold text-[15px] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 border border-[#234235]"
             >
               <WindowsIcon className="w-4 h-4 fill-current" />
               <span>{t("hero.cta_primary")}</span>
-            </a>
+            </Link>
             <a
               href="#features"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all"

@@ -1,12 +1,13 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Testimonial from "./components/Testimonial";
+import StatementConcern from "./components/StatementConcern";
 import StatsBanner from "./components/StatsBanner";
 import DataPrivacySection from "./components/DataPrivacySection";
 import FeaturesBento from "./components/FeaturesBento";
 import InteractiveAppExplorer from "./components/InteractiveAppExplorer";
 import NodeWorkflowSection from "./components/NodeWorkflowSection";
 import PricingSection from "./components/PricingSection";
+import FounderSection from "./components/FounderSection";
 import CtaBanner from "./components/CtaBanner";
 import Footer from "./components/Footer";
 
@@ -16,13 +17,14 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <Testimonial />
+        <StatementConcern />
         <StatsBanner />
         <DataPrivacySection />
         <FeaturesBento />
         <InteractiveAppExplorer />
         <NodeWorkflowSection />
         <PricingSection />
+        <FounderSection />
         <CtaBanner />
       </main>
       <Footer />

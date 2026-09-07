@@ -22,7 +22,7 @@ export default function IntegrationSection() {
     { name: "Telegram", icon: MessageSquare, category: "Messaging Channel", desc: "Bot API" },
     { name: "Google Gemini", icon: Sparkles, category: "AI Engine", desc: "2.5-Flash & Lite" },
     { name: "Ollama LLM", icon: Cpu, category: "Local AI Engine", desc: "Offline Inference" },
-    { name: "Local IndexedDB", icon: HardDrive, category: "Local Database", desc: "100% On-Device" },
+    { name: "Local Storage", icon: HardDrive, category: "Local Database", desc: "Operational data locally managed" },
     { name: "Supabase SSO", icon: ShieldCheck, category: "Cloud Auth", desc: "Session Bridge" },
     { name: "Desktop Native", icon: Terminal, category: "Cross-Platform", desc: "Mac, Win, Linux" },
     { name: "CSV / JSON Export", icon: Database, category: "Data Sovereignty", desc: "Manual Backup" },

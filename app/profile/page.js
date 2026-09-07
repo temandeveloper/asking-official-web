@@ -75,7 +75,7 @@ export default function ProfilePage() {
 
   // Upgrade Modal State
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("pro"); // "pro" | "advance"
+  const [selectedPlan, setSelectedPlan] = useState("pro"); // "pro" | "pro_plus"
   const [paymentAccordion, setPaymentAccordion] = useState("bca"); // "bca" | "qris"
   const [copiedBca, setCopiedBca] = useState(false);
   const [showQrConfirmation, setShowQrConfirmation] = useState(false);
@@ -300,9 +300,9 @@ export default function ProfilePage() {
   // Plan info calculation
   const planType = paymentData?.jenis_plan ?? 0;
   const isPro = planType === 1;
-  const isAdvance = planType === 2;
-  const planName = isAdvance
-    ? t("profile.plan_advance_business")
+  const isProPlus = planType === 2;
+  const planName = isProPlus
+    ? t("profile.plan_pro_plus_business")
     : isPro
       ? t("profile.plan_pro_business")
       : t("profile.plan_free_trial");
@@ -313,6 +313,7 @@ export default function ProfilePage() {
 
   // Actual database status evaluation
   const rawStatus = String(paymentData?.status || "active").trim().toLowerCase();
+  const isTrial = String(paymentData?.note_plan || "").toLowerCase().includes("free trial");
   const isSuspended = rawStatus === "suspended";
   const isExpired = rawStatus === "expired" || (!isSuspended && (nowMs > expiredMs));
   const daysRemaining = (isExpired || isSuspended) ? 0 : Math.max(0, Math.ceil((expiredMs - nowMs) / (1000 * 60 * 60 * 24)));
@@ -334,6 +335,10 @@ export default function ProfilePage() {
         badgeClass: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
         dotClass: "bg-emerald-500 animate-pulse",
       };
+
+    if (!isSuspended && !isExpired && isTrial) {
+      statusBadge.label = language === "id" ? "Trial Aktif" : "Active Trial";
+    }
 
   const startDateFormatted = new Date(startMs).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
     year: "numeric",
@@ -363,8 +368,10 @@ export default function ProfilePage() {
 
   // WhatsApp Message Payload & URL
   const whatsappNumber = "6287769005244";
-  const selectedPlanTitle = selectedPlan === "pro" ? "Pro Business (1 Bulan)" : "Advance Business";
-  const selectedPlanPrice = selectedPlan === "pro" ? `Rp ${formattedPrice}` : "Coming Soon";
+  const selectedPlanTitle = selectedPlan === "pro" ? "Pro Business (1 Bulan)" : "Pro+ Business (One-Time)";
+  const selectedPlanPrice = selectedPlan === "pro"
+    ? `Rp ${formattedPrice}`
+    : `Rp ${PRICING_CONFIG.proPlusPrice}`;
   const customerName = fullName || user?.user_metadata?.full_name || "User AsKing";
   const customerEmail = user?.email || "";
   const paymentDateStr = new Date().toLocaleDateString("id-ID", {
@@ -844,21 +851,32 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                           </ul>
                         </div>
 
-                        {/* Advance Business Option (Coming Soon) */}
-                        <div className="p-4 rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75 relative cursor-not-allowed">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-black text-[#6B8075]">
-                              {t("profile.modal_advance_title")}
+                        {/* Pro+ Business One-Time Option */}
+                        <div
+                          onClick={() => setSelectedPlan("pro_plus")}
+                          className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${selectedPlan === "pro_plus"
+                            ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
+                            : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
+                            }`}
+                        >
+                          <div className="flex items-center justify-between mb-1 gap-2">
+                            <span className="text-sm font-black text-[#11231B]">
+                              {t("profile.modal_pro_plus_title")}
                             </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
-                              Coming Soon
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530] whitespace-nowrap">
+                              {t("profile.modal_pro_plus_badge")}
                             </span>
                           </div>
-                          <div className="text-sm font-bold text-[#8FA599] mt-1">
-                            Coming Soon
+                          <div className="flex items-baseline gap-2 mt-2">
+                            <span className="text-sm font-semibold text-[#8FA599] line-through">
+                              Rp {PRICING_CONFIG.proPlusOriginalPrice}
+                            </span>
+                            <span className="text-xl font-black text-[#184530]">
+                              Rp {PRICING_CONFIG.proPlusPrice}
+                            </span>
                           </div>
-                          <p className="text-[11px] text-[#8FA599] mt-2">
-                            Multi-user, custom Gemini API key & integrasi internal.
+                          <p className="text-[11px] text-[#556A60] mt-2 leading-relaxed">
+                            {t("profile.modal_pro_plus_desc")}
                           </p>
                         </div>
                       </div>
@@ -997,7 +1015,7 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                         type="button"
                         onClick={() => {
                           trackMetaCustomEvent("SubmitPaymentConfirmation", {
-                            plan: selectedPlan === "pro" ? "pro_business" : "advance_business",
+                            plan: selectedPlan === "pro" ? "pro_business" : "pro_plus_business",
                             payment_method: "bca_transfer",
                           });
                           setShowQrConfirmation(true);
@@ -1083,8 +1101,8 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
         onClose={() => setIsSupportModalOpen(false)}
         context={supportContext}
         user={user}
-        planName={selectedPlan === "pro" ? "Pro Business" : "Advance Business"}
-        amount={PRICING_CONFIG.proPrice}
+        planName={selectedPlan === "pro" ? "Pro Business" : "Pro+ Business"}
+        amount={selectedPlan === "pro" ? PRICING_CONFIG.proPrice : PRICING_CONFIG.proPlusPrice}
       />
 
       {/* Footer */}

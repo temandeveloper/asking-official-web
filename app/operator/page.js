@@ -297,7 +297,7 @@ export default function OperatorDashboardPage() {
       p.uid,
       `"${p.user_name || "-"}"`,
       p.user_email || "-",
-      p.jenis_plan === 1 ? "Pro Business" : p.jenis_plan === 2 ? "Advance Business" : "Free Trial",
+      p.jenis_plan === 1 ? "Pro Business" : p.jenis_plan === 2 ? "Pro+ Business" : "Free Trial",
       p.datetime_payment ? new Date(Number(p.datetime_payment)).toISOString() : "-",
       p.datetime_expired ? new Date(Number(p.datetime_expired)).toISOString() : "-",
       p.request_budget || 0,
@@ -475,7 +475,7 @@ export default function OperatorDashboardPage() {
                   <option value="all">Semua Plan</option>
                   <option value="0">Free Trial (0)</option>
                   <option value="1">Pro Business (1)</option>
-                  <option value="2">Advance Business (2)</option>
+                  <option value="2">Pro+ Business (2)</option>
                 </select>
               </div>
 
@@ -529,7 +529,7 @@ export default function OperatorDashboardPage() {
                       row.jenis_plan === 1
                         ? { label: "Pro Business", bg: "bg-[#E5EFE7] text-[#184530] border-[#CFE2D3]" }
                         : row.jenis_plan === 2
-                          ? { label: "Advance Business", bg: "bg-blue-50 text-blue-800 border-blue-200" }
+                          ? { label: "Pro+ Business", bg: "bg-blue-50 text-blue-800 border-blue-200" }
                           : { label: "Free Trial", bg: "bg-[#F0F4F1] text-[#556A60] border-[#DEE7DF]" };
 
                     const statusBadge =
@@ -765,7 +765,7 @@ export default function OperatorDashboardPage() {
                   >
                     <option value={0}>0 - Free Trial</option>
                     <option value={1}>1 - Pro Business</option>
-                    <option value={2}>2 - Advance Business</option>
+                    <option value={2}>2 - Pro+ Business</option>
                   </select>
                 </div>
 

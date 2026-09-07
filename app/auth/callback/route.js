@@ -27,7 +27,7 @@ export async function GET(request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       if (data?.user && !isRecoveryFlow) {
-        await ensureUserPayment(supabase, data.user.id);
+        await ensureUserPayment(supabase, data.user);
       }
       return redirectToDestination(request, origin, isRecoveryFlow ? "/auth/reset-password" : next);
     }
@@ -45,7 +45,7 @@ export async function GET(request) {
     });
     if (!error) {
       if (data?.user && !isRecoveryFlow) {
-        await ensureUserPayment(supabase, data.user.id);
+        await ensureUserPayment(supabase, data.user);
       }
       return redirectToDestination(request, origin, isRecoveryFlow ? "/auth/reset-password" : next);
     }
@@ -62,7 +62,7 @@ export async function GET(request) {
 
   if (user) {
     if (!isRecoveryFlow) {
-      await ensureUserPayment(supabase, user.id);
+      await ensureUserPayment(supabase, user);
     }
     return redirectToDestination(request, origin, isRecoveryFlow ? "/auth/reset-password" : next);
   }
@@ -85,7 +85,8 @@ function getSafeRedirectPath(requestedPath) {
   return ALLOWED_REDIRECT_PATHS.has(requestedPath) ? requestedPath : "/profile";
 }
 
-async function ensureUserPayment(supabase, userId) {
+async function ensureUserPayment(supabase, user) {
+  const userId = user?.id;
   if (!userId) return;
   try {
     const { data, error } = await supabase
@@ -97,14 +98,17 @@ async function ensureUserPayment(supabase, userId) {
     if (!data && !error) {
       const nowMs = Date.now();
       const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
-      const basePrice = Number(String(PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || 199000;
-      const discount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
-      const price = Number(PRICING_CONFIG.proRawAmount) || 79000;
+      const selectedPlan = user.user_metadata?.selected_plan === "pro_plus" ? "pro_plus" : user.user_metadata?.selected_plan === "pro" ? "pro" : "free_trial";
+      const isProPlus = selectedPlan === "pro_plus";
+      const isPro = selectedPlan === "pro";
+      const basePrice = Number(String(isProPlus ? PRICING_CONFIG.proPlusOriginalPrice : PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || (isProPlus ? 2990000 : 199000);
+      const discount = Number(isProPlus ? PRICING_CONFIG.proPlusDiscountPercent : PRICING_CONFIG.proDiscountPercent) || (isProPlus ? 83 : 60);
+      const price = Number(isProPlus ? PRICING_CONFIG.proPlusRawAmount : PRICING_CONFIG.proRawAmount) || (isProPlus ? 499000 : 79000);
 
       await supabase.from("tb_payment").insert({
         uid: userId,
-        jenis_plan: 0,
-        note_plan: "free trial",
+        jenis_plan: isPro || isProPlus ? (isProPlus ? 2 : 1) : 0,
+        note_plan: `${isProPlus ? "pro+ business" : isPro ? "pro business" : "free trial"} - free trial`,
         datetime_payment: nowMs,
         datetime_expired: expiredMs,
         request_budget: 300,

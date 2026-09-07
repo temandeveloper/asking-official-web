@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -28,6 +28,12 @@ import {
 export default function SignupPage() {
   const router = useRouter();
   const { t, language, toggleLanguage } = useTranslation();
+  const [selectedPlan, setSelectedPlan] = useState("free_trial");
+
+  useEffect(() => {
+    const plan = new URLSearchParams(window.location.search).get("plan");
+    setSelectedPlan(plan === "pro_plus" || plan === "pro" ? plan : "free_trial");
+  }, []);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -87,6 +93,7 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: fullName.trim(),
+            selected_plan: selectedPlan,
           },
           emailRedirectTo: redirectUrl,
         },
@@ -242,6 +249,13 @@ export default function SignupPage() {
                 <p className="text-xs text-[#556A60]">
                   {t("auth.signup_subtitle")}
                 </p>
+                {selectedPlan !== "free_trial" && (
+                  <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-[#E5EFE7] border border-[#CFE2D3] text-[11px] font-bold text-[#184530]">
+                    {language === "id"
+                      ? `Paket dipilih: ${selectedPlan === "pro_plus" ? "Pro+ Business" : "Pro Business"} + Trial 15 hari`
+                      : `Selected plan: ${selectedPlan === "pro_plus" ? "Pro+ Business" : "Pro Business"} + 15-day trial`}
+                  </div>
+                )}
               </div>
 
               {/* Error Alert */}

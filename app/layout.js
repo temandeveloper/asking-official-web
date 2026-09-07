@@ -15,7 +15,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata = {
   title: "AsKing — Aplikasi Manajemen Pelanggan & Pesan dengan AI Customer Agent",
   description:
-    "AsKing adalah Customer Manager modern untuk manajemen tiket Kanban, omnichannel messaging WhatsApp & Telegram, dan AI Customer Agent dengan privasi data 100% di perangkat Anda.",
+    "AsKing adalah Customer Manager modern untuk manajemen tiket Kanban, omnichannel messaging WhatsApp & Telegram, dan AI Customer Agent dengan data operasional utama yang dikelola secara lokal.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

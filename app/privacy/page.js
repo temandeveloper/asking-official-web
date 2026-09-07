@@ -113,28 +113,28 @@ export default function PrivacyPage() {
                   <div className="space-y-3">
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        100% Arsitektur Local-First
+                        Penyimpanan Operasional Local-First
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Seluruh basis data kontak pelanggan, riwayat obrolan, dan tiket Kanban disimpan di perangkat lokal Anda. Data bisnis Anda tidak pernah dikirimkan ke server kami untuk penyimpanan data.
+                        Data operasional utama seperti kontak, riwayat obrolan, dan tiket Kanban disimpan di perangkat lokal Anda. Fitur tertentu seperti login, AI, update, dan integrasi pesan tetap dapat memerlukan layanan online.
                       </p>
                     </div>
 
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Nol Pengawasan & Tanpa Penjualan Data
+                        Batas Penggunaan Data yang Jelas
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Kami tidak memantau, memeriksa, atau menjual pesan obrolan pelanggan Anda. Kami tidak memiliki basis data terpusat yang menyimpan percakapan bisnis Anda.
+                        AsKing tidak menjadikan pesan pelanggan sebagai database cloud operasional utama. Saat Anda memakai AI atau layanan online lain, data yang diperlukan diproses sesuai penjelasan pada bagian terkait dalam kebijakan ini.
                       </p>
                     </div>
 
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Kedaulatan Data Penuh
+                        Kontrol dan Portabilitas Data
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Anda memegang kendali mutlak. Seluruh data dapat diekspor, dipindahkan, atau dihapus kapan saja langsung dari komputer Anda tanpa ketergantungan vendor lock-in.
+                        Anda dapat mengelola data lokal, membuat backup, dan menggunakan fitur export yang tersedia. Ketersediaan fitur online tetap bergantung pada layanan terkait.
                       </p>
                     </div>
                   </div>
@@ -325,7 +325,7 @@ export default function PrivacyPage() {
                     Introduction
                   </h2>
                   <p>
-                    At AsKing, privacy and user data sovereignty are our core foundations. This Privacy Policy explains how our desktop application and official website handle data. We are committed to absolute transparency without hidden monitoring or telemetry.
+                    At AsKing, privacy and user data control are core principles. This Privacy Policy explains how our desktop application and official website handle data, including the boundaries of local storage and online features.
                   </p>
                 </section>
 
@@ -341,28 +341,28 @@ export default function PrivacyPage() {
                   <div className="space-y-3">
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        100% Local-First Architecture
+                        Local-First Operational Storage
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        All customer directories, chat histories, and Kanban tickets reside on your device. Your business data is never stored on our cloud servers.
+                        Core operational data such as customer directories, chat histories, and Kanban tickets reside on your device. Features such as login, AI, updates, and messaging integrations may still require online services.
                       </p>
                     </div>
 
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Zero Inspection & No Data Selling
+                        Clear Data Boundaries
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        We never inspect, monitor, or sell your customer conversations. We maintain no centralized database of your private business chats.
+                        AsKing does not use customer messages as its primary cloud operations database. When you use AI or another online feature, the required data is processed as described in the relevant section of this policy.
                       </p>
                     </div>
 
                     <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Complete Data Sovereignty
+                        Data Control and Portability
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        You maintain absolute ownership. All data can be exported, backed up, or deleted at any time directly from your computer without vendor lock-in.
+                        You can manage local data, create backups, and use the available export tools. Online feature availability remains dependent on the relevant services.
                       </p>
                     </div>
                   </div>
