@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,11 +11,28 @@ import {
   Lock,
   Bot,
   Ticket,
+  Headset,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import ContactSupportModal from "./ContactSupportModal";
 
 export default function Hero() {
   const { t } = useTranslation();
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user: currentUser } }) => {
+        setUser(currentUser);
+      });
+    } catch (err) {
+      console.error("Hero user fetch error:", err);
+    }
+  }, []);
 
   function WindowsIcon({ className = "w-4 h-4" }) {
     return (
@@ -153,9 +171,20 @@ export default function Hero() {
               <WindowsIcon className="w-4 h-4 fill-current" />
               <span>{t("hero.cta_primary")}</span>
             </Link>
+            {/* Mobile: Tombol "Minta Demo" dengan popup modal */}
+            <button
+              type="button"
+              onClick={() => setIsDemoModalOpen(true)}
+              className="sm:hidden w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all cursor-pointer"
+            >
+              <Headset className="w-4 h-4 text-[#12281F]" />
+              <span>{t("nav.request_demo")}</span>
+            </button>
+
+            {/* Desktop: Tombol "Jelajahi Fitur" mengarah ke section #features */}
             <a
               href="#features"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all"
+              className="hidden sm:inline-flex sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all"
             >
               <span>{t("hero.cta_secondary")}</span>
               <ArrowRight className="w-4 h-4" />
@@ -163,6 +192,14 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+
+      {/* Minta Demo Modal */}
+      <ContactSupportModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        context="demo"
+        user={user}
+      />
     </section>
   );
 }
