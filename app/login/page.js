@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -105,6 +106,9 @@ function LoginForm() {
       }
 
       if (data?.session) {
+        if (data?.user) {
+          await ensureUserPayment(supabase, data.user);
+        }
         const nextUrl = searchParams.get("next") || "/profile";
         router.push(nextUrl);
         router.refresh();

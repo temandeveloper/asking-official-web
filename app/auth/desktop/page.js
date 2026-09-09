@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "@/app/components/Navbar";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import {
@@ -52,6 +53,13 @@ function DesktopAuthBridge() {
         const currentUser = session.user;
         setUser(currentUser);
         setStatus("authorizing");
+
+        // Ensure tb_payment record exists so Desktop app has immediate access to subscription & AI quota
+        try {
+          await ensureUserPayment(supabase, currentUser);
+        } catch (payErr) {
+          console.warn("[DesktopAuth] ensureUserPayment error:", payErr);
+        }
 
         // Construct deep link URL to AsKing Desktop Application
         const params = new URLSearchParams({

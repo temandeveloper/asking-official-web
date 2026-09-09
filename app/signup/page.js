@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -94,6 +95,7 @@ export default function SignupPage() {
           data: {
             full_name: fullName.trim(),
             selected_plan: selectedPlan,
+            asking_email_confirmed: false,
           },
           emailRedirectTo: redirectUrl,
         },
@@ -110,10 +112,46 @@ export default function SignupPage() {
             ? "Akun dengan email ini sudah terdaftar. Silakan masuk."
             : "An account with this email address already exists. Please log in."
         );
-      } else {
-        trackMetaEvent("CompleteRegistration", { content_name: "AsKing account" });
-        setSignupSuccess(true);
+        return;
       }
+
+      trackMetaEvent("CompleteRegistration", { content_name: "AsKing account" });
+
+      // 1. Ensure tb_payment record is created with chosen plan
+      if (data?.user) {
+        await ensureUserPayment(supabase, data.user, selectedPlan);
+      }
+
+      const searchParams = new URLSearchParams(window.location.search);
+      const nextUrl = searchParams.get("next") || "/profile";
+
+      // 2. If active session is available (auto-confirm enabled), redirect directly!
+      if (data?.session) {
+        router.push(nextUrl);
+        router.refresh();
+        return;
+      }
+
+      // 3. If session not returned directly, try signing in immediately with password
+      try {
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInData?.session) {
+          if (signInData.user) {
+            await ensureUserPayment(supabase, signInData.user, selectedPlan);
+          }
+          router.push(nextUrl);
+          router.refresh();
+          return;
+        }
+      } catch (signInCatch) {
+        console.warn("[Signup] Auto sign-in fallback attempt:", signInCatch);
+      }
+
+      // 4. Fallback: Show verification sent screen if project requires confirmation
+      setSignupSuccess(true);
     } catch (err) {
       setError(err.message || (language === "id" ? "Gagal membuat akun." : "Failed to create account."));
     } finally {

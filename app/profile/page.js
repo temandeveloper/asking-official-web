@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
@@ -36,6 +37,7 @@ import {
   QrCode,
   Send,
   Headphones,
+  Inbox,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -80,6 +82,12 @@ export default function ProfilePage() {
   const [copiedBca, setCopiedBca] = useState(false);
   const [showQrConfirmation, setShowQrConfirmation] = useState(false);
 
+  // Email Verification State (Pure Verification Link)
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+  const [verificationCooldown, setVerificationCooldown] = useState(0);
+  const [verificationStatus, setVerificationStatus] = useState(null); // { type: 'success' | 'error', text: '' }
+  const [isSentModalOpen, setIsSentModalOpen] = useState(false);
+
   useEffect(() => {
     async function loadUser() {
       if (!isSupabaseConfigured()) {
@@ -103,47 +111,32 @@ export default function ProfilePage() {
         setUser(currentUser);
         setFullName(currentUser.user_metadata?.full_name || "");
 
-        // Fetch or initialize tb_payment
+        // Fetch or initialize tb_payment with accurate plan
         try {
-          const { data: payment, error: pError } = await supabase
-            .from("tb_payment")
-            .select("*")
-            .eq("uid", currentUser.id)
-            .maybeSingle();
-
+          const payment = await ensureUserPayment(supabase, currentUser);
           if (payment) {
             setPaymentData(payment);
-          } else {
-            // Auto initialize default Free Trial record with dynamic PRICING_CONFIG
-            const nowMs = Date.now();
-            const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
-            const basePrice = Number(String(PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || 199000;
-            const discount = Number(PRICING_CONFIG.proDiscountPercent) || 60;
-            const price = Number(PRICING_CONFIG.proRawAmount) || 79000;
-
-            const newPayment = {
-              uid: currentUser.id,
-              jenis_plan: 0,
-              note_plan: "free trial",
-              datetime_payment: nowMs,
-              datetime_expired: expiredMs,
-              request_budget: 300,
-              status: "active",
-              base_price: basePrice,
-              discount: discount,
-              price: price,
-            };
-
-            const { data: inserted } = await supabase
-              .from("tb_payment")
-              .insert(newPayment)
-              .select()
-              .maybeSingle();
-
-            setPaymentData(inserted || newPayment);
           }
         } catch (payErr) {
-          console.warn("Error fetching payment record:", payErr);
+          console.warn("Error fetching/ensuring payment record:", payErr);
+        }
+
+        // Check if user just arrived from clicking email verification link
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          const hasVerifiedParam = params.get("verified") === "true";
+          const isUserActuallyVerified =
+            currentUser?.user_metadata?.asking_email_confirmed === true;
+
+          // Only display the celebratory banner IF the user is genuinely verified in the database
+          if (hasVerifiedParam && isUserActuallyVerified) {
+            setVerificationStatus({
+              type: "success",
+              text: t("profile.verification_verified_banner"),
+            });
+            // Clean up the URL query param so refresh doesn't keep showing it
+            window.history.replaceState({}, "", "/profile");
+          }
         }
       } catch (err) {
         console.error("Failed to load user profile:", err);
@@ -252,6 +245,54 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSendVerificationLink = async () => {
+    if (!user?.email || verificationCooldown > 0 || isSendingVerification) return;
+    setIsSendingVerification(true);
+    setVerificationStatus(null);
+
+    try {
+      const supabase = createClient();
+      const redirectUrl = `${window.location.origin}/auth/callback?type=verify_email&next=/profile`;
+
+      // Dispatch magic link to user email (uses the Verification Link template in Supabase)
+      const { error: sendErr } = await supabase.auth.signInWithOtp({
+        email: user.email.trim(),
+        options: {
+          emailRedirectTo: redirectUrl,
+          shouldCreateUser: false,
+        },
+      });
+
+      if (sendErr) {
+        throw sendErr;
+      }
+
+      setIsSentModalOpen(true);
+      setVerificationStatus({
+        type: "success",
+        text: t("profile.verification_link_sent", { email: user.email }),
+      });
+      setVerificationCooldown(60);
+      const timer = setInterval(() => {
+        setVerificationCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      console.error("Failed to send verification link:", err);
+      setVerificationStatus({
+        type: "error",
+        text: err.message || (language === "id" ? "Gagal mengirimkan link verifikasi." : "Failed to send verification link."),
+      });
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8FAF7] flex flex-col items-center justify-center space-y-3">
@@ -288,6 +329,10 @@ export default function ProfilePage() {
   const userInitial = (user?.user_metadata?.full_name || user?.email || "U")
     .charAt(0)
     .toUpperCase();
+
+  const isEmailVerified = Boolean(
+    user?.user_metadata?.asking_email_confirmed === true
+  );
 
   const createdDate = user?.created_at
     ? new Date(user.created_at).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
@@ -444,10 +489,28 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                 <h1 className="text-xl sm:text-2xl font-black text-[#11231B] tracking-tight">
                   {user?.user_metadata?.full_name || "User Account"}
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px]">
-                  <CheckCircle2 className="w-3 h-3 text-[#22C55E]" />
-                  <span>{t("profile.verified_badge")}</span>
-                </span>
+                {isEmailVerified ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px]">
+                    <CheckCircle2 className="w-3 h-3 text-[#22C55E]" />
+                    <span>{t("profile.verified_badge")}</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendVerificationLink}
+                    disabled={isSendingVerification || verificationCooldown > 0}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
+                    title={t("profile.send_verification_btn")}
+                  >
+                    <AlertCircle className="w-3 h-3 text-amber-500" />
+                    <span>{t("profile.unverified_badge")}</span>
+                    <span className="text-[10px] underline font-extrabold ml-0.5 text-amber-900">
+                      {verificationCooldown > 0
+                        ? `${verificationCooldown}s`
+                        : t("profile.send_verification_btn")}
+                    </span>
+                  </button>
+                )}
               </div>
 
               <p className="text-xs text-[#556A60] flex items-center gap-1.5">
@@ -657,17 +720,81 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[#2D3E35]">
-                  {t("profile.email_label")}
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-[#2D3E35]">
+                    {t("profile.email_label")}
+                  </label>
+                  {!isEmailVerified && (
+                    <button
+                      type="button"
+                      onClick={handleSendVerificationLink}
+                      disabled={isSendingVerification || verificationCooldown > 0}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-[11px] font-bold transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
+                    >
+                      {isSendingVerification ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span>{t("profile.sending_verification")}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3 h-3" />
+                          <span>
+                            {verificationCooldown > 0
+                              ? `${t("profile.resend_in")} ${verificationCooldown}s`
+                              : t("profile.send_verification_btn")}
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <input
                   type="email"
                   disabled
                   value={user?.email || ""}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#F0F4F1] border border-[#DEE7DF] text-[#6B8075] cursor-not-allowed"
                 />
-                <p className="text-[10.5px] text-[#8EA096]">
-                  {t("profile.email_note")}
+
+                {verificationStatus && (
+                  <div
+                    className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200 ${
+                      verificationStatus.type === "success"
+                        ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                        : "bg-rose-50 border border-rose-200 text-rose-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {verificationStatus.type === "success" ? (
+                        <CheckCircle2 className="w-4 h-4 shrink-0 text-[#22C55E]" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      )}
+                      <span className="leading-relaxed">{verificationStatus.text}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setVerificationStatus(null)}
+                      className="p-1 hover:opacity-75 cursor-pointer text-xs"
+                      title="Tutup"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                <p className="text-[10.5px] text-[#8EA096] flex items-center gap-1.5">
+                  {isEmailVerified ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                      <span>{t("profile.email_note_verified")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+                      <span className="text-amber-700">{t("profile.email_note_unverified")}</span>
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -1086,6 +1213,111 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
           </div>
         )
       }
+
+      {/* ========================================================================= */}
+      {/* VERIFICATION LINK SENT MODAL POPUP */}
+      {/* ========================================================================= */}
+      {isSentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white rounded-3xl border border-[#DEE7DF] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200 text-center">
+            {/* Top Accent Header with Glow */}
+            <div className="relative bg-[#12281F] text-white p-7 sm:p-8 overflow-hidden">
+              <div className="absolute -top-16 -right-16 w-36 h-36 bg-[#B8F55C]/15 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-[#18362B]/50 rounded-full blur-2xl pointer-events-none" />
+
+              <button
+                type="button"
+                onClick={() => setIsSentModalOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
+                title="Tutup Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Icon Badge */}
+              <div className="w-16 h-16 mx-auto rounded-3xl bg-white/10 text-[#B8F55C] border border-white/15 flex items-center justify-center shadow-lg mb-4">
+                <Inbox className="w-8 h-8 text-[#B8F55C]" />
+              </div>
+
+              <h3 className="text-xl font-black text-white tracking-tight">
+                {t("profile.verification_modal_title")}
+              </h3>
+              <p className="text-xs text-[#A5B8AD] mt-1.5 leading-relaxed max-w-xs mx-auto">
+                {t("profile.verification_modal_subtitle")}
+              </p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 sm:p-7 space-y-5 text-left">
+              {/* Target Email Chip */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F0F5F1] border border-[#DEE7DF]">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-white text-[#184530] flex items-center justify-center shadow-2xs shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="block text-[10px] uppercase font-bold text-[#6B8075] tracking-wider">
+                      {t("profile.email_label")}
+                    </span>
+                    <span className="block text-xs font-mono font-bold text-[#11231B] truncate">
+                      {user?.email}
+                    </span>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10.5px] font-bold shrink-0">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span>{language === "en" ? "Sent" : "Terkirim"}</span>
+                </span>
+              </div>
+
+              {/* Step Checklist Box */}
+              <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5">
+                <p className="text-xs font-bold text-[#11231B]">
+                  {language === "en" ? "Next steps:" : "Langkah selanjutnya:"}
+                </p>
+                <div className="space-y-2 text-xs text-[#4A5F54]">
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <span className="leading-relaxed">
+                      {t("profile.verification_tip_1")}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <span className="leading-relaxed">
+                      {t("profile.verification_tip_2")}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <span className="leading-relaxed">
+                      {t("profile.verification_tip_3")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Close / Action Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsSentModalOpen(false)}
+                  className="w-full py-3.5 px-6 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2 border border-[#234235]"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>{t("profile.verification_modal_btn")}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Support Button */}
       <div className="fixed bottom-6 right-6 z-30">

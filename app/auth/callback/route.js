@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { PRICING_CONFIG } from "@/lib/config/pricing";
+import { ensureUserPayment } from "@/lib/supabase/payment";
 
 const ALLOWED_REDIRECT_PATHS = new Set([
   "/",
@@ -14,7 +14,7 @@ export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type"); // "signup" | "email" | "recovery" | "invite"
+  const type = searchParams.get("type"); // "signup" | "email" | "recovery" | "invite" | "verify_email"
   const next = getSafeRedirectPath(searchParams.get("next"));
   const isRecoveryFlow = type === "recovery" || next === "/auth/reset-password";
   const errorParam = searchParams.get("error");
@@ -28,8 +28,22 @@ export async function GET(request) {
     if (!error) {
       if (data?.user && !isRecoveryFlow) {
         await ensureUserPayment(supabase, data.user);
+        try {
+          await supabase.auth.updateUser({
+            data: {
+              email_verified: true,
+              is_email_verified: true,
+              asking_email_confirmed: true,
+            },
+          });
+        } catch (e) {
+          console.warn("[Auth Callback] updateUser metadata error:", e);
+        }
       }
-      return redirectToDestination(request, origin, isRecoveryFlow ? "/auth/reset-password" : next);
+      const destination = isRecoveryFlow
+        ? "/auth/reset-password"
+        : `${next}${next.includes("?") ? "&" : "?"}verified=true`;
+      return redirectToDestination(request, origin, destination);
     }
     console.warn("[Auth Callback] exchangeCodeForSession failed:", error.message);
     if (isRecoveryFlow) {
@@ -39,15 +53,30 @@ export async function GET(request) {
 
   // 2. Handle token_hash verification (Standard Supabase OTP / Email confirmation)
   if (token_hash && type) {
+    const otpType = type === "verify_email" ? "email" : type;
     const { data, error } = await supabase.auth.verifyOtp({
-      type,
+      type: otpType,
       token_hash,
     });
     if (!error) {
       if (data?.user && !isRecoveryFlow) {
         await ensureUserPayment(supabase, data.user);
+        try {
+          await supabase.auth.updateUser({
+            data: {
+              email_verified: true,
+              is_email_verified: true,
+              asking_email_confirmed: true,
+            },
+          });
+        } catch (e) {
+          console.warn("[Auth Callback] updateUser metadata error:", e);
+        }
       }
-      return redirectToDestination(request, origin, isRecoveryFlow ? "/auth/reset-password" : next);
+      const destination = isRecoveryFlow
+        ? "/auth/reset-password"
+        : `${next}${next.includes("?") ? "&" : "?"}verified=true`;
+      return redirectToDestination(request, origin, destination);
     }
     console.warn("[Auth Callback] verifyOtp failed:", error.message);
     if (isRecoveryFlow) {
@@ -55,7 +84,7 @@ export async function GET(request) {
     }
   }
 
-  // 3. Check if user already has an active session
+  // 3. Check if user already has an active session (for regular OAuth / redirect navigation)
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -73,54 +102,16 @@ export async function GET(request) {
   }
 
   if (errorCode === "otp_expired" || errorParam === "access_denied") {
-    // If OTP was already consumed, the email is likely verified, direct to login with verified notice
+    // If OTP was already consumed, direct to login with verified notice
     return NextResponse.redirect(`${origin}/login?verified=true`);
   }
 
-  // 5. Fallback: If hash fragment exists (handled on client side), redirect to /login with verified indicator
-  return NextResponse.redirect(`${origin}/login?verified=true`);
+  // 5. Fallback
+  return NextResponse.redirect(`${origin}/login`);
 }
 
 function getSafeRedirectPath(requestedPath) {
   return ALLOWED_REDIRECT_PATHS.has(requestedPath) ? requestedPath : "/profile";
-}
-
-async function ensureUserPayment(supabase, user) {
-  const userId = user?.id;
-  if (!userId) return;
-  try {
-    const { data, error } = await supabase
-      .from("tb_payment")
-      .select("id")
-      .eq("uid", userId)
-      .maybeSingle();
-
-    if (!data && !error) {
-      const nowMs = Date.now();
-      const expiredMs = nowMs + 15 * 24 * 60 * 60 * 1000;
-      const selectedPlan = user.user_metadata?.selected_plan === "pro_plus" ? "pro_plus" : user.user_metadata?.selected_plan === "pro" ? "pro" : "free_trial";
-      const isProPlus = selectedPlan === "pro_plus";
-      const isPro = selectedPlan === "pro";
-      const basePrice = Number(String(isProPlus ? PRICING_CONFIG.proPlusOriginalPrice : PRICING_CONFIG.proOriginalPrice).replace(/\D/g, "")) || (isProPlus ? 2990000 : 199000);
-      const discount = Number(isProPlus ? PRICING_CONFIG.proPlusDiscountPercent : PRICING_CONFIG.proDiscountPercent) || (isProPlus ? 83 : 60);
-      const price = Number(isProPlus ? PRICING_CONFIG.proPlusRawAmount : PRICING_CONFIG.proRawAmount) || (isProPlus ? 499000 : 79000);
-
-      await supabase.from("tb_payment").insert({
-        uid: userId,
-        jenis_plan: isPro || isProPlus ? (isProPlus ? 2 : 1) : 0,
-        note_plan: `${isProPlus ? "pro+ business" : isPro ? "pro business" : "free trial"} - free trial`,
-        datetime_payment: nowMs,
-        datetime_expired: expiredMs,
-        request_budget: 300,
-        status: "active",
-        base_price: basePrice,
-        discount: discount,
-        price: price,
-      });
-    }
-  } catch (err) {
-    console.error("[Auth Callback] ensureUserPayment error:", err);
-  }
 }
 
 function redirectToDestination(request, origin, next) {
