@@ -38,6 +38,7 @@ import {
   Send,
   Headphones,
   Inbox,
+  Headset,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -553,11 +554,11 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-stretch sm:self-auto">
+            <div className="flex flex-col gap-2.5 self-stretch sm:self-auto">
               <Link
                 href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
                 onClick={() => trackMetaCustomEvent("ClickMicrosoftStore", { placement: "profile_download" })}
-                className="relative w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className="relative w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 text-left">
                   <div className="w-8 h-8 rounded-full bg-[#11281F] text-[#B8F55C] flex items-center justify-center shrink-0">
@@ -573,6 +574,18 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                   </div>
                 </div>
               </Link>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSupportContext("demo");
+                  setIsSupportModalOpen(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-[0.99] border border-[#234235] cursor-pointer"
+              >
+                <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>{t("profile.request_demo_btn")}</span>
+              </button>
             </div>
           </div>
 
@@ -812,8 +825,8 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                 {verificationStatus && (
                   <div
                     className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200 ${verificationStatus.type === "success"
-                        ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
-                        : "bg-rose-50 border border-rose-200 text-rose-700"
+                      ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
+                      : "bg-rose-50 border border-rose-200 text-rose-700"
                       }`}
                   >
                     <div className="flex items-center gap-2">

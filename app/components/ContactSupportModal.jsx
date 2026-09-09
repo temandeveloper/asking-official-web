@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
@@ -12,19 +14,26 @@ import {
   HelpCircle,
   CreditCard,
   UserCheck,
+  Headset,
 } from "lucide-react";
 
 export default function ContactSupportModal({
   isOpen,
   onClose,
-  context = "general", // 'general' | 'payment' | 'signup' | 'login'
+  context = "general", // 'general' | 'payment' | 'signup' | 'login' | 'demo'
   user = null,
   planName = "Pro Business",
   amount = null,
 }) {
   const { t, language } = useTranslation();
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const supportNumber = PRICING_CONFIG.supportPhone || "6287769005244";
   const userName = user?.user_metadata?.full_name || user?.email || "Pengguna AsKing";
@@ -44,6 +53,18 @@ export default function ContactSupportModal({
 • Total Amount: ${amount ? `Rp ${amount}` : `Rp ${PRICING_CONFIG.proPrice}`}
 
 Issue / Question with Payment: `;
+    } else if (context === "demo") {
+      const hasUserData = (userEmail && userEmail !== "-") || (userName && userName !== "Pengguna AsKing" && userName !== "-");
+      if (hasUserData) {
+        supportMessage = `Hello AsKing Support Team, I am interested in AsKing Customer Manager and would like to request a product demo / feature walkthrough:
+
+• Name: ${userName}
+• Email: ${userEmail}
+${userId && userId !== "-" ? `• User ID: ${userId}\n` : ""}
+Please share the schedule and demo information. Thank you!`;
+      } else {
+        supportMessage = `Hello AsKing Support Team, I am interested in AsKing Customer Manager and would like to request a product demo / feature walkthrough. Please share more details. Thank you!`;
+      }
     } else if (context === "signup") {
       supportMessage = `Hello AsKing Support Team, I need assistance regarding Account Registration / Email Verification:
 
@@ -77,6 +98,18 @@ Inquiry: `;
 • Total Nominal: ${amount ? `Rp ${amount}` : `Rp ${PRICING_CONFIG.proPrice}`}
 
 Kendala / Pertanyaan Pembayaran: `;
+    } else if (context === "demo") {
+      const hasUserData = (userEmail && userEmail !== "-") || (userName && userName !== "Pengguna AsKing" && userName !== "-");
+      if (hasUserData) {
+        supportMessage = `Halo Tim Support AsKing, saya tertarik dengan aplikasi AsKing Customer Manager dan ingin mengajukan jadwal demo / presentasi fitur:
+
+• Nama: ${userName}
+• Email: ${userEmail}
+${userId && userId !== "-" ? `• User ID: ${userId}\n` : ""}
+Mohon informasi jadwal dan tautan demonya. Terima kasih!`;
+      } else {
+        supportMessage = `Halo Tim Support AsKing, saya tertarik dengan aplikasi AsKing Customer Manager dan ingin mengajukan demo / presentasi fitur aplikasi. Mohon informasi selengkapnya. Terima kasih!`;
+      }
     } else if (context === "signup") {
       supportMessage = `Halo Tim Support AsKing, saya butuh bantuan terkait Pendaftaran Akun / Verifikasi Email:
 
@@ -111,9 +144,15 @@ Pertanyaan / Kendala: `;
 
   const formattedPhone = `+${supportNumber.slice(0, 2)} ${supportNumber.slice(2, 5)}-${supportNumber.slice(5, 9)}-${supportNumber.slice(9)}`;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150 select-none">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#12241C] rounded-3xl border border-[#DEE7DF] dark:border-[#1F382B] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200">
+  return createPortal(
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150 select-none cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg bg-white dark:bg-[#12241C] rounded-3xl border border-[#DEE7DF] dark:border-[#1F382B] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200 cursor-default"
+      >
 
         {/* Modal Header */}
         <div className="bg-[#12281F] text-white p-6 flex items-center justify-between border-b border-[#234235]">
@@ -121,6 +160,8 @@ Pertanyaan / Kendala: `;
             <div className="w-10 h-10 rounded-2xl bg-[#18362B] text-[#B8F55C] border border-[#2A5241] flex items-center justify-center shadow-xs">
               {context === "payment" ? (
                 <CreditCard className="w-5 h-5" />
+              ) : context === "demo" ? (
+                <Headset className="w-5 h-5" />
               ) : (
                 <Headphones className="w-5 h-5" />
               )}
@@ -131,14 +172,22 @@ Pertanyaan / Kendala: `;
                   ? language === "en"
                     ? "Payment Assistance"
                     : "Bantuan Kendala Pembayaran"
+                  : context === "demo"
+                  ? language === "en"
+                    ? "Request Product Demo"
+                    : "Minta Demo AsKing"
                   : language === "en"
                     ? "Contact AsKing Support"
                     : "Hubungi Tim Support AsKing"}
               </h3>
               <p className="text-xs text-[#A5B8AD] leading-tight">
-                {language === "en"
-                  ? "Official Customer Care & Technical Team"
-                  : "Layanan Bantuan Resmi & Tim Support Cepat"}
+                {context === "demo"
+                  ? language === "en"
+                    ? "Schedule an interactive demo with our specialist"
+                    : "Konsultasi & Jadwalkan Sesi Demo Interaktif"
+                  : language === "en"
+                    ? "Official Customer Care & Technical Team"
+                    : "Layanan Bantuan Resmi & Tim Support Cepat"}
               </p>
             </div>
           </div>
@@ -166,6 +215,10 @@ Pertanyaan / Kendala: `;
                 ? language === "en"
                   ? "Having trouble with transfer or need immediate plan approval? Chat directly with our finance & support team."
                   : "Mengalami kendala saat transfer atau butuh persetujuan plan cepat? Hubungi langsung tim support kami."
+                : context === "demo"
+                ? language === "en"
+                  ? "Scan the QR code or click the button below to connect with our team via WhatsApp to request an interactive product demo."
+                  : "Pindai QR code atau klik tombol di bawah untuk langsung terhubung ke WhatsApp dan jadwalkan sesi demo interaktif aplikasi AsKing."
                 : language === "en"
                   ? "Our dedicated support team is ready to assist your onboarding, questions, or setup."
                   : "Tim support kami siap membantu pertanyaan, onboarding, dan kendala teknis Anda."}
@@ -202,9 +255,13 @@ Pertanyaan / Kendala: `;
             >
               <Send className="w-4 h-4" />
               <span>
-                {language === "en"
-                  ? "Open WhatsApp Web / App Directly"
-                  : "Buka WhatsApp Langsung"}
+                {context === "demo"
+                  ? language === "en"
+                    ? "Request Demo via WhatsApp"
+                    : "Minta Demo via WhatsApp"
+                  : language === "en"
+                    ? "Open WhatsApp Web / App Directly"
+                    : "Buka WhatsApp Langsung"}
               </span>
               <ExternalLink className="w-3.5 h-3.5" />
             </button>
@@ -219,6 +276,7 @@ Pertanyaan / Kendala: `;
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

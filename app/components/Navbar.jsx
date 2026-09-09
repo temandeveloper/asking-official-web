@@ -14,9 +14,11 @@ import {
   MessageSquare,
   Kanban,
   Check,
+  Headset
 } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import ContactSupportModal from "./ContactSupportModal";
 
 export function AsKingLogo({ className = "w-9 h-9" }) {
   return (
@@ -48,6 +50,7 @@ export default function Navbar() {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   const { t, language, setLanguage, toggleLanguage } = useTranslation();
 
@@ -75,7 +78,8 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#F8FAF7]/90 backdrop-blur-md border-b border-[#12281F]/5 transition-all">
+    <>
+      <header className="sticky top-0 z-50 w-full bg-[#F8FAF7]/90 backdrop-blur-md border-b border-[#12281F]/5 transition-all">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center group">
@@ -229,34 +233,46 @@ export default function Navbar() {
 
           {/* User Auth Buttons */}
           {user ? (
-            <Link
-              href="/profile"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs border border-[#234235]"
-            >
-              <div className="w-5 h-5 rounded-full bg-[#B8F55C] text-[#12281F] flex items-center justify-center text-[10px] font-black">
-                {(user.user_metadata?.full_name || user.email || "U")
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
-              <span className="max-w-[120px] truncate">
-                {user.user_metadata?.full_name || t("nav.profile")}
-              </span>
-            </Link>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsDemoModalOpen(true)}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#18362B] hover:bg-[#1E4537] text-[#B8F55C] text-xs font-bold transition-all shadow-xs border border-[#2A5241] cursor-pointer"
+              >
+                <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>{t("nav.request_demo")}</span>
+              </button>
+              <Link
+                href="/profile"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs border border-[#234235]"
+              >
+                <div className="w-5 h-5 rounded-full bg-[#B8F55C] text-[#12281F] flex items-center justify-center text-[10px] font-black">
+                  {(user.user_metadata?.full_name || user.email || "U")
+                    .charAt(0)
+                    .toUpperCase()}
+                </div>
+                <span className="max-w-[120px] truncate">
+                  {user.user_metadata?.full_name || t("nav.profile")}
+                </span>
+              </Link>
+            </div>
           ) : (
-            <>
+            <div className="flex items-center gap-2">
               <Link
                 href="/login"
                 className="text-xs font-bold text-[#3D5247] hover:text-[#11231B] px-3.5 py-2 transition-colors"
               >
                 {t("nav.login")}
               </Link>
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center px-5 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs active:scale-98 border border-[#234235]"
+              <button
+                type="button"
+                onClick={() => setIsDemoModalOpen(true)}
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs active:scale-98 border border-[#234235] cursor-pointer"
               >
-                {t("nav.signup")}
-              </Link>
-            </>
+                <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>{t("nav.request_demo")}</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -329,13 +345,26 @@ export default function Navbar() {
 
           <div className="pt-4 border-t border-[#DEE7DF] flex flex-col gap-2.5">
             {user ? (
-              <Link
-                href="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs"
-              >
-                {t("nav.profile")}
-              </Link>
+              <>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs"
+                >
+                  {t("nav.profile")}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsDemoModalOpen(true);
+                  }}
+                  className="w-full py-2.5 rounded-full border border-[#2A5241] bg-[#18362B] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
+                  <span>{t("nav.request_demo")}</span>
+                </button>
+              </>
             ) : (
               <>
                 <Link
@@ -345,18 +374,31 @@ export default function Navbar() {
                 >
                   {t("nav.login")}
                 </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsDemoModalOpen(true);
+                  }}
+                  className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  {t("nav.signup")}
-                </Link>
+                  <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
+                  <span>{t("nav.request_demo")}</span>
+                </button>
               </>
             )}
           </div>
         </div>
       )}
-    </header>
+      </header>
+
+      {/* Request Demo Support Modal */}
+      <ContactSupportModal
+        isOpen={isDemoModalOpen}
+        onClose={() => setIsDemoModalOpen(false)}
+        context="demo"
+        user={user}
+      />
+    </>
   );
 }
