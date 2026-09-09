@@ -115,7 +115,17 @@ export default function SignupPage() {
         return;
       }
 
-      trackMetaEvent("CompleteRegistration", { content_name: "AsKing account" });
+      // Track Meta Pixel CompleteRegistration immediately upon account creation (no email verification required)
+      trackMetaEvent("CompleteRegistration", {
+        content_name: "AsKing account",
+        status: true,
+        currency: "IDR",
+        value: 0,
+      });
+
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("asking_complete_registration_pending", "true");
+      }
 
       // 1. Ensure tb_payment record is created with chosen plan
       if (data?.user) {

@@ -7,6 +7,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "@/app/components/Navbar";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import { trackMetaEvent } from "@/lib/metaPixel";
 import {
   Sparkles,
   CheckCircle2,
@@ -53,6 +54,19 @@ function DesktopAuthBridge() {
         const currentUser = session.user;
         setUser(currentUser);
         setStatus("authorizing");
+
+        // Track pending CompleteRegistration if user just signed up before desktop bridge
+        if (typeof window !== "undefined") {
+          if (sessionStorage.getItem("asking_complete_registration_pending") === "true") {
+            trackMetaEvent("CompleteRegistration", {
+              content_name: "AsKing account",
+              status: true,
+              currency: "IDR",
+              value: 0,
+            });
+            sessionStorage.removeItem("asking_complete_registration_pending");
+          }
+        }
 
         // Ensure tb_payment record exists so Desktop app has immediate access to subscription & AI quota
         try {

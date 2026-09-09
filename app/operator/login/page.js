@@ -8,21 +8,20 @@ import { AsKingLogo } from "@/app/components/Navbar";
 import {
   ShieldCheck,
   Mail,
-  KeyRound,
   ArrowRight,
   Loader2,
   AlertCircle,
   CheckCircle2,
   Lock,
-  Globe,
+  Inbox,
+  Sparkles,
 } from "lucide-react";
 
 export default function OperatorLoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [otpToken, setOtpToken] = useState("");
-  const [step, setStep] = useState("email"); // 'email' | 'otp'
+  const [step, setStep] = useState("email"); // 'email' | 'link_sent'
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -48,14 +47,14 @@ export default function OperatorLoginPage() {
               router.push("/operator");
             }
           })
-          .catch(() => { });
+          .catch(() => {});
       }
     });
   }, [router]);
 
-  // Step 1: Request OTP Token for Whitelisted Operator
-  const handleRequestOtp = async (e) => {
-    e.preventDefault();
+  // Request Magic Login Link for Whitelisted Operator
+  const handleRequestLoginLink = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     setError(null);
     setSuccessMsg(null);
 
@@ -78,79 +77,48 @@ export default function OperatorLoginPage() {
       if (!whitelistRes.ok || !whitelistData.authorized) {
         setError(
           whitelistData.message ||
-          "Akses ditolak: Email tidak memiliki otorisasi operator AsKing."
+            "Akses ditolak: Email tidak memiliki otorisasi operator AsKing."
         );
         return;
       }
 
-      // 2. Dispatch OTP via Supabase Auth
+      // 2. Dispatch Magic Link via Supabase Auth directly redirecting to /operator
       const supabase = createClient();
-      const { error: otpError } = await supabase.auth.signInWithOtp({
+      const redirectUrl = `${window.location.origin}/auth/callback?next=/operator`;
+
+      const { error: linkError } = await supabase.auth.signInWithOtp({
         email: cleanEmail,
         options: {
-          shouldCreateUser: false, // Only existing authorized users
+          emailRedirectTo: redirectUrl,
+          shouldCreateUser: false,
         },
       });
 
-      if (otpError) {
+      if (linkError) {
         // If user record doesn't exist in auth yet, allow signInWithOtp to initialize
         const { error: retryError } = await supabase.auth.signInWithOtp({
           email: cleanEmail,
           options: {
+            emailRedirectTo: redirectUrl,
             shouldCreateUser: true,
           },
         });
         if (retryError) throw retryError;
       }
 
-      setSuccessMsg(
-        `Kode OTP rahasia telah dikirim ke ${cleanEmail}. Silakan periksa inbox email Anda.`
-      );
-      setStep("otp");
-      startCooldown();
-    } catch (err) {
-      console.error("Operator OTP request error:", err);
-      setError(err.message || "Gagal mengirimkan kode OTP operator.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Step 2: Verify OTP Token
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccessMsg(null);
-
-    const cleanToken = otpToken.trim();
-    if (!cleanToken) {
-      setError("Silakan masukkan kode OTP yang Anda terima di email.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const supabase = createClient();
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: email.trim().toLowerCase(),
-        token: cleanToken,
-        type: "email",
-      });
-
-      if (verifyError) throw verifyError;
-
       // Store operator email in localStorage for fast lookup
       if (typeof window !== "undefined") {
-        localStorage.setItem("asking_operator_email", email.trim().toLowerCase());
+        localStorage.setItem("asking_operator_email", cleanEmail);
       }
 
-      setSuccessMsg("Verifikasi berhasil! Mengarahkan ke Dashboard Operator...");
-      setTimeout(() => {
-        router.push("/operator");
-      }, 800);
+      setSuccessMsg(
+        `Tautan masuk aman telah dikirimkan ke ${cleanEmail}. Silakan periksa inbox email Anda.`
+      );
+      setStep("link_sent");
+      startCooldown();
     } catch (err) {
-      console.error("OTP verification error:", err);
-      setError(err.message || "Kode OTP tidak valid atau telah kadaluarsa.");
+      console.error("Operator login link error:", err);
+      setError(err.message || "Gagal mengirimkan tautan masuk operator.");
     } finally {
       setLoading(false);
     }
@@ -189,24 +157,23 @@ export default function OperatorLoginPage() {
       <main className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-md">
           <div className="rounded-3xl bg-white/95 backdrop-blur-xl border border-[#DEE7DF] shadow-xl p-8 sm:p-10 space-y-6 animate-in fade-in duration-150">
-
             {/* Title & Badge */}
             <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#E5EFE7] border border-[#CFE2D3] text-[#184530] flex items-center justify-center mx-auto shadow-2xs">
+              <div className="w-14 h-14 rounded-2xl bg-[#E5EFE7] border border-[#CFE2D3] text-[#184530] flex items-center justify-center mx-auto shadow-2xs">
                 {step === "email" ? (
                   <Lock className="w-6 h-6 text-[#184530]" />
                 ) : (
-                  <KeyRound className="w-6 h-6 text-[#184530]" />
+                  <Inbox className="w-7 h-7 text-[#184530]" />
                 )}
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight pt-1">
-                {step === "email" ? "Login Operator" : "Verifikasi OTP"}
+                {step === "email" ? "Login Operator" : "Tautan Masuk Terkirim"}
               </h1>
               <p className="text-xs text-[#556A60] leading-relaxed max-w-xs mx-auto">
                 {step === "email"
                   ? "Sistem autentikasi tanpa password. Masukkan email operator yang terdaftar di database."
-                  : `Masukkan kode OTP rahasia yang dikirimkan ke ${email}.`}
+                  : `Tautan akses aman telah dikirim ke ${email}. Klik tautan di email Anda untuk masuk.`}
               </p>
             </div>
 
@@ -219,7 +186,7 @@ export default function OperatorLoginPage() {
             )}
 
             {/* Success Message */}
-            {successMsg && (
+            {successMsg && step === "email" && (
               <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5 animate-in slide-in-from-top-2 duration-150">
                 <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                 <span className="leading-relaxed font-medium">{successMsg}</span>
@@ -228,7 +195,7 @@ export default function OperatorLoginPage() {
 
             {/* STEP 1: EMAIL INPUT */}
             {step === "email" ? (
-              <form onSubmit={handleRequestOtp} className="space-y-4">
+              <form onSubmit={handleRequestLoginLink} className="space-y-4">
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-[#2D3E35]">
                     Email Operator Terdaftar
@@ -238,7 +205,7 @@ export default function OperatorLoginPage() {
                     <input
                       type="email"
                       required
-                      placeholder="Email Operator Terdaftar"
+                      placeholder="operator@godiscus.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors font-mono"
@@ -261,60 +228,87 @@ export default function OperatorLoginPage() {
                     </>
                   ) : (
                     <>
-                      <span>Kirim Akses Login</span>
+                      <span>Kirim Tautan Akses Masuk</span>
                       <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
                     </>
                   )}
                 </button>
               </form>
             ) : (
-              /* STEP 2: OTP INPUT */
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="block text-xs font-bold text-[#2D3E35]">
-                    Kode OTP / Token
-                  </label>
-                  <div className="relative">
-                    <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B8075]" />
-                    <input
-                      type="text"
-                      required
-                      autoFocus
-                      placeholder="123456"
-                      value={otpToken}
-                      onChange={(e) => setOtpToken(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#184530] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors font-mono tracking-widest text-center font-black"
-                    />
+              /* STEP 2: LINK SENT STATE */
+              <div className="space-y-5 animate-in fade-in duration-200">
+                {/* Target Email Box */}
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F0F5F1] border border-[#DEE7DF]">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-white text-[#184530] flex items-center justify-center shadow-2xs shrink-0">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-[10px] uppercase font-bold text-[#6B8075] tracking-wider">
+                        Email Penerima
+                      </span>
+                      <span className="block text-xs font-mono font-bold text-[#11231B] truncate">
+                        {email}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-[#6B8075] pt-1">
-                    <span>Masa berlaku: 10 menit</span>
-                    <button
-                      type="button"
-                      onClick={handleRequestOtp}
-                      disabled={resendCooldown > 0 || loading}
-                      className="text-[#184530] font-bold hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer"
-                    >
-                      {resendCooldown > 0
-                        ? `Kirim ulang (${resendCooldown}s)`
-                        : "Kirim Ulang OTP"}
-                    </button>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10.5px] font-bold shrink-0">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    <span>Terkirim</span>
+                  </span>
+                </div>
+
+                {/* Instructions Box */}
+                <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5 text-left">
+                  <p className="text-xs font-bold text-[#11231B]">
+                    Langkah Masuk Portal:
+                  </p>
+                  <div className="space-y-2 text-xs text-[#4A5F54]">
+                    <div className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        1
+                      </span>
+                      <span className="leading-relaxed">
+                        Buka kotak masuk (inbox) atau folder spam email Anda.
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        2
+                      </span>
+                      <span className="leading-relaxed">
+                        Klik tombol atau tautan <strong>"Masuk ke Portal Operator"</strong>.
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-[#12281F] text-[#B8F55C] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        3
+                      </span>
+                      <span className="leading-relaxed">
+                        Anda akan otomatis dialihkan langsung ke Dashboard Operator AsKing.
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-2">
+                {/* Resend & Change Email Actions */}
+                <div className="space-y-2 pt-1">
                   <button
-                    type="submit"
-                    disabled={loading}
+                    type="button"
+                    onClick={handleRequestLoginLink}
+                    disabled={resendCooldown > 0 || loading}
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] disabled:opacity-50 text-[#B8F55C] text-xs font-bold shadow-md transition-all active:scale-98 cursor-pointer border border-[#234235]"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin text-[#B8F55C]" />
-                        <span>Memvalidasi OTP...</span>
+                        <span>Mengirim ulang...</span>
                       </>
+                    ) : resendCooldown > 0 ? (
+                      <span>Kirim Ulang Tautan ({resendCooldown}s)</span>
                     ) : (
                       <>
-                        <span>Masuk ke Dashboard Operator</span>
+                        <span>Kirim Ulang Tautan Masuk</span>
                         <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
                       </>
                     )}
@@ -327,12 +321,12 @@ export default function OperatorLoginPage() {
                       setError(null);
                       setSuccessMsg(null);
                     }}
-                    className="w-full py-2 text-xs text-[#556A60] hover:text-[#11231B] transition-colors cursor-pointer"
+                    className="w-full py-2 text-xs text-[#556A60] hover:text-[#11231B] transition-colors cursor-pointer text-center"
                   >
-                    ← Ganti Alamat Email
+                    ← Gunakan Email Operator Lain
                   </button>
                 </div>
-              </form>
+              </div>
             )}
 
             {/* Back to Public Web */}

@@ -6,6 +6,7 @@ const ALLOWED_REDIRECT_PATHS = new Set([
   "/",
   "/login",
   "/profile",
+  "/operator",
   "/auth/desktop",
   "/auth/reset-password",
 ]);

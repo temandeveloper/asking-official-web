@@ -9,7 +9,7 @@ import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
-import { trackMetaCustomEvent } from "@/lib/metaPixel";
+import { trackMetaEvent, trackMetaCustomEvent } from "@/lib/metaPixel";
 import { QRCodeSVG } from "qrcode.react";
 import {
   User,
@@ -119,6 +119,19 @@ export default function ProfilePage() {
           }
         } catch (payErr) {
           console.warn("Error fetching/ensuring payment record:", payErr);
+        }
+
+        // Check if user just arrived from completing registration (ensures CompleteRegistration is tracked without email verification)
+        if (typeof window !== "undefined") {
+          if (sessionStorage.getItem("asking_complete_registration_pending") === "true") {
+            trackMetaEvent("CompleteRegistration", {
+              content_name: "AsKing account",
+              status: true,
+              currency: "IDR",
+              value: 0,
+            });
+            sessionStorage.removeItem("asking_complete_registration_pending");
+          }
         }
 
         // Check if user just arrived from clicking email verification link
