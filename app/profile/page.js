@@ -23,7 +23,7 @@ import {
   Check,
   Loader2,
   AlertCircle,
-  Sparkles,
+  ThumbsUp,
   ArrowUpRight,
   Fingerprint,
   Globe,
@@ -381,9 +381,9 @@ export default function ProfilePage() {
         dotClass: "bg-emerald-500 animate-pulse",
       };
 
-    if (!isSuspended && !isExpired && isTrial) {
-      statusBadge.label = language === "id" ? "Trial Aktif" : "Active Trial";
-    }
+  if (!isSuspended && !isExpired && isTrial) {
+    statusBadge.label = language === "id" ? "Trial Aktif" : "Active Trial";
+  }
 
   const startDateFormatted = new Date(startMs).toLocaleDateString(language === "id" ? "id-ID" : "en-US", {
     year: "numeric",
@@ -477,89 +477,129 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
       {/* Main Profile Content */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 sm:px-8 py-10 space-y-8">
         {/* User Hero Banner Card */}
-        <div className="rounded-3xl bg-white border border-[#DEE7DF] p-6 sm:p-8 shadow-sm relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            {/* Avatar Pill */}
-            <div className="w-20 h-20 rounded-3xl bg-[#12281F] text-[#B8F55C] text-2xl font-extrabold flex items-center justify-center shadow-lg border border-[#234235] shrink-0">
-              {userInitial}
-            </div>
+        <div className="rounded-3xl bg-white border border-[#DEE7DF] shadow-sm relative overflow-hidden">
+          <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              {/* Avatar Pill */}
+              <div className="w-20 h-20 rounded-3xl bg-[#12281F] text-[#B8F55C] text-2xl font-extrabold flex items-center justify-center shadow-lg border border-[#234235] shrink-0">
+                {userInitial}
+              </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-black text-[#11231B] tracking-tight">
-                  {user?.user_metadata?.full_name || "User Account"}
-                </h1>
-                {isEmailVerified ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px]">
-                    <CheckCircle2 className="w-3 h-3 text-[#22C55E]" />
-                    <span>{t("profile.verified_badge")}</span>
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSendVerificationLink}
-                    disabled={isSendingVerification || verificationCooldown > 0}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
-                    title={t("profile.send_verification_btn")}
-                  >
-                    <AlertCircle className="w-3 h-3 text-amber-500" />
-                    <span>{t("profile.unverified_badge")}</span>
-                    <span className="text-[10px] underline font-extrabold ml-0.5 text-amber-900">
-                      {verificationCooldown > 0
-                        ? `${verificationCooldown}s`
-                        : t("profile.send_verification_btn")}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="text-xl sm:text-2xl font-black text-[#11231B] tracking-tight">
+                    {user?.user_metadata?.full_name || "User Account"}
+                  </h1>
+                  {isEmailVerified ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px]">
+                      <CheckCircle2 className="w-3 h-3 text-[#22C55E]" />
+                      <span>{t("profile.verified_badge")}</span>
                     </span>
-                  </button>
-                )}
-              </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSendVerificationLink}
+                      disabled={isSendingVerification || verificationCooldown > 0}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-[11px] transition-all cursor-pointer disabled:opacity-60 shadow-2xs"
+                      title={t("profile.send_verification_btn")}
+                    >
+                      <AlertCircle className="w-3 h-3 text-amber-500" />
+                      <span>{t("profile.unverified_badge")}</span>
+                      <span className="text-[10px] underline font-extrabold ml-0.5 text-amber-900">
+                        {verificationCooldown > 0
+                          ? `${verificationCooldown}s`
+                          : t("profile.send_verification_btn")}
+                      </span>
+                    </button>
+                  )}
+                </div>
 
-              <p className="text-xs text-[#556A60] flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-[#6B8075]" />
-                {user?.email}
-              </p>
+                <p className="text-xs text-[#556A60] flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-[#6B8075]" />
+                  {user?.email}
+                </p>
 
-              <div className="flex items-center gap-4 text-[11px] text-[#8EA096] pt-1 flex-wrap">
-                <span className="flex items-center gap-1 font-mono">
-                  <Fingerprint className="w-3 h-3" />
-                  {t("profile.user_id")}: {user?.id?.slice(0, 8)}...
-                  <button
-                    type="button"
-                    onClick={handleCopyId}
-                    className="p-0.5 hover:text-[#11231B] cursor-pointer"
-                    title="Copy full User ID"
-                  >
-                    {copiedId ? (
-                      <Check className="w-3 h-3 text-[#22C55E]" />
-                    ) : (
-                      <Copy className="w-3 h-3" />
-                    )}
-                  </button>
-                </span>
+                <div className="flex items-center gap-4 text-[11px] text-[#8EA096] pt-1 flex-wrap">
+                  <span className="flex items-center gap-1 font-mono">
+                    <Fingerprint className="w-3 h-3" />
+                    {t("profile.user_id")}: {user?.id?.slice(0, 8)}...
+                    <button
+                      type="button"
+                      onClick={handleCopyId}
+                      className="p-0.5 hover:text-[#11231B] cursor-pointer"
+                      title="Copy full User ID"
+                    >
+                      {copiedId ? (
+                        <Check className="w-3 h-3 text-[#22C55E]" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                    </button>
+                  </span>
+                </div>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-stretch sm:self-auto">
+              <Link
+                href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
+                onClick={() => trackMetaCustomEvent("ClickMicrosoftStore", { placement: "profile_download" })}
+                className="relative w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <div className="w-8 h-8 rounded-full bg-[#11281F] text-[#B8F55C] flex items-center justify-center shrink-0">
+                    <WindowsIcon className="w-4 h-4 fill-current" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider font-extrabold text-[#193F2D] flex items-center gap-1">
+                      <span>{t("cta.ms_store_desc")}</span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-black text-[#0B1A13] tracking-tight leading-tight">
+                      {t("cta.btn_download")}
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-stretch sm:self-auto">
-            <Link
-              href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
-              onClick={() => trackMetaCustomEvent("ClickMicrosoftStore", { placement: "profile_download" })}
-              className="relative w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5 text-left">
-                <div className="w-8 h-8 rounded-full bg-[#11281F] text-[#B8F55C] flex items-center justify-center shrink-0">
-                  <WindowsIcon className="w-4 h-4 fill-current" />
-                </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-wider font-extrabold text-[#193F2D] flex items-center gap-1">
-                    <span>{t("cta.ms_store_desc")}</span>
-                  </div>
-                  <div className="text-xs sm:text-sm font-black text-[#0B1A13] tracking-tight leading-tight">
-                    {t("cta.btn_download")}
-                  </div>
-                </div>
+          {/* Conditional Info Caption Banner (Only shown when !isEmailVerified) */}
+          {!isEmailVerified && (
+            <div className="bg-gradient-to-r from-[#F4F9F5] via-[#F8FAF7] to-amber-50/50 border-t border-[#DEE7DF] px-6 py-3.5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+              <div className="flex items-start sm:items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#184530] text-[#B8F55C] text-[10px] font-extrabold uppercase tracking-wider shrink-0 shadow-2xs">
+                  <ThumbsUp className="w-3 h-3 text-[#B8F55C]" />
+                  <span>{t("profile.unverified_header_caption_badge")}</span>
+                </span>
+                <p className="text-[#3E5348] text-xs leading-relaxed">
+                  {t("profile.unverified_header_caption_text")}
+                </p>
               </div>
-            </Link>
-          </div>
+
+              <div className="shrink-0 self-end md:self-auto pl-1 sm:pl-0">
+                <button
+                  type="button"
+                  onClick={handleSendVerificationLink}
+                  disabled={isSendingVerification || verificationCooldown > 0}
+                  className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#184530] hover:text-[#0B1A13] underline underline-offset-4 decoration-[#B8F55C] hover:decoration-[#184530] transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSendingVerification ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>{t("profile.sending_verification")}</span>
+                    </>
+                  ) : verificationCooldown > 0 ? (
+                    <span>{`${t("profile.resend_in")} ${verificationCooldown}s`}</span>
+                  ) : (
+                    <>
+                      <span>{t("profile.unverified_header_caption_action")}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ========================================================================= */}
@@ -758,11 +798,10 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
 
                 {verificationStatus && (
                   <div
-                    className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200 ${
-                      verificationStatus.type === "success"
+                    className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 animate-in fade-in duration-200 ${verificationStatus.type === "success"
                         ? "bg-emerald-50 border border-emerald-200 text-emerald-800"
                         : "bg-rose-50 border border-rose-200 text-rose-700"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       {verificationStatus.type === "success" ? (
