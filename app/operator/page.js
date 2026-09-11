@@ -26,6 +26,7 @@ import {
   Download,
   Loader2,
   ChevronDown,
+  FileText,
 } from "lucide-react";
 
 function msToDatetimeLocal(ms) {
@@ -69,6 +70,10 @@ export default function OperatorDashboardPage() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [copiedUid, setCopiedUid] = useState(null);
+
+  // Business Requirement Detail Modal State
+  const [selectedRequirement, setSelectedRequirement] = useState(null);
+  const [copiedReq, setCopiedReq] = useState(false);
 
   // Pagination State (10 items per page + Load More)
   const [visibleCount, setVisibleCount] = useState(10);
@@ -226,6 +231,7 @@ export default function OperatorDashboardPage() {
           base_price: Number(editingRecord.base_price ?? 199000),
           discount: Number(editingRecord.discount ?? 60),
           price: Number(editingRecord.price ?? 79000),
+          business_requirement: editingRecord.business_requirement || null,
         }),
       });
 
@@ -269,7 +275,8 @@ export default function OperatorDashboardPage() {
         (p.uid || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_email || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_name || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-        (p.note_plan || "").toLowerCase().includes(searchQuery.toLowerCase().trim());
+        (p.note_plan || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        (p.business_requirement || "").toLowerCase().includes(searchQuery.toLowerCase().trim());
 
       const matchStatus = statusFilter === "all" || (p.status || "active").toLowerCase() === statusFilter.toLowerCase();
       const matchPlan = planFilter === "all" || String(p.jenis_plan) === planFilter;
@@ -312,6 +319,7 @@ export default function OperatorDashboardPage() {
       "UID",
       "Nama Pelanggan",
       "Email",
+      "Kebutuhan Bisnis",
       "Jenis Plan",
       "Tgl Payment",
       "Masa Berlaku (Expired)",
@@ -324,6 +332,7 @@ export default function OperatorDashboardPage() {
       p.uid,
       `"${p.user_name || "-"}"`,
       p.user_email || "-",
+      `"${(p.business_requirement || "").replace(/"/g, '""')}"`,
       p.jenis_plan === 1 ? "Pro Business" : p.jenis_plan === 2 ? "Pro+ Business" : "Free Trial",
       p.datetime_payment ? new Date(Number(p.datetime_payment)).toISOString() : "-",
       p.datetime_expired ? new Date(Number(p.datetime_expired)).toISOString() : "-",
@@ -524,31 +533,34 @@ export default function OperatorDashboardPage() {
         {/* Data Table */}
         <div className="rounded-3xl bg-white border border-[#DEE7DF] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[1360px] border-collapse">
               <thead className="bg-[#F8FAF7] border-b border-[#DEE7DF] text-[#556A60] uppercase tracking-wider font-bold text-[10px]">
                 <tr>
-                  <th className="py-4 px-5">UID & Pelanggan</th>
-                  <th className="py-4 px-5">Jenis Plan</th>
-                  <th className="py-4 px-5">Harga & Diskon</th>
-                  <th className="py-4 px-5">Tgl Payment</th>
-                  <th className="py-4 px-5">Masa Berlaku (Expired)</th>
-                  <th className="py-4 px-5">Request Budget</th>
-                  <th className="py-4 px-5">Status</th>
-                  <th className="py-4 px-5">Last Login</th>
-                  <th className="py-4 px-5 text-right">Action</th>
+                  <th className="py-4 px-4 sticky left-0 z-20 bg-[#F8FAF7] border-r border-[#DEE7DF] min-w-[125px] text-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)]">
+                    Action
+                  </th>
+                  <th className="py-4 px-5 min-w-[210px]">UID & Pelanggan</th>
+                  <th className="py-4 px-5 min-w-[170px]">Kebutuhan Bisnis</th>
+                  <th className="py-4 px-5 min-w-[130px]">Jenis Plan</th>
+                  <th className="py-4 px-5 min-w-[140px]">Harga & Diskon</th>
+                  <th className="py-4 px-5 min-w-[130px]">Tgl Payment</th>
+                  <th className="py-4 px-5 min-w-[155px]">Masa Berlaku (Expired)</th>
+                  <th className="py-4 px-5 min-w-[130px]">Request Budget</th>
+                  <th className="py-4 px-5 min-w-[110px]">Status</th>
+                  <th className="py-4 px-5 min-w-[150px]">Last Login</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EEF3EF] text-[#11231B]">
                 {loadingPayments ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={10} className="py-12 text-center text-[#556A60]">
                       <Loader2 className="w-6 h-6 animate-spin text-[#184530] mx-auto mb-2" />
                       <span>Memuat data tabel tb_payment...</span>
                     </td>
                   </tr>
                 ) : filteredPayments.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={10} className="py-12 text-center text-[#556A60]">
                       Tidak ada data pembayaran yang cocok dengan filter atau pencarian Anda.
                     </td>
                   </tr>
@@ -593,10 +605,39 @@ export default function OperatorDashboardPage() {
                     return (
                       <tr
                         key={row.uid || row.id}
-                        className="hover:bg-[#F8FAF7] transition-colors"
+                        className="hover:bg-[#F6FAF7] transition-colors group"
                       >
-                        {/* UID & Customer Info */}
-                        <td className="py-4 px-5">
+                        {/* 1. Action (Far Left & Sticky) */}
+                        <td className="py-4 px-4 sticky left-0 z-10 bg-white group-hover:bg-[#F6FAF7] transition-colors border-r border-[#DEE7DF] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)]">
+                          <div className="flex items-center justify-center gap-1.5">
+                            {/* Quick Approve Button if pending */}
+                            {row.status === "pending" && (
+                              <button
+                                type="button"
+                                onClick={() => handleQuickApprove(row)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-[11px] font-bold transition-all shadow-2xs active:scale-95 cursor-pointer"
+                                title="Approve Pro Plan (+30 Hari)"
+                              >
+                                <Check className="w-3.5 h-3.5 text-emerald-700" />
+                                <span>Approve</span>
+                              </button>
+                            )}
+
+                            {/* Edit Button */}
+                            <button
+                              type="button"
+                              onClick={() => setEditingRecord({ ...row })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-[11px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer border border-[#234235]"
+                              title="Edit Data Pelanggan"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit</span>
+                            </button>
+                          </div>
+                        </td>
+
+                        {/* 2. UID & Customer Info */}
+                        <td className="py-4 px-5 min-w-[210px]">
                           <div className="space-y-1">
                             <div className="flex items-center gap-1.5">
                               <span className="font-mono text-[11px] text-[#11231B] font-bold">
@@ -617,17 +658,34 @@ export default function OperatorDashboardPage() {
                                 </button>
                               )}
                             </div>
-                            <div className="text-[11px] font-bold text-[#11231B]">
+                            <div className="text-[11px] font-bold text-[#11231B] truncate max-w-[190px]" title={row.user_name}>
                               {row.user_name || "Tanpa Nama"}
                             </div>
-                            <div className="text-[10.5px] text-[#556A60]">
+                            <div className="text-[10.5px] text-[#556A60] truncate max-w-[190px]" title={row.user_email}>
                               {row.user_email || "-"}
                             </div>
                           </div>
                         </td>
 
-                        {/* Plan Badge */}
-                        <td className="py-4 px-5">
+                        {/* 3. Kebutuhan Bisnis */}
+                        <td className="py-4 px-5 min-w-[170px]">
+                          {row.business_requirement ? (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedRequirement(row)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#E5EFE7] hover:bg-[#D5E6D8] border border-[#CFE2D3] text-[#184530] text-[11px] font-bold transition-all shadow-2xs active:scale-95 cursor-pointer"
+                              title="Klik untuk melihat rincian kebutuhan pelanggan"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-[#184530]" />
+                              <span>Lihat Kebutuhan</span>
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-[#8FA599] italic">Tidak ada catatan</span>
+                          )}
+                        </td>
+
+                        {/* 4. Plan Badge */}
+                        <td className="py-4 px-5 min-w-[130px]">
                           <span
                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${planBadge.bg}`}
                           >
@@ -635,8 +693,8 @@ export default function OperatorDashboardPage() {
                           </span>
                         </td>
 
-                        {/* Price & Discount Setup */}
-                        <td className="py-4 px-5">
+                        {/* 5. Price & Discount Setup */}
+                        <td className="py-4 px-5 min-w-[140px]">
                           <div className="space-y-0.5">
                             <span className="font-mono font-black text-[#184530] text-xs block">
                               Rp {(row.price ?? 79000).toLocaleString("id-ID")}
@@ -652,13 +710,13 @@ export default function OperatorDashboardPage() {
                           </div>
                         </td>
 
-                        {/* Payment Date */}
-                        <td className="py-4 px-5 font-mono text-[11px] text-[#556A60]">
+                        {/* 6. Payment Date */}
+                        <td className="py-4 px-5 font-mono text-[11px] text-[#556A60] min-w-[130px]">
                           {paymentDate}
                         </td>
 
-                        {/* Expiration Date */}
-                        <td className="py-4 px-5">
+                        {/* 7. Expiration Date */}
+                        <td className="py-4 px-5 min-w-[155px]">
                           <div className="space-y-0.5">
                             <span className="font-mono text-[11px] text-[#556A60] block">
                               {expiredDate}
@@ -672,15 +730,15 @@ export default function OperatorDashboardPage() {
                           </div>
                         </td>
 
-                        {/* Request Budget */}
-                        <td className="py-4 px-5">
+                        {/* 8. Request Budget */}
+                        <td className="py-4 px-5 min-w-[130px]">
                           <span className="font-mono font-bold text-[#11231B] text-xs">
                             {(row.request_budget || 0).toLocaleString("id-ID")}
                           </span>
                         </td>
 
-                        {/* Status */}
-                        <td className="py-4 px-5">
+                        {/* 9. Status */}
+                        <td className="py-4 px-5 min-w-[110px]">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10.5px] font-bold border ${statusBadge.bg}`}
                           >
@@ -688,8 +746,8 @@ export default function OperatorDashboardPage() {
                           </span>
                         </td>
 
-                        {/* Last Login */}
-                        <td className="py-4 px-5">
+                        {/* 10. Last Login */}
+                        <td className="py-4 px-5 min-w-[150px]">
                           {row.last_sign_in_at ? (
                             <div className="space-y-0.5">
                               <span className="font-mono text-[11px] text-[#11231B] font-semibold block">
@@ -709,34 +767,6 @@ export default function OperatorDashboardPage() {
                           ) : (
                             <span className="text-[11px] text-[#8FA599] italic">Belum Pernah</span>
                           )}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="py-4 px-5 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* Quick Approve Button if not active pro */}
-                            {row.status === "pending" && (
-                              <button
-                                type="button"
-                                onClick={() => handleQuickApprove(row)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-[11px] font-bold transition-all shadow-2xs cursor-pointer"
-                                title="Approve Pro Plan (+30 Hari)"
-                              >
-                                <Check className="w-3.5 h-3.5 text-emerald-700" />
-                                <span>Approve</span>
-                              </button>
-                            )}
-
-                            {/* Edit Button */}
-                            <button
-                              type="button"
-                              onClick={() => setEditingRecord({ ...row })}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-[11px] font-bold transition-all shadow-xs cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" />
-                              <span>Edit</span>
-                            </button>
-                          </div>
                         </td>
                       </tr>
                     );
@@ -1067,6 +1097,18 @@ export default function OperatorDashboardPage() {
                 />
               </div>
 
+              {/* Business Requirement */}
+              <div className="space-y-1">
+                <label className="font-bold text-[#2D3E35]">Kebutuhan Bisnis Pelanggan</label>
+                <textarea
+                  rows={3}
+                  value={editingRecord.business_requirement || ""}
+                  onChange={(e) => setEditingRecord({ ...editingRecord, business_requirement: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F] resize-none leading-relaxed"
+                  placeholder="Catatan kebutuhan otomatisasi dari pelanggan..."
+                />
+              </div>
+
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EEF3EF]">
                 <button
@@ -1095,6 +1137,122 @@ export default function OperatorDashboardPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP MODAL: KEBUTUHAN BISNIS PELANGGAN */}
+      {selectedRequirement && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-150 select-none">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-[#DEE7DF] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="bg-[#12281F] text-white p-6 flex items-center justify-between border-b border-[#234235]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#18362B] text-[#B8F55C] border border-[#2A5241] flex items-center justify-center shadow-xs">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white tracking-tight">
+                    Kebutuhan Bisnis Pelanggan
+                  </h3>
+                  <p className="text-xs text-[#A5B8AD] truncate max-w-[280px]">
+                    {selectedRequirement.user_name || "Pelanggan"} • {selectedRequirement.user_email || "-"}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedRequirement(null)}
+                className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="p-6 sm:p-7 space-y-5 text-xs text-[#11231B]">
+              {/* Customer Metadata Card */}
+              <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
+                <div className="grid grid-cols-2 gap-3 text-[11px]">
+                  <div>
+                    <span className="text-[#6B8075] block">Nama Pelanggan</span>
+                    <span className="font-bold text-[#11231B]">{selectedRequirement.user_name || "-"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#6B8075] block">Email Pelanggan</span>
+                    <span className="font-bold text-[#11231B] truncate block">{selectedRequirement.user_email || "-"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#6B8075] block">UID</span>
+                    <span className="font-mono text-[10px] text-[#556A60]">{selectedRequirement.uid}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#6B8075] block">Jenis Plan</span>
+                    <span className="font-bold text-[#184530]">
+                      {selectedRequirement.jenis_plan === 1 ? "Pro Business" : selectedRequirement.jenis_plan === 2 ? "Pro+ Business" : "Free Trial"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Requirement Text Box */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#2D3E35]">Rincian Kebutuhan:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedRequirement.business_requirement) {
+                        navigator.clipboard.writeText(selectedRequirement.business_requirement);
+                        setCopiedReq(true);
+                        setTimeout(() => setCopiedReq(false), 2000);
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#184530] hover:text-[#12281F] cursor-pointer"
+                  >
+                    {copiedReq ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-700">Tersalin!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Salin Teks</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs text-[#11231B] leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto select-text font-sans">
+                  {selectedRequirement.business_requirement || "Tidak ada catatan kebutuhan."}
+                </div>
+              </div>
+
+              {/* Modal Footer Action */}
+              <div className="pt-2 flex items-center justify-between border-t border-[#EEF3EF]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const req = selectedRequirement;
+                    setSelectedRequirement(null);
+                    setEditingRecord({ ...req });
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#DEE7DF] text-[#184530] hover:bg-[#F2F7F3] font-bold text-xs transition-all cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Data Pelanggan</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedRequirement(null)}
+                  className="px-5 py-2 rounded-xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

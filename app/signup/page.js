@@ -24,6 +24,7 @@ import {
   Inbox,
   Globe,
   Headphones,
+  FileText,
 } from "lucide-react";
 
 export default function SignupPage() {
@@ -40,6 +41,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [businessRequirement, setBusinessRequirement] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
@@ -96,6 +98,7 @@ export default function SignupPage() {
             full_name: fullName.trim(),
             selected_plan: selectedPlan,
             asking_email_confirmed: false,
+            business_requirement: businessRequirement.trim() || null,
           },
           emailRedirectTo: redirectUrl,
         },
@@ -127,9 +130,9 @@ export default function SignupPage() {
         sessionStorage.setItem("asking_complete_registration_pending", "true");
       }
 
-      // 1. Ensure tb_payment record is created with chosen plan
+      // 1. Ensure tb_payment record is created with chosen plan and requirement
       if (data?.user) {
-        await ensureUserPayment(supabase, data.user, selectedPlan);
+        await ensureUserPayment(supabase, data.user, selectedPlan, businessRequirement.trim() || null);
       }
 
       const searchParams = new URLSearchParams(window.location.search);
@@ -407,6 +410,37 @@ export default function SignupPage() {
                       )}
                     </button>
                   </div>
+                </div>
+
+                {/* Business Requirement (Optional) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-[#2D3E35]">
+                      {language === "id" ? "Izinkan Kami Mengetahui Kebutuhan Anda" : "Let Us Know About Your Needs"}
+                    </label>
+                    <span className="text-[10.5px] text-[#6B8075] font-medium">
+                      {language === "id" ? "(Optional)" : "(Optional)"}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <FileText className="w-4 h-4 absolute left-3.5 top-3 text-[#6B8075]" />
+                    <textarea
+                      rows={3}
+                      placeholder={
+                        language === "id"
+                          ? "Jelaskan kebutuhan dari bisnis Anda, atau fitur apa yang Anda harapkan tersedia di AsKing"
+                          : "Explain the needs of your business, or what features you expect to be available in AsKing"
+                      }
+                      value={businessRequirement}
+                      onChange={(e) => setBusinessRequirement(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] transition-colors resize-none leading-relaxed"
+                    />
+                  </div>
+                  <p className="text-[10.5px] text-[#6B8075]">
+                    {language === "id"
+                      ? "Bantu kami menyiapkan solusi otomatisasi AI yang paling cocok untuk bisnis Anda."
+                      : "Help us prepare the most suitable AI automation solution for your business."}
+                  </p>
                 </div>
 
                 {/* Required legal consent */}

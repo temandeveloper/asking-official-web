@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS public.tb_payment (
     base_price BIGINT, -- Inisialisasi dinamis dari PRICING_CONFIG.proOriginalPrice
     discount INT,      -- Persentase diskon dinamis dari PRICING_CONFIG.proDiscountPercent (e.g. 60)
     price BIGINT,       -- Inisialisasi dinamis dari PRICING_CONFIG.proRawAmount (e.g. 79000)
+    business_requirement TEXT, -- Catatan/kebutuhan pelanggan saat registrasi (opsional)
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -82,7 +83,8 @@ CREATE OR REPLACE FUNCTION public.get_operator_payments()
    price bigint,
    created_at timestamp with time zone,
    updated_at timestamp with time zone,
-   last_sign_in_at timestamp with time zone
+   last_sign_in_at timestamp with time zone,
+   business_requirement text
  )
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -105,7 +107,8 @@ BEGIN
     p.price,
     p.created_at,
     p.updated_at,
-    u.last_sign_in_at
+    u.last_sign_in_at,
+    p.business_requirement
   FROM public.tb_payment p
   LEFT JOIN auth.users u ON p.uid = u.id
   ORDER BY p.updated_at DESC NULLS LAST;

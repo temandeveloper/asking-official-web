@@ -154,6 +154,7 @@ export async function PUT(request) {
       base_price,
       discount,
       price,
+      business_requirement,
     } = body;
 
     if (!uid) {
@@ -176,6 +177,14 @@ export async function PUT(request) {
       p_discount: discount !== undefined ? Number(discount) : null,
       p_price: price !== undefined ? Number(price) : null,
     });
+
+    // If business_requirement provided, update it in tb_payment
+    if (business_requirement !== undefined) {
+      await supabase
+        .from("tb_payment")
+        .update({ business_requirement: business_requirement || null })
+        .eq("uid", uid);
+    }
 
     if (error) {
       console.error("[Operator Payments PUT] Error:", error.message);
