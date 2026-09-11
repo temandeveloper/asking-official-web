@@ -101,10 +101,24 @@ export async function GET(request) {
       });
     }
 
+    const limitParam = searchParams.get("limit");
+    const offsetParam = searchParams.get("offset");
+    const total = results.length;
+    let paginatedResults = results;
+
+    if (limitParam !== null && limitParam !== undefined) {
+      const limit = parseInt(limitParam, 10);
+      const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+      if (!isNaN(limit) && limit > 0) {
+        paginatedResults = results.slice(offset, offset + limit);
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      data: results,
-      total: results.length,
+      data: paginatedResults,
+      total,
+      count: paginatedResults.length,
     });
   } catch (err) {
     console.error("[Operator Payments GET] Server error:", err);

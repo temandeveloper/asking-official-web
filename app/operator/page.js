@@ -25,6 +25,7 @@ import {
   Save,
   Download,
   Loader2,
+  ChevronDown,
 } from "lucide-react";
 
 function msToDatetimeLocal(ms) {
@@ -68,6 +69,15 @@ export default function OperatorDashboardPage() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [copiedUid, setCopiedUid] = useState(null);
+
+  // Pagination State (10 items per page + Load More)
+  const [visibleCount, setVisibleCount] = useState(10);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // Reset pagination when search query or filters change
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [searchQuery, statusFilter, planFilter]);
 
   // 1. Authenticate Operator Session dynamically
   useEffect(() => {
@@ -268,6 +278,22 @@ export default function OperatorDashboardPage() {
     });
   }, [payments, searchQuery, statusFilter, planFilter]);
 
+  // Paginated/Displayed Payments (initial 10 items + Load More)
+  const displayedPayments = useMemo(() => {
+    return filteredPayments.slice(0, visibleCount);
+  }, [filteredPayments, visibleCount]);
+
+  const hasMore = visibleCount < filteredPayments.length;
+  const remainingCount = Math.max(0, filteredPayments.length - visibleCount);
+
+  const handleLoadMore = () => {
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount((prev) => prev + 10);
+      setIsLoadingMore(false);
+    }, 200);
+  };
+
   // Summary Metrics
   const metrics = useMemo(() => {
     const total = payments.length;
@@ -288,9 +314,10 @@ export default function OperatorDashboardPage() {
       "Email",
       "Jenis Plan",
       "Tgl Payment",
-      "Tgl Expired",
+      "Masa Berlaku (Expired)",
       "Request Budget",
       "Status",
+      "Last Login",
     ];
 
     const rows = filteredPayments.map((p) => [
@@ -302,6 +329,7 @@ export default function OperatorDashboardPage() {
       p.datetime_expired ? new Date(Number(p.datetime_expired)).toISOString() : "-",
       p.request_budget || 0,
       p.status || "active",
+      p.last_sign_in_at ? new Date(p.last_sign_in_at).toISOString() : "-",
     ]);
 
     const csvContent =
@@ -506,25 +534,26 @@ export default function OperatorDashboardPage() {
                   <th className="py-4 px-5">Masa Berlaku (Expired)</th>
                   <th className="py-4 px-5">Request Budget</th>
                   <th className="py-4 px-5">Status</th>
+                  <th className="py-4 px-5">Last Login</th>
                   <th className="py-4 px-5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EEF3EF] text-[#11231B]">
                 {loadingPayments ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={9} className="py-12 text-center text-[#556A60]">
                       <Loader2 className="w-6 h-6 animate-spin text-[#184530] mx-auto mb-2" />
                       <span>Memuat data tabel tb_payment...</span>
                     </td>
                   </tr>
                 ) : filteredPayments.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={9} className="py-12 text-center text-[#556A60]">
                       Tidak ada data pembayaran yang cocok dengan filter atau pencarian Anda.
                     </td>
                   </tr>
                 ) : (
-                  filteredPayments.map((row) => {
+                  displayedPayments.map((row) => {
                     const planBadge =
                       row.jenis_plan === 1
                         ? { label: "Pro Business", bg: "bg-[#E5EFE7] text-[#184530] border-[#CFE2D3]" }
@@ -659,6 +688,29 @@ export default function OperatorDashboardPage() {
                           </span>
                         </td>
 
+                        {/* Last Login */}
+                        <td className="py-4 px-5">
+                          {row.last_sign_in_at ? (
+                            <div className="space-y-0.5">
+                              <span className="font-mono text-[11px] text-[#11231B] font-semibold block">
+                                {new Date(row.last_sign_in_at).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                              <span className="font-mono text-[10px] text-[#6B8075] block">
+                                {new Date(row.last_sign_in_at).toLocaleTimeString("id-ID", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })} WIB
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-[#8FA599] italic">Belum Pernah</span>
+                          )}
+                        </td>
+
                         {/* Actions */}
                         <td className="py-4 px-5 text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -693,6 +745,42 @@ export default function OperatorDashboardPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Footer / Load More Pagination */}
+          {!loadingPayments && filteredPayments.length > 0 && (
+            <div className="p-4 sm:p-5 bg-[#F8FAF7] border-t border-[#DEE7DF] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-[#556A60]">
+                Menampilkan <span className="font-bold text-[#11231B] font-mono">{displayedPayments.length}</span> dari{" "}
+                <span className="font-bold text-[#11231B] font-mono">{filteredPayments.length}</span> data pelanggan
+              </div>
+
+              {hasMore ? (
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={isLoadingMore}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#B8F55C]" />
+                      <span>Memuat 10 data berikutnya...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4 text-[#B8F55C]" />
+                      <span>Muat Lebih Banyak (+{Math.min(10, remainingCount)})</span>
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="text-[11px] text-[#6B8075] font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#184530]" />
+                  <span>Semua data telah ditampilkan ({filteredPayments.length} data)</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
       </main>
@@ -714,6 +802,22 @@ export default function OperatorDashboardPage() {
                   </h3>
                   <p className="text-xs text-[#A5B8AD] font-mono">
                     UID: {editingRecord.uid}
+                    {editingRecord.last_sign_in_at ? (
+                      <span className="ml-2 pl-2 border-l border-[#2A5241] text-[#B8F55C]">
+                        Terakhir Login: {new Date(editingRecord.last_sign_in_at).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })} {new Date(editingRecord.last_sign_in_at).toLocaleTimeString("id-ID", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} WIB
+                      </span>
+                    ) : (
+                      <span className="ml-2 pl-2 border-l border-[#2A5241] text-[#8FA599] italic">
+                        Terakhir Login: Belum Pernah
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
