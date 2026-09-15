@@ -5,7 +5,7 @@ import {
   MessageSquare,
   MessageCircle,
   Kanban,
-  Sparkles,
+  BrainCircuit,
   Bot,
   CalendarClock,
   ThumbsUp,
@@ -13,6 +13,15 @@ import {
   ShieldCheck,
   Zap,
   Radio,
+  Globe,
+  Smartphone,
+  Monitor,
+  Layers,
+  Lock,
+  CheckCircle2,
+  ShoppingCart,
+  MessageCircleCheck,
+  Gem,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 
@@ -224,82 +233,15 @@ export default function FeaturesBento() {
           </motion.div>
 
           {/* ========================================================================= */}
-          {/* ROW 2: Card 3 (Span 1) + Card 4 (Span 1) + Card 5 (Span 1) */}
+          {/* ROW 2: Card 3 (Span 1) + Card 4 (Span 2) */}
           {/* ========================================================================= */}
 
-          {/* Card 3: AsKing AI Assistant Manager (Col 1 of Row 2) */}
+          {/* Card 3: Smart Scheduler & Broadcast Templates (Span 1 col on lg) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-3xl bg-[#0C1712] text-white border border-[#234235] p-7 sm:p-9 shadow-lg flex flex-col justify-between space-y-6 h-full"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#12281F] text-[#B8F55C] border border-[#234235] flex items-center justify-center shadow-xs">
-                <Sparkles className="w-6 h-6 text-[#B8F55C]" />
-              </div>
-              <h3 className="text-xl font-black text-[#F2F7F4]">
-                {t("features.assistant_title")}
-              </h3>
-              <p className="text-xs sm:text-sm text-[#A5B8AD] leading-relaxed">
-                {t("features.assistant_desc")}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#12241C] border border-[#1F382B] space-y-2">
-              <div className="text-[11px] text-[#A5B8AD] font-semibold flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-[#B8F55C]" />
-                <span>Executive Guidance:</span>
-              </div>
-              <p className="text-xs text-[#D1DDD6] italic leading-relaxed">
-                "{t("features.assistant_reply_sample")}"
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Card 4: Autonomous 24/7 AI Customer Agent (Col 2 of Row 2) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-3xl bg-white border border-[#DEE7DF] p-7 sm:p-9 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6 h-full"
-          >
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#12281F] text-[#B8F55C] border border-[#234235] flex items-center justify-center shadow-xs">
-                <Bot className="w-6 h-6 text-[#B8F55C]" />
-              </div>
-              <h3 className="text-xl font-black text-[#11231B]">
-                {t("features.agent_title")}
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4B6055] leading-relaxed">
-                {t("features.agent_desc")}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#184530] flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  {t("features.agent_guardrail")}
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                  {t("features.agent_badge")}
-                </span>
-              </div>
-              <p className="text-xs text-[#556A60] leading-relaxed">
-                AI Agent bertindak otomatis dalam batas SOP perusahaan tanpa resiko penyalahgunaan data.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Card 5: Smart Scheduler & Templates (Col 3 of Row 2) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
             className="rounded-3xl bg-white border border-[#DEE7DF] p-7 sm:p-9 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6 h-full"
           >
             <div className="space-y-3">
@@ -317,12 +259,261 @@ export default function FeaturesBento() {
             <div className="p-4 rounded-2xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-2">
               <div className="flex items-center justify-between text-xs font-bold text-[#11231B]">
                 <span>Follow-Up Demo Calendar</span>
-                <span className="text-emerald-700 font-semibold text-[10px] bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                  {t("features.scheduler_active_badge")}
-                </span>
               </div>
               <p className="text-xs text-[#556A60] leading-relaxed">
                 Pengingat otomatis H-1 & broadcast template dengan parameter variabel dinamis.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 4: Landing Page Studio & Instant Publishing (Span 2 cols on lg) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="lg:col-span-2 rounded-3xl bg-white border border-[#DEE7DF] p-7 sm:p-9 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6 h-full"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#12281F] text-[#B8F55C] border border-[#234235] flex items-center justify-center shadow-xs">
+                  <Globe className="w-6 h-6 text-[#B8F55C]" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-black text-[#11231B]">
+                {t("features.landing_title")}
+              </h3>
+              <p className="text-sm text-[#4B6055] leading-relaxed max-w-xl">
+                {t("features.landing_desc")}
+              </p>
+            </div>
+
+            {/* Studio Workspace Authentic Preview */}
+            <div className="rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] p-4 sm:p-5 space-y-4 shadow-2xs overflow-hidden">
+              {/* Top Studio Browser Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#DEE7DF]">
+                {/* Traffic Light Dots */}
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80" />
+                </div>
+
+                {/* Subdomain URL Display */}
+                <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white border border-[#DEE7DF] shadow-2xs text-[11px] font-mono text-[#11231B]">
+                  <Lock className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span className="font-semibold text-emerald-700">https://</span>
+                  <span className="font-bold text-[#11231B]">{t("features.landing_subdomain_sample")}</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {t("features.landing_live_status")}
+                  </span>
+                </div>
+
+                {/* Viewport Toggles */}
+                <div className="flex items-center gap-1 bg-[#EBF1EB] p-1 rounded-lg text-xs">
+                  <div className="px-2 py-0.5 rounded bg-white text-[#184530] font-bold shadow-2xs flex items-center gap-1 text-[10px]">
+                    <Smartphone className="w-3 h-3" />
+                    <span>375px</span>
+                  </div>
+                  <div className="px-1.5 py-0.5 text-[#6B8075] flex items-center text-[10px]">
+                    <Monitor className="w-3 h-3" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Two-Column Studio Content: Left Components Architecture, Right Mobile Rendered Page */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                {/* Left (Col 5): Drag-and-drop Component Palette */}
+                <div className="md:col-span-5 space-y-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[#6B8075] flex items-center gap-1.5 mb-2">
+                    <Layers className="w-3.5 h-3.5 text-[#184530]" />
+                    <span>Komponen Terintegrasi</span>
+                  </div>
+
+                  {/* Component 1: Hero Block */}
+                  <div className="p-2.5 rounded-xl bg-white border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-[#EAF3EC] text-[#184530] flex items-center justify-center font-bold text-[10px]">
+                        <ShoppingCart className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-bold text-[#11231B]">Banner & List Product</span>
+                    </div>
+                  </div>
+
+                  {/* Component 2: WhatsApp CTA */}
+                  <div className="p-2.5 rounded-xl bg-white border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px]">
+                        <MessageCircleCheck className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-bold text-[#11231B]">Conversion Button (CTA)</span>
+                    </div>
+                  </div>
+
+                  {/* Component 3: Promo & Multi-Channel */}
+                  <div className="p-2.5 rounded-xl bg-white border border-[#DEE7DF] hover:border-[#CFE2D3] transition-all flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-[10px]">
+                        <Gem className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-bold text-[#11231B]">Promo & Multichannel</span>
+                    </div>
+                  </div>
+
+                  {/* Performance Specs */}
+                  <div className="pt-1.5 text-[11px] text-[#556A60] space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{t("features.landing_tag_speed")}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>{t("features.landing_feature_domain_desc")}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right (Col 7): Mobile Live Rendered Mockup */}
+                <div className="md:col-span-7 bg-white rounded-2xl border border-[#DEE7DF] p-4 shadow-sm space-y-3 relative overflow-hidden">
+                  {/* Subtle top accent bar */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#184530] to-[#B8F55C]" />
+
+                  {/* Mockup Header */}
+                  <div className="flex items-center justify-between pt-1 pb-2 border-b border-[#F2F7F3]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#12281F] text-[#B8F55C] flex items-center justify-center font-bold text-[9px]">
+                        B
+                      </div>
+                      <span className="text-xs font-bold text-[#11231B]">Brand Official Store</span>
+                    </div>
+                  </div>
+
+                  {/* Mockup Hero Headline & Copy */}
+                  <div className="space-y-1.5 py-1">
+                    <h5 className="text-xs sm:text-sm font-extrabold text-[#11231B] leading-tight">
+                      {t("features.landing_preview_hero_title")}
+                    </h5>
+                    <p className="text-[11px] text-[#556A60] leading-snug">
+                      {t("features.landing_preview_hero_subtitle")}
+                    </p>
+                  </div>
+
+                  {/* Mockup WhatsApp CTA Button */}
+                  <div className="w-full py-2 px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-default">
+                    <MessageSquare className="w-3.5 h-3.5 fill-current" />
+                    <span>{t("features.landing_preview_cta")}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ========================================================================= */}
+          {/* ROW 3: Card 5 (Span 2) + Card 6 (Span 1) */}
+          {/* ========================================================================= */}
+
+          {/* Card 5: Autonomous 24/7 AI Customer Agent (Span 2 cols on lg) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="lg:col-span-2 rounded-3xl bg-white border border-[#DEE7DF] p-7 sm:p-9 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6 h-full"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#12281F] text-[#B8F55C] border border-[#234235] flex items-center justify-center shadow-xs">
+                  <Bot className="w-6 h-6 text-[#B8F55C]" />
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  {t("features.agent_badge")}
+                </span>
+              </div>
+              <h3 className="text-2xl font-black text-[#11231B]">
+                {t("features.agent_title")}
+              </h3>
+              <p className="text-sm text-[#4B6055] leading-relaxed max-w-xl">
+                {t("features.agent_desc")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+              {/* Left: Guardrail & SOP Status */}
+              <div className="p-4 rounded-2xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#184530] flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    {t("features.agent_guardrail")}
+                  </span>
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-white border border-[#DEE7DF] text-[#184530]">
+                    SOP Safe
+                  </span>
+                </div>
+                <p className="text-xs text-[#556A60] leading-relaxed">
+                  AI Agent bertindak otomatis dalam batas SOP perusahaan tanpa resiko halusinasi atau penyalahgunaan data.
+                </p>
+                <div className="space-y-1.5 pt-1 text-[11px] text-[#4B6055]">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Grounding basis data internal terverifikasi</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Human handover otomatis saat kasus eskalasi</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Live Simulated Chat Bubble */}
+              <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5 shadow-2xs">
+                <div className="flex items-center justify-between pb-2 border-b border-[#DEE7DF] text-[10px] text-[#6B8075]">
+                  <span className="font-bold text-[#11231B]">Simulasi Respon Percakapan</span>
+                  <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Aktif 24/7
+                  </span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="bg-white p-2.5 rounded-xl rounded-tl-xs border border-[#DEE7DF] max-w-[85%] text-[#11231B]">
+                    Apakah AsKing support integrasi WhatsApp dan Telegram sekaligus?
+                  </div>
+                  <div className="bg-[#12281F] text-[#F2F7F4] p-2.5 rounded-xl rounded-tr-xs border border-[#234235] max-w-[90%] ml-auto text-[11px] leading-relaxed">
+                    <span className="text-[#B8F55C] font-bold block text-[10px] mb-0.5">AsKing AI Agent:</span>
+                    Ya, AsKing mendukung WhatsApp dan Telegram secara terpadu dalam satu aplikasi desktop Local-First.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 6: AsKing AI Assistant Manager (Span 1 col on lg, Dark Theme) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="rounded-3xl bg-[#0C1712] text-white border border-[#234235] p-7 sm:p-9 shadow-lg flex flex-col justify-between space-y-6 h-full"
+          >
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#12281F] text-[#B8F55C] border border-[#234235] flex items-center justify-center shadow-xs">
+                <BrainCircuit className="w-6 h-6 text-[#B8F55C]" />
+              </div>
+              <h3 className="text-xl font-black text-[#F2F7F4]">
+                {t("features.assistant_title")}
+              </h3>
+              <p className="text-xs sm:text-sm text-[#A5B8AD] leading-relaxed">
+                {t("features.assistant_desc")}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#12241C] border border-[#1F382B] space-y-2">
+              <div className="text-[11px] text-[#A5B8AD] font-semibold flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>Executive Guidance:</span>
+              </div>
+              <p className="text-xs text-[#D1DDD6] italic leading-relaxed">
+                "{t("features.assistant_reply_sample")}"
               </p>
             </div>
           </motion.div>

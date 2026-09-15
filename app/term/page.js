@@ -63,8 +63,8 @@ export default function TermsPage() {
               </h1>
               <p className="text-xs text-[#556A60]">
                 {language === "id"
-                  ? "Terakhir Diperbarui: 29 Agustus 2026"
-                  : "Last Updated: August 29, 2026"}
+                  ? "Terakhir Diperbarui: 15 September 2026"
+                  : "Last Updated: September 15, 2026"}
               </p>
             </div>
 
@@ -264,11 +264,136 @@ export default function TermsPage() {
                   </ul>
                 </section>
 
-                {/* Section 7: Disclaimers & Limitations of Liability */}
+                {/* Section 7: Landing Page Studio & Hosting Service */}
                 <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       7
+                    </span>
+                    Layanan Publikasi & Hosting Landing Page
+                  </h2>
+                  <p>
+                    AsKing menyediakan fitur pembuatan dan penerbitan halaman arahan (<em>Landing Page Studio</em>) yang memungkinkan pengguna mempublikasikan konten web melalui infrastruktur subdomain kami (seperti <code>[slug]-app.godiscus.com</code>) maupun domain kustom. Ketentuan khusus berikut mengikat setiap halaman yang dibuat dan dipublikasikan:
+                  </p>
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Penyedia Sarana Teknis & Penyangkalan Afiliasi
+                      </h3>
+                      <p>
+                        AsKing dan GoDiscus bertindak semata-mata sebagai penyedia sarana perangkat lunak teknis dan hosting (<em>technical hosting provider</em>), bukan sebagai penerbit (<em>publisher</em>) ataupun pembuat materi. AsKing dan GoDiscus tidak memiliki afiliasi, asosiasi, keterkaitan kepemilikan, ataupun persetujuan dalam bentuk apa pun terhadap produk, layanan, penawaran komersial, klaim, teks, gambar, tautan, atau materi apa pun yang dimuat pada halaman web yang dibuat oleh pengguna.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Tanggung Jawab Pengguna & Pelepasan Tuntutan (Indemnifikasi)
+                      </h3>
+                      <p>
+                        Segala bentuk penyalahgunaan, kerugian pihak ketiga/konsumen, dan transaksi yang terjadi melalui landing page sepenuhnya merupakan tanggung jawab pribadi pengguna yang bersangkutan. Pengguna wajib membebaskan, membela, dan mengganti kerugian (<em>indemnify and hold harmless</em>) AsKing, GoDiscus, para pengembang, serta afiliasinya dari dan terhadap setiap tuntutan hukum, gugatan perdata/pidana, denda administratif, atau kerugian finansial yang diajukan oleh pihak ketiga, konsumen, ataupun regulator yang timbul dari konten web pengguna.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Larangan Konten & Hak Take Down Seketika
+                      </h3>
+                      <p>
+                        Pengguna dilarang keras memanfaatkan fitur landing page untuk mempublikasikan materi atau aktivitas yang melanggar hukum, norma, dan etika, termasuk namun tidak terbatas pada:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Perjudian online, taruhan, kasino daring, atau skema lotre ilegal.</li>
+                        <li>Penipuan (<em>fraud</em>), phishing, penyebaran malware/spyware, atau penyesatan konsumen.</li>
+                        <li>Pornografi, materi asusila, atau eksploitasi pihak di bawah umur.</li>
+                        <li>Penjualan zat terlarang (narkotika/psikotropika), obat keras tanpa izin instansi berwenang, senjata, atau produk bajakan/palsu.</li>
+                        <li>Pelanggaran hak kekayaan intelektual (hak cipta dan merek dagang) milik pihak lain.</li>
+                      </ul>
+                      <p className="mt-2">
+                        Kami berhak secara sepihak untuk memblokir, menonaktifkan akses (<em>take down</em>), menghapus landing page terkait, serta menangguhkan atau menghentikan akun pengguna yang melanggar ketentuan ini secara seketika tanpa pemberitahuan sebelumnya demi kepatuhan hukum dan perlindungan publik.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Kebijakan Retensi Hosting 3 Bulan & Pelepasan Subdomain
+                      </h3>
+                      <p>
+                        Layanan hosting publik serta pengikatan nama subdomain diberikan selama akun pengguna memiliki status langganan atau lisensi aktif. Apabila pengguna tidak melakukan perpanjangan langganan selama <strong>3 (tiga) bulan berturut-turut</strong> sejak masa berlaku berakhir:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Kami berhak melakukan <em>take down</em> dan/atau penghapusan permanen atas berkas landing page dari server cloud kami.</li>
+                        <li>Nama subdomain yang sebelumnya digunakan berhak dilepas dan dialokasikan kembali agar dapat digunakan oleh pengguna lain.</li>
+                        <li>Proyek draf yang tersimpan pada database lokal di komputer pengguna tetap berada di bawah kendali pengguna (sesuai arsitektur <em>Local-First</em>), namun hosting daring publiknya telah dihentikan.</li>
+                        <li>Kami tidak bertanggung jawab atas hilangnya trafik pengunjung, peringkat mesin pencari (SEO), atau potensi pendapatan yang timbul akibat penghapusan hosting tersebut.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Kanal Pelaporan Penyalahgunaan (Abuse Reporting)
+                      </h3>
+                      <p>
+                        Masyarakat, pemilik hak kekayaan intelektual, dan pihak berwenang dapat melaporkan landing page yang diduga melanggar hukum atau hak pihak ketiga dengan mengirimkan laporan ke <a href="mailto:asking@godiscus.com?subject=Laporan%20Penyalahgunaan%20Landing%20Page" className="text-[#184530] font-bold underline">asking@godiscus.com</a> disertai tautan halaman dan bukti pendukung. Tim kami akan segera meninjau dan menindaklanjuti laporan tersebut.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 8: Service Availability, Force Majeure & Continuity */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      8
+                    </span>
+                    Ketersediaan Layanan, Keadaan Memaksa (Force Majeure) & Kelangsungan Operasional
+                  </h2>
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Komitmen Ketersediaan & Upaya Wajar (Commercially Reasonable Efforts)
+                      </h3>
+                      <p>
+                        Kami berkomitmen untuk mengerahkan upaya teknis dan komersial yang wajar secara industri guna menjaga seluruh layanan berbasis server dan infrastruktur daring kami (termasuk server otentikasi lisensi, sinkronisasi cloud opsional, dan server hosting publik landing page) tetap beroperasi dan dapat diakses secara berkelanjutan.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Keadaan Memaksa (Force Majeure)
+                      </h3>
+                      <p>
+                        Pengguna memahami dan menyepakati bahwa kami tidak bertanggung jawab atas keterlambatan, gangguan, penurunan performa, maupun kegagalan ketersediaan layanan daring yang diakibatkan oleh peristiwa di luar kendali wajar kami (<em>Force Majeure</em>). Peristiwa tersebut mencakup namun tidak terbatas pada:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Bencana alam berskala besar (gempa bumi, banjir bandang, tsunami, badai ekstrem, letusan gunung berapi).</li>
+                        <li>Kebakaran hebat, ledakan, epidemi/pandemi global, perang, invasi militer, terorisme, atau kerusuhan sipil.</li>
+                        <li>Gangguan atau pemadaman massal pada jaringan listrik nasional, kabel serat optik bawah laut, atau penyedia infrastruktur cloud global (seperti AWS, Cloudflare, Google Cloud, dsb.).</li>
+                        <li>Tindakan sabotase siber masif berskala internasional (seperti serangan DDoS global, eksploitasi zero-day infrastruktur telekomunikasi global).</li>
+                        <li>Kebijakan pemerintah, embargo, pembatasan hukum baru, atau regulasi darurat negara yang menghalangi penyediaan layanan.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Kelangsungan Bisnis & Prosedur Penghentian Layanan (Business Discontinuation)
+                      </h3>
+                      <p>
+                        Dalam skenario luar biasa di mana penyedia layanan terpaksa menghentikan operasional secara permanen karena alasan likuidasi, restrukturisasi menyeluruh, kepailitan, atau berakhirnya kelangsungan bisnis:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Kami akan berupaya memberikan pemberitahuan tertulis kepada pengguna sekurang-kurangnya <strong>30 (tiga puluh) hari kalender</strong> sebelum penghentian resmi melalui email terdaftar atau pengumuman resmi di situs web kami.</li>
+                        <li>Pengguna diberikan masa tenggang untuk mengunduh, mencadangkan, atau memindahkan aset dan draf proyek mereka.</li>
+                        <li><strong>Perlindungan Local-First:</strong> Karena AsKing dirancang dengan arsitektur <em>Local-First</em>, seluruh riwayat obrolan, kontak pelanggan, pesan tersimpan, dan konfigurasi lokal pada komputer Anda tetap dapat diakses secara lokal di perangkat Anda dan tidak akan hilang meskipun layanan cloud/server web kami berhenti beroperasi.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 9: Disclaimers & Limitations of Liability */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      9
                     </span>
                     Pernyataan Penyangkalan (Disclaimer) & Batasan Tanggung Jawab
                   </h2>
@@ -287,11 +412,11 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 8: Intellectual Property */}
+                {/* Section 10: Intellectual Property */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      8
+                      10
                     </span>
                     Hak Kekayaan Intelektual
                   </h2>
@@ -300,9 +425,9 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 8: Refund & Subscription Cancellation */}
+                {/* Section 11: Refund & Subscription Cancellation */}
                 <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">8</span>Kebijakan Refund & Pembatalan Langganan</h2>
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">11</span>Kebijakan Refund & Pembatalan Langganan</h2>
                   <p>Anda dapat membatalkan langganan kapan saja. Pembatalan menghentikan perpanjangan berikutnya, sedangkan akses berbayar tetap tersedia sampai akhir periode pembayaran yang telah dibayar.</p>
                   <ul className="list-disc list-inside space-y-1.5 pl-2">
                     <li>Untuk pembatalan biasa (Ordinary cancellation), kami tidak memberikan refund prorata atas sisa waktu. Akses berbayar tetap tersedia sampai akhir periode yang telah dibayar.</li>
@@ -317,11 +442,11 @@ export default function TermsPage() {
                   <p>Permintaan di luar kondisi tersebut ditinjau berdasarkan kasus per kasus. Ketentuan ini tidak mengurangi hak konsumen yang tidak dapat dikesampingkan berdasarkan hukum yang berlaku.</p>
                 </section>
 
-                {/* Section 9: Termination */}
+                {/* Section 12: Termination */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      9
+                      12
                     </span>
                     Pengakhiran (Termination)
                   </h2>
@@ -330,11 +455,11 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 10: Governing Law & Updates */}
+                {/* Section 13: Governing Law & Updates */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      10
+                      13
                     </span>
                     Hukum yang Berlaku & Pembaruan Ketentuan
                   </h2>
@@ -343,16 +468,16 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 11: Contact */}
+                {/* Section 14: Contact & Abuse Reporting */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      11
+                      14
                     </span>
-                    Kontak Kami
+                    Kontak Kami & Pelaporan Penyalahgunaan
                   </h2>
                   <p>
-                    Jika Anda memiliki pertanyaan mengenai Syarat & Ketentuan Penggunaan ini, silakan hubungi kami melalui:
+                    Jika Anda memiliki pertanyaan mengenai Syarat & Ketentuan Penggunaan ini, atau ingin melaporkan penyalahgunaan layanan, silakan hubungi kami melalui:
                   </p>
                   <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs">
                     <p>
@@ -573,11 +698,136 @@ export default function TermsPage() {
                   </ul>
                 </section>
 
-                {/* Section 7: Disclaimers & Limitations of Liability */}
+                {/* Section 7: Landing Page Studio & Hosting Service */}
                 <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       7
+                    </span>
+                    Landing Page Studio & Cloud Hosting Services
+                  </h2>
+                  <p>
+                    AsKing provides a landing page builder and web deployment service (<em>Landing Page Studio</em>) that enables users to publish websites via our subdomain infrastructure (e.g., <code>[slug]-app.godiscus.com</code>) or connected custom domains. The following special provisions apply to all user-published pages:
+                  </p>
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Technical Intermediary & Non-Affiliation Disclaimer
+                      </h3>
+                      <p>
+                        AsKing and GoDiscus act strictly as technical software and hosting infrastructure providers (<em>technical hosting provider</em>), not as publishers or creators of published material. AsKing and GoDiscus maintain no affiliation, endorsement, sponsorship, or association with any products, services, commercial offers, claims, text, images, external links, or transactions hosted on pages published by users.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Sole User Responsibility & Indemnification
+                      </h3>
+                      <p>
+                        Any misuse, consumer loss, dispute, or transaction arising from published landing pages is solely and exclusively the responsibility of the account holder. Users agree to indemnify, defend, and hold harmless AsKing, GoDiscus, its creators, developers, and affiliates against any claims, regulatory penalties, damages, or legal expenses resulting from the content or operation of their published pages.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Prohibited Content & Immediate Takedown Authority
+                      </h3>
+                      <p>
+                        Users are strictly prohibited from utilizing the Landing Page Studio to publish, promote, or link to unlawful, abusive, or unethical materials, including but not limited to:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Unlicensed online gambling, sports betting, or illegal lottery schemes.</li>
+                        <li>Fraud, phishing, credential harvesting, malware dissemination, or deceptive consumer practices.</li>
+                        <li>Pornography, sexually explicit materials, or child exploitation.</li>
+                        <li>Sale of illicit narcotics, prescription drugs without authorized license, weapons, or counterfeit merchandise.</li>
+                        <li>Infringement of third-party intellectual property (copyrights, trademarks, or trade secrets).</li>
+                      </ul>
+                      <p className="mt-2">
+                        We reserve the right to unilaterally block, take down, or permanently delete any landing page and suspend or terminate associated user accounts immediately without prior notice upon identifying or receiving notice of severe legal violations.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        3-Month Inactivity Retention & Subdomain Recycling
+                      </h3>
+                      <p>
+                        Active cloud hosting and subdomain reservations remain active as long as the user maintains a valid subscription or license. If an account remains expired or unrenewed for <strong>3 (three) consecutive months</strong>:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>We reserve the right to take down and permanently delete the hosted deployment files from our cloud storage and CDN servers.</li>
+                        <li>The previously claimed subdomain name will be released and returned to the general availability pool for other users to claim.</li>
+                        <li>Local project drafts saved within your computer's desktop AsKing application remain under your control (per our <em>Local-First</em> architecture), but public web access is terminated.</li>
+                        <li>We bear no liability for lost traffic, SEO rankings, backlinks, or business opportunities resulting from dormancy takedowns.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Abuse Reporting Mechanism
+                      </h3>
+                      <p>
+                        Third parties, rights holders, and authorities may report any landing page that violates these Terms or applicable laws by emailing <a href="mailto:asking@godiscus.com?subject=Landing%20Page%20Abuse%20Report" className="text-[#184530] font-bold underline">asking@godiscus.com</a> with the URL and supporting evidence. Our team will promptly review and take appropriate action.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 8: Service Availability, Force Majeure & Continuity */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      8
+                    </span>
+                    Service Availability, Force Majeure & Business Continuity
+                  </h2>
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Commercially Reasonable Efforts & Uptime Commitment
+                      </h3>
+                      <p>
+                        We commit to deploying commercially and technically reasonable efforts to maintain the continuous availability and uptime of all online services and server infrastructure (including license authentication, optional cloud synchronization, and public landing page hosting).
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Force Majeure (Events Beyond Reasonable Control)
+                      </h3>
+                      <p>
+                        Users acknowledge and agree that we shall not be held liable or responsible for any delays, interruptions, downtime, or failure in performance of online services resulting from events beyond our reasonable control (<em>Force Majeure</em>). Such events include, without limitation:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>Natural disasters of major scale (earthquakes, floods, tsunamis, severe storms, volcanic eruptions).</li>
+                        <li>Fires, explosions, global epidemics/pandemics, war, acts of terrorism, civil unrest, or armed conflicts.</li>
+                        <li>Major utility failures, telecommunication cable cuts, or outages of upstream cloud/CDN providers (e.g., Cloudflare, AWS, Google Cloud).</li>
+                        <li>Massive cyber warfare or distributed denial-of-service (DDoS) attacks beyond commercial mitigation capacities.</li>
+                        <li>Government orders, sanctions, embargoes, legal prohibitions, or national regulatory restrictions.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-xs text-[#11231B] mb-1">
+                        Business Discontinuation & Grace Period
+                      </h3>
+                      <p>
+                        In the unforeseen event that AsKing or GoDiscus must permanently cease operating online services due to corporate dissolution, insolvency, bankruptcy, or operational sunsetting:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
+                        <li>We will make commercially reasonable efforts to provide users with at least <strong>30 (thirty) calendar days'</strong> prior written notice via registered email or an official notice on our website.</li>
+                        <li>Users will be afforded a transitional grace period to export, download, or migrate their assets and published configurations.</li>
+                        <li><strong>Local-First Guarantee:</strong> Because AsKing is architected on a <em>Local-First</em> foundation, your offline customer database, chat history, contacts, and desktop project files residing on your computer remain intact and accessible regardless of any cloud server sunset.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 9: Disclaimers & Limitations of Liability */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      9
                     </span>
                     Disclaimers & Limitation of Liability
                   </h2>
@@ -596,11 +846,11 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 8: Intellectual Property */}
+                {/* Section 10: Intellectual Property */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      8
+                      10
                     </span>
                     Intellectual Property
                   </h2>
@@ -609,9 +859,9 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 8: Refund & Subscription Cancellation */}
+                {/* Section 11: Refund & Subscription Cancellation */}
                 <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">8</span>Refund & Subscription Cancellation Policy</h2>
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2"><span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">11</span>Refund & Subscription Cancellation Policy</h2>
                   <p>You may cancel your subscription at any time. Cancellation stops the next renewal, while paid access remains available until the end of the already-paid billing period.</p>
                   <ul className="list-disc list-inside space-y-1.5 pl-2">
                     <li>Ordinary cancellations are not eligible for prorated refunds for unused time. Paid access remains available until the end of the period already paid for.</li>
@@ -626,11 +876,11 @@ export default function TermsPage() {
                   <p>Requests outside these conditions are assessed case by case. Nothing in this policy limits non-waivable consumer rights under applicable law.</p>
                 </section>
 
-                {/* Section 9: Termination */}
+                {/* Section 12: Termination */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      9
+                      12
                     </span>
                     Termination
                   </h2>
@@ -639,11 +889,11 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 10: Governing Law */}
+                {/* Section 13: Governing Law */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      10
+                      13
                     </span>
                     Governing Law & Changes to Terms
                   </h2>
@@ -652,16 +902,16 @@ export default function TermsPage() {
                   </p>
                 </section>
 
-                {/* Section 11: Contact */}
+                {/* Section 14: Contact & Abuse Reporting */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      11
+                      14
                     </span>
-                    Contact Information
+                    Contact Information & Abuse Reporting
                   </h2>
                   <p>
-                    For questions regarding these Terms of Use, please reach out to us at:
+                    For questions regarding these Terms of Use, or to report service abuse, please reach out to us at:
                   </p>
                   <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs">
                     <p>
