@@ -315,10 +315,10 @@ export default function TermsPage() {
 
                     <div>
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Kebijakan Retensi Hosting 3 Bulan & Pelepasan Subdomain
+                        Kebijakan Retensi Hosting 14 Hari & Pelepasan Subdomain
                       </h3>
                       <p>
-                        Layanan hosting publik serta pengikatan nama subdomain diberikan selama akun pengguna memiliki status langganan atau lisensi aktif. Apabila pengguna tidak melakukan perpanjangan langganan selama <strong>3 (tiga) bulan berturut-turut</strong> sejak masa berlaku berakhir:
+                        Layanan hosting publik serta pengikatan nama subdomain diberikan selama akun pengguna memiliki status langganan atau lisensi aktif. Apabila pengguna tidak melakukan perpanjangan langganan selama <strong>14 (empat belas) hari</strong> sejak masa berlaku berakhir:
                       </p>
                       <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
                         <li>Kami berhak melakukan <em>take down</em> dan/atau penghapusan permanen atas berkas landing page dari server cloud kami.</li>
@@ -749,10 +749,10 @@ export default function TermsPage() {
 
                     <div>
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        3-Month Inactivity Retention & Subdomain Recycling
+                        14-Day Inactivity Retention & Subdomain Recycling
                       </h3>
                       <p>
-                        Active cloud hosting and subdomain reservations remain active as long as the user maintains a valid subscription or license. If an account remains expired or unrenewed for <strong>3 (three) consecutive months</strong>:
+                        Active cloud hosting and subdomain reservations remain active as long as the user maintains a valid subscription or license. If an account remains expired or unrenewed for <strong>14 (fourteen) days</strong>:
                       </p>
                       <ul className="list-disc list-inside space-y-1 pl-2 mt-1">
                         <li>We reserve the right to take down and permanently delete the hosted deployment files from our cloud storage and CDN servers.</li>
