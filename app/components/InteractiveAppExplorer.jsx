@@ -19,7 +19,7 @@ import {
   X,
   GalleryThumbnails,
   Zap,
-  Sparkles,
+  FileBox,
   ShieldCheck,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -80,6 +80,13 @@ const SCREENSHOT_MODULES = [
     image: "/screenshots/message channels.webp",
     route: "asking://app/channels",
     tag: "Connectivity",
+  },
+  {
+    id: "landingpages",
+    icon: FileBox,
+    image: "/screenshots/landing page studio.webp",
+    route: "asking://app/landingpages",
+    tag: "Landing Pages",
   },
   {
     id: "backup",
@@ -245,7 +252,7 @@ export default function InteractiveAppExplorer() {
                   {currentIndex + 1} / {SCREENSHOT_MODULES.length}
                 </span>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2">
                 {SCREENSHOT_MODULES.map((item, idx) => {
                   const isSelected = item.id === activeTab;
                   return (
