@@ -110,6 +110,7 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
     contacts,
     fetchContacts,
     templates,
+    fetchTemplates,
     schedules,
     addScheduledMessage,
     updateScheduledMessage,
@@ -120,7 +121,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
     if (fetchContacts) {
       fetchContacts();
     }
-  }, [fetchContacts]);
+    if (fetchTemplates) {
+      fetchTemplates();
+    }
+  }, [fetchContacts, fetchTemplates]);
 
   const PAGE_SIZE = 15;
 
@@ -182,7 +186,7 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
 
   // Form Fields
   const [subject, setSubject] = useState(
-    editingSchedule?.subject || editingSchedule?.title || t("scheduler.modal_subject_chat_ph")
+    editingSchedule?.subject || editingSchedule?.title || ""
   );
   const [scheduledTime, setScheduledTime] = useState(() => {
     if (editingSchedule?.scheduledTime) {
@@ -203,12 +207,13 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
   const [showTagMenu, setShowTagMenu] = useState(false);
   const [editorText, setEditorText] = useState(
     editingSchedule?.text ||
-      editingSchedule?.message ||
-      "Halo {{name}}, terima kasih telah mempercayakan kebutuhan Anda pada AsKing. Tim kami siap membantu proses integrasi Anda kapan saja."
+    editingSchedule?.message ||
+    ""
   );
 
   // Tiptap Rich Text Editor Setup
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         bulletList: {
@@ -231,7 +236,7 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
       editingSchedule?.html ||
       editingSchedule?.text ||
       editingSchedule?.message ||
-      "Halo {{name}}, terima kasih telah mempercayakan kebutuhan Anda pada AsKing. Tim kami siap membantu proses integrasi Anda kapan saja.",
+      "",
     editorProps: {
       attributes: {
         class:
@@ -498,12 +503,12 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
 
   const conflictTimeStr = conflictInfo.recommendedTime
     ? new Date(conflictInfo.recommendedTime).toLocaleTimeString(
-        language === "en" ? "en-US" : "id-ID",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      )
+      language === "en" ? "en-US" : "id-ID",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    )
     : "";
 
   return (
@@ -555,11 +560,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
               <button
                 type="button"
                 onClick={() => handleChannelChange("whatsapp")}
-                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                  channel === "whatsapp"
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${channel === "whatsapp"
                     ? "bg-[#E5EFE7] dark:bg-[#18362B] border-[#184530] dark:border-[#B8F55C] text-[#184530] dark:text-[#B8F55C] shadow-xs"
                     : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] text-[#6B8075] dark:text-[#8EA096] hover:bg-[#EEF3EF] dark:hover:bg-[#1B3528]"
-                }`}
+                  }`}
               >
                 <WhatsAppLogo className="w-4 h-4" />
                 <span>WhatsApp</span>
@@ -567,11 +571,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
               <button
                 type="button"
                 onClick={() => handleChannelChange("telegram")}
-                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                  channel === "telegram"
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${channel === "telegram"
                     ? "bg-[#E5EFE7] dark:bg-[#18362B] border-[#184530] dark:border-[#B8F55C] text-[#184530] dark:text-[#B8F55C] shadow-xs"
                     : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] text-[#6B8075] dark:text-[#8EA096] hover:bg-[#EEF3EF] dark:hover:bg-[#1B3528]"
-                }`}
+                  }`}
               >
                 <TelegramLogo className="w-4 h-4" />
                 <span>Telegram</span>
@@ -579,11 +582,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
               <button
                 type="button"
                 onClick={() => handleChannelChange("email")}
-                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${
-                  channel === "email"
+                className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${channel === "email"
                     ? "bg-sky-50 dark:bg-sky-950/40 border-sky-500 text-sky-700 dark:text-sky-300 shadow-xs"
                     : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] text-[#6B8075] dark:text-[#8EA096] hover:bg-[#EEF3EF] dark:hover:bg-[#1B3528]"
-                }`}
+                  }`}
               >
                 <EmailLogo className="w-4 h-4 text-sky-500" />
                 <span>Email</span>
@@ -692,11 +694,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                               ? handleRemoveTarget(targetJid)
                               : handleAddTarget(c)
                           }
-                          className={`p-2 rounded-xl text-xs flex items-center justify-between cursor-pointer transition-colors ${
-                            isSelected
+                          className={`p-2 rounded-xl text-xs flex items-center justify-between cursor-pointer transition-colors ${isSelected
                               ? "bg-[#E5EFE7] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] font-semibold"
                               : "hover:bg-white dark:hover:bg-[#12241C] text-[#2D3E35] dark:text-[#D1DDD6]"
-                          }`}
+                            }`}
                         >
                           <div className="truncate">
                             <span>{c.name}</span>
@@ -861,11 +862,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                 <button
                   type="button"
                   onClick={() => editor?.chain().focus().toggleBold().run()}
-                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                    editor?.isActive("bold")
+                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive("bold")
                       ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] font-bold"
                       : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                  }`}
+                    }`}
                   title={language === "en" ? "Bold (*bold*)" : "Bold (*tebal*)"}
                 >
                   <Bold className="w-3.5 h-3.5" />
@@ -873,11 +873,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                 <button
                   type="button"
                   onClick={() => editor?.chain().focus().toggleItalic().run()}
-                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                    editor?.isActive("italic")
+                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive("italic")
                       ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] font-bold"
                       : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                  }`}
+                    }`}
                   title={language === "en" ? "Italic (_italic_)" : "Italic (_miring_)"}
                 >
                   <Italic className="w-3.5 h-3.5" />
@@ -885,11 +884,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                 <button
                   type="button"
                   onClick={() => editor?.chain().focus().toggleUnderline().run()}
-                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                    editor?.isActive("underline")
+                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive("underline")
                       ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] font-bold"
                       : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                  }`}
+                    }`}
                   title="Underline"
                 >
                   <UnderlineIcon className="w-3.5 h-3.5" />
@@ -902,11 +900,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                     <button
                       type="button"
                       onClick={() => editor?.chain().focus().setTextAlign("left").run()}
-                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                        editor?.isActive({ textAlign: "left" })
+                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive({ textAlign: "left" })
                           ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C]"
                           : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                      }`}
+                        }`}
                       title={t("scheduler.modal_align_left")}
                     >
                       <AlignLeft className="w-3.5 h-3.5" />
@@ -914,11 +911,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                     <button
                       type="button"
                       onClick={() => editor?.chain().focus().setTextAlign("center").run()}
-                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                        editor?.isActive({ textAlign: "center" })
+                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive({ textAlign: "center" })
                           ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C]"
                           : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                      }`}
+                        }`}
                       title={t("scheduler.modal_align_center")}
                     >
                       <AlignCenter className="w-3.5 h-3.5" />
@@ -926,11 +922,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                     <button
                       type="button"
                       onClick={() => editor?.chain().focus().setTextAlign("right").run()}
-                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                        editor?.isActive({ textAlign: "right" })
+                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive({ textAlign: "right" })
                           ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C]"
                           : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                      }`}
+                        }`}
                       title={t("scheduler.modal_align_right")}
                     >
                       <AlignRight className="w-3.5 h-3.5" />
@@ -938,11 +933,10 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                     <button
                       type="button"
                       onClick={() => editor?.chain().focus().setTextAlign("justify").run()}
-                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                        editor?.isActive({ textAlign: "justify" })
+                      className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${editor?.isActive({ textAlign: "justify" })
                           ? "bg-[#EBF1EB] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C]"
                           : "text-[#6B8075] dark:text-[#8EA096] hover:bg-[#F8FAF7] dark:hover:bg-[#162B21]"
-                      }`}
+                        }`}
                       title={t("scheduler.modal_align_justify")}
                     >
                       <AlignJustify className="w-3.5 h-3.5" />
@@ -1106,9 +1100,6 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                   <span>{t("scheduler.modal_append_ticket_id")}</span>
                 </label>
               </div>
-              <p className="text-[11px] text-[#556A60] dark:text-[#A5B8AD] leading-relaxed">
-                {t("scheduler.modal_anti_spam_desc")}
-              </p>
             </div>
           )}
         </form>

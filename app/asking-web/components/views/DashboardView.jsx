@@ -108,28 +108,28 @@ export default function DashboardView() {
       return {
         badge: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/50",
         dot: "bg-rose-500",
-        label: t("tickets.priority_urgent") || "Urgent",
+        label: "Urgent",
       };
     }
     if (p === "high" || p === "tinggi") {
       return {
         badge: "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800/50",
         dot: "bg-orange-500",
-        label: t("tickets.priority_high") || "High",
+        label: "High",
       };
     }
     if (p === "medium" || p === "sedang") {
       return {
         badge: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50",
         dot: "bg-amber-500",
-        label: t("tickets.priority_medium") || "Medium",
+        label: "Medium",
       };
     }
     if (p === "low" || p === "rendah") {
       return {
         badge: "bg-[#E5EFE7] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] border-[#CFE2D3] dark:border-[#234235]",
         dot: "bg-[#184530] dark:bg-[#B8F55C]",
-        label: t("tickets.priority_low") || "Low",
+        label: "Low",
       };
     }
     return {
@@ -154,7 +154,7 @@ export default function DashboardView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#DEE7DF] dark:border-[#1F382B]">
         <div>
           <div className="inline-block">
-            <span className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight px-4 py-1.5 rounded-full bg-[#E5EFE7] text-[#184530] dark:bg-[#18362B] dark:text-[#B8F55C] border border-[#CFE2D3] dark:border-[#234235] shadow-2xs">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight px-4 py-1.5 text-[#184530] dark:text-[#B8F55C]">
               {t("dashboard.welcome", { name: userProfile?.name ? `, ${userProfile.name}` : "" }) || `Selamat Datang${userProfile?.name ? `, ${userProfile.name}` : ""} 👋`}
             </span>
           </div>
@@ -322,46 +322,6 @@ export default function DashboardView() {
               </div>
             </div>
           </div>
-
-          {/* Middle Grid: 2 Suggested AI / Quick Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div
-              onClick={() => setActiveTab("chat")}
-              className="rounded-3xl p-6 bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] shadow-xs hover:border-[#12281F] dark:hover:border-[#B8F55C] transition-all cursor-pointer group space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#184530] dark:text-[#B8F55C]">
-                  <Sparkles className="w-4 h-4 text-[#184530] dark:text-[#B8F55C]" />
-                  <span>{t("dashboard.quick_action_unread") || "Lihat Chat Belum Terbalas"}</span>
-                </div>
-              </div>
-              <h3 className="text-sm font-bold text-[#11231B] dark:text-[#F2F7F4] group-hover:text-[#184530] dark:group-hover:text-[#B8F55C] transition-colors">
-                {t("dashboard.unread_messages") || "Pesan Belum Dibaca"}
-              </h3>
-              <p className="text-xs text-[#4A5F54] dark:text-[#A5B8AD] leading-relaxed">
-                {t("dashboard.subtitle") || "Kelola percakapan pelanggan, pantau status tiket, dan maksimalkan produktivitas tim Anda."}
-              </p>
-            </div>
-
-            <div
-              onClick={() => setActiveTab("tickets")}
-              className="rounded-3xl p-6 bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] shadow-xs hover:border-[#12281F] dark:hover:border-[#B8F55C] transition-all cursor-pointer group space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#184530] dark:text-[#B8F55C]">
-                  <Sparkles className="w-4 h-4 text-[#184530] dark:text-[#B8F55C]" />
-                  <span>{t("dashboard.quick_action_tickets") || "Tinjau Tiket Prioritas"}</span>
-                </div>
-              </div>
-              <h3 className="text-sm font-bold text-[#11231B] dark:text-[#F2F7F4] group-hover:text-[#184530] dark:group-hover:text-[#B8F55C] transition-colors">
-                {t("dashboard.prioritize_tickets") || "Tiket Prioritas"}
-              </h3>
-              <p className="text-xs text-[#4A5F54] dark:text-[#A5B8AD] leading-relaxed">
-                {t("tickets.page_subtitle") || "Pantau alur keluhan, permintaan layanan, dan progres penyelesaian tiket pelanggan."}
-              </p>
-            </div>
-          </div>
-
           {/* Bottom Card: Prioritize Tickets (Top 5 Approaching Deadline) */}
           <div className="rounded-3xl p-6 bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-[#EEF3EF] dark:border-[#1F382B]">
@@ -438,8 +398,8 @@ export default function DashboardView() {
                         {ticket.deadline ? (
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${overdue
-                                ? "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/60"
-                                : "bg-[#EBF1EB] dark:bg-[#18362B] text-[#2D3E35] dark:text-[#D1DDD6] border-[#DEE7DF] dark:border-[#1F382B]"
+                              ? "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/60"
+                              : "bg-[#EBF1EB] dark:bg-[#18362B] text-[#2D3E35] dark:text-[#D1DDD6] border-[#DEE7DF] dark:border-[#1F382B]"
                               }`}
                           >
                             <Clock className="w-3 h-3" />

@@ -18,31 +18,14 @@ import {
   X,
   RotateCcw,
 } from "lucide-react";
+import {
+  CATEGORY_OPTIONS,
+  STATUS_OPTIONS,
+  STATUS_COLUMNS,
+  PRIORITY_OPTIONS,
+} from "../../constants/ticketConstants";
 
-export const CATEGORY_OPTIONS = [
-  { id: "technical", label: "Technical" },
-  { id: "issue", label: "Issue" },
-  { id: "marketing", label: "Marketing" },
-  { id: "support", label: "Support" },
-  { id: "sales", label: "Sales" },
-  { id: "feedback", label: "Feedback" },
-];
-
-export const STATUS_OPTIONS = [
-  { value: "New", label: "Baru" },
-  { value: "In Progress", label: "Dalam Proses" },
-  { value: "Under Review", label: "Menunggu Review" },
-  { value: "Completed", label: "Selesai" },
-  { value: "Cancelled", label: "Dibatalkan" },
-];
-
-export const PRIORITY_OPTIONS = [
-  { id: "urgent", title: "Urgent" },
-  { id: "high", title: "High" },
-  { id: "medium", title: "Medium" },
-  { id: "low", title: "Low" },
-  { id: "lowest", title: "Lowest" },
-];
+export { CATEGORY_OPTIONS, STATUS_OPTIONS, STATUS_COLUMNS, PRIORITY_OPTIONS };
 
 export default function TicketsView() {
   const { t } = useTranslation();
@@ -230,43 +213,29 @@ export default function TicketsView() {
 
   const getCategoryBadge = (cat) => {
     const key = (cat || "support").toLowerCase();
+    const opt =
+      CATEGORY_OPTIONS.find((c) => c.id === key) || CATEGORY_OPTIONS[3];
     let colorClass =
       "bg-[#E5EFE7] text-[#184530] dark:bg-[#18362B] dark:text-[#B8F55C] border-[#CFE2D3] dark:border-[#234235]";
-    if (key === "technical")
+    if (opt.id === "technical")
       colorClass =
         "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200/60";
-    if (key === "issue")
+    if (opt.id === "issue")
       colorClass =
         "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200/60";
-    if (key === "marketing")
+    if (opt.id === "marketing")
       colorClass =
         "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/60";
-    if (key === "general")
+    if (opt.id === "general")
       colorClass =
         "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/60";
-    if (key === "billing")
-      colorClass =
-        "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200/60";
-
-    const label =
-      key === "technical"
-        ? t("tickets.cat_technical")
-        : key === "issue"
-          ? t("tickets.cat_issue")
-          : key === "marketing"
-            ? t("tickets.cat_marketing")
-            : key === "billing"
-              ? t("tickets.cat_billing")
-              : key === "support"
-                ? t("tickets.cat_support")
-                : t("tickets.cat_general");
 
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${colorClass}`}
+        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${colorClass} capitalize`}
       >
         <Tag className="w-2.5 h-2.5" />
-        <span>{label}</span>
+        <span>{opt.label}</span>
       </span>
     );
   };
@@ -276,28 +245,28 @@ export default function TicketsView() {
     let badgeBg =
       "bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300";
     let dotColor = "bg-slate-400";
-    let title = t("tickets.priority_lowest");
+    let title = "Lowest";
 
     if (priorityVal === "low") {
       badgeBg =
         "bg-[#E5EFE7] dark:bg-[#18362B] text-[#184530] dark:text-[#B8F55C]";
       dotColor = "bg-[#184530] dark:bg-[#B8F55C]";
-      title = t("tickets.priority_low");
+      title = "Low";
     } else if (priorityVal === "medium") {
       badgeBg =
         "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300";
       dotColor = "bg-amber-500";
-      title = t("tickets.priority_medium");
+      title = "Medium";
     } else if (priorityVal === "high") {
       badgeBg =
         "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300";
       dotColor = "bg-orange-500";
-      title = t("tickets.priority_high");
+      title = "High";
     } else if (priorityVal === "urgent") {
       badgeBg =
         "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300";
       dotColor = "bg-rose-500";
-      title = t("tickets.priority_urgent");
+      title = "Urgent";
     }
 
     return (
@@ -312,37 +281,30 @@ export default function TicketsView() {
 
   const getStatusBadge = (status) => {
     const statusVal = normalizeStatus(status);
+    const statusObj =
+      STATUS_OPTIONS.find((s) => s.value === statusVal) || STATUS_OPTIONS[1];
+
     let colorClass =
       "bg-[#E5EFE7] text-[#184530] dark:bg-[#18362B] dark:text-[#B8F55C]";
-    let label = statusVal;
-
-    if (statusVal === "Cancelled") {
+    if (statusObj.color === "rose") {
       colorClass =
         "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300";
-      label = t("tickets.status_cancelled");
-    } else if (statusVal === "Under Review") {
+    } else if (statusObj.color === "purple") {
       colorClass =
-        "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300";
-      label = t("tickets.status_under_review");
-    } else if (statusVal === "In Progress") {
+        "bg-[#12281F] text-white dark:bg-[#18362B] dark:text-[#B8F55C]";
+    } else if (statusObj.color === "amber") {
       colorClass =
         "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300";
-      label = t("tickets.status_in_progress");
-    } else if (statusVal === "Completed") {
+    } else if (statusObj.color === "emerald") {
       colorClass =
         "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300";
-      label = t("tickets.status_completed");
-    } else if (statusVal === "New") {
-      colorClass =
-        "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300";
-      label = t("tickets.status_new");
     }
 
     return (
       <span
         className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[10px] ${colorClass}`}
       >
-        {label}
+        {statusVal}
       </span>
     );
   };
@@ -366,8 +328,8 @@ export default function TicketsView() {
           {/* Create Ticket Button */}
           <button
             type="button"
-            onClick={() => handleOpenCreateTicket()}
-            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl bg-[#12281F] hover:bg-[#1C3B2E] text-[#B8F55C] text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#234235]"
+            onClick={handleOpenCreateTicket}
+            className="flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#12281F] dark:bg-[#18362B] hover:bg-[#1C3B2E] dark:hover:bg-[#234A38] text-[#B8F55C] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#234235]"
           >
             <Plus className="w-4 h-4 text-[#B8F55C]" />
             <span>{t("tickets.btn_create")}</span>
@@ -375,10 +337,9 @@ export default function TicketsView() {
         </div>
       </div>
 
-      {/* 1. Desktop 5-Filter Strip & Search Bar (hidden on mobile) */}
-      <div className="hidden lg:flex px-6 py-3 bg-white dark:bg-[#12241C] border-b border-[#DEE7DF] dark:border-[#1F382B] items-center justify-between gap-3 shrink-0">
-        {/* The 5 Dropdown Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
+      {/* 1. Desktop Control Bar: Search & Status Filter (hidden on mobile) */}
+      <div className="hidden lg:flex px-6 py-3 border-b border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7]/80 dark:bg-[#0C1712]/80 items-center justify-between gap-3 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap flex-1">
           {/* Filter 1: Category */}
           <div className="relative">
             <select
@@ -389,7 +350,7 @@ export default function TicketsView() {
               <option value="all">{t("tickets.filter_category_all")}</option>
               {CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {t(`tickets.cat_${cat.id}`) || cat.label}
+                  {cat.label}
                 </option>
               ))}
             </select>
@@ -406,17 +367,7 @@ export default function TicketsView() {
               <option value="all">{t("tickets.filter_status_all")}</option>
               {STATUS_OPTIONS.map((st) => (
                 <option key={st.value} value={st.value}>
-                  {st.value === "New"
-                    ? t("tickets.status_new")
-                    : st.value === "In Progress"
-                      ? t("tickets.status_in_progress")
-                      : st.value === "Under Review"
-                        ? t("tickets.status_under_review")
-                        : st.value === "Completed"
-                          ? t("tickets.status_completed")
-                          : st.value === "Cancelled"
-                            ? t("tickets.status_cancelled")
-                            : st.label}
+                  {st.label}
                 </option>
               ))}
             </select>
@@ -433,7 +384,7 @@ export default function TicketsView() {
               <option value="all">{t("tickets.filter_priority_all")}</option>
               {PRIORITY_OPTIONS.map((pri) => (
                 <option key={pri.id} value={pri.id}>
-                  {t(`tickets.priority_${pri.id}`) || pri.title}
+                  {pri.title}
                 </option>
               ))}
             </select>
@@ -523,11 +474,11 @@ export default function TicketsView() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {[
             { value: "all", label: t("common.all"), count: statusCounts.all },
-            { value: "New", label: t("tickets.status_new") || "New", count: statusCounts["New"] || 0 },
-            { value: "In Progress", label: t("tickets.status_in_progress") || "In Progress", count: statusCounts["In Progress"] || 0 },
-            { value: "Under Review", label: t("tickets.status_under_review") || "Review", count: statusCounts["Under Review"] || 0 },
-            { value: "Completed", label: t("tickets.status_resolved") || "Resolved", count: statusCounts["Completed"] || 0 },
-            { value: "Cancelled", label: t("tickets.status_closed") || "Closed", count: statusCounts["Cancelled"] || 0 },
+            { value: "New", label: "New", count: statusCounts["New"] || 0 },
+            { value: "In Progress", label: "In Progress", count: statusCounts["In Progress"] || 0 },
+            { value: "Under Review", label: "Under Review", count: statusCounts["Under Review"] || 0 },
+            { value: "Completed", label: "Completed", count: statusCounts["Completed"] || 0 },
+            { value: "Cancelled", label: "Cancelled", count: statusCounts["Cancelled"] || 0 },
           ].map((st) => {
             const isSelected = ticketFilters.status === st.value;
             return (
@@ -567,7 +518,7 @@ export default function TicketsView() {
                 <option value="all">{t("tickets.filter_category_all")}</option>
                 {CATEGORY_OPTIONS.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {t(`tickets.cat_${c.id}`) || c.label}
+                    {c.label}
                   </option>
                 ))}
               </select>
@@ -581,7 +532,7 @@ export default function TicketsView() {
                 <option value="all">{t("tickets.filter_priority_all")}</option>
                 {PRIORITY_OPTIONS.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {t(`tickets.priority_${p.id}`) || p.title}
+                    {p.title}
                   </option>
                 ))}
               </select>

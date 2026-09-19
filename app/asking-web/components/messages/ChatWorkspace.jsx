@@ -39,6 +39,7 @@ export default function ChatWorkspace({ onBackToList }) {
     replyingToMessage,
     setReplyingToMessage,
     templates,
+    channelStatuses,
     handleQuickCreateTicketFromChat,
     toggleConversationHumanSupport,
     deleteConversation,
@@ -117,6 +118,7 @@ export default function ChatWorkspace({ onBackToList }) {
   };
 
   const handleSend = () => {
+    if (!isChannelConnected) return;
     if (!inputMessage.trim() && !selectedFile) return;
 
     const attachments = selectedFile ? [selectedFile] : [];
@@ -131,7 +133,9 @@ export default function ChatWorkspace({ onBackToList }) {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (isChannelConnected) {
+        handleSend();
+      }
     }
   };
 
@@ -214,8 +218,43 @@ export default function ChatWorkspace({ onBackToList }) {
     );
   }
 
-  const isTg = activeConversation.channel === "telegram";
-  const isEmail = activeConversation.channel === "email";
+  const isTg = activeConversation.channel === "telegram" || activeConversation.jid?.startsWith("tg_");
+  const isEmail = activeConversation.channel === "email" || activeConversation.jid?.startsWith("email:");
+
+  const currentChannelStatus = isEmail
+    ? channelStatuses?.email || "close"
+    : isTg
+      ? channelStatuses?.telegram || "close"
+      : channelStatuses?.whatsapp || "close";
+
+  const isChannelConnected = currentChannelStatus === "open";
+
+  const inputPlaceholder = useMemo(() => {
+    if (isChannelConnected) {
+      return isEmail
+        ? t("messages.reply_placeholder_email") || "Balas via email..."
+        : t("messages.reply_placeholder_chat") || "Ketik pesan...";
+    }
+    if (isEmail) {
+      if (currentChannelStatus === "connecting") return t("messages.placeholder_connecting") || "Menghubungkan ke saluran Email...";
+      return "Email Terputus - Hubungkan akun di menu Channels";
+    }
+    if (isTg) {
+      if (currentChannelStatus === "connecting") return t("messages.placeholder_connecting") || "Menghubungkan ke saluran Telegram...";
+      return "Telegram Terputus - Hubungkan akun di menu Channels";
+    }
+    // WhatsApp
+    if (currentChannelStatus === "connecting") {
+      return t("messages.placeholder_connecting") || "Sedang menghubungkan ke saluran pesan... Mohon tunggu.";
+    }
+    if (currentChannelStatus === "reconnecting") {
+      return t("messages.placeholder_reconnecting") || "Menghubungkan ulang sesi saluran pesan... Mohon tunggu.";
+    }
+    if (currentChannelStatus === "qr") {
+      return t("messages.placeholder_qr") || "Silakan hubungkan saluran pesan di menu Message Channels.";
+    }
+    return t("messages.placeholder_disconnected") || "Saluran pesan belum terhubung. Silakan hubungkan saluran di menu Message Channels.";
+  }, [isChannelConnected, isEmail, isTg, currentChannelStatus, t]);
 
   return (
     <div className="flex-1 h-full bg-[#F8FAF7] dark:bg-[#0C1712] flex flex-col min-w-0 transition-colors duration-200 relative">
@@ -257,6 +296,21 @@ export default function ChatWorkspace({ onBackToList }) {
             {activeConversation.isTyping ? (
               <p className="text-[11px] text-[#22C55E] dark:text-[#B8F55C] font-semibold truncate animate-pulse">
                 {t("messages.typing") || "sedang mengetik..."}
+              </p>
+            ) : !isChannelConnected ? (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold truncate flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  currentChannelStatus === "reconnecting" || currentChannelStatus === "connecting"
+                    ? "bg-amber-400 animate-ping"
+                    : "bg-rose-500"
+                }`} />
+                <span>
+                  {currentChannelStatus === "reconnecting"
+                    ? (t("channels.status_reconnecting") || "Menghubungkan ulang...")
+                    : currentChannelStatus === "connecting"
+                      ? (t("channels.status_connecting") || "Menghubungkan...")
+                      : (t("channels.status_close") || "Saluran Terputus")}
+                </span>
               </p>
             ) : (
               <p className="text-[11px] text-[#6B8075] dark:text-[#8EA096] font-medium truncate">
@@ -692,6 +746,7 @@ export default function ChatWorkspace({ onBackToList }) {
 
             <button
               type="button"
+              disabled={!isChannelConnected}
               onClick={() => {
                 setComposeData({
                   to: activeConversation.email || activeConversation.jid?.replace(/^email:/, ""),
@@ -699,7 +754,8 @@ export default function ChatWorkspace({ onBackToList }) {
                 });
                 setIsComposeDrawerOpen(true);
               }}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-white dark:bg-[#18362B] dark:text-[#B8F55C] text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#234235] shrink-0"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] text-white dark:bg-[#18362B] dark:text-[#B8F55C] text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#234235] shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+              title={isChannelConnected ? t("messages.compose_email_btn") : inputPlaceholder}
             >
               <SquarePen className="w-4 h-4 text-[#B8F55C]" />
               <span>{t("messages.compose_email_btn")}</span>
@@ -767,7 +823,13 @@ export default function ChatWorkspace({ onBackToList }) {
           )}
 
           {/* Floating Input Pill */}
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 p-1.5 pl-3 rounded-full border border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7] dark:bg-[#0C1712] shadow-xs relative">
+          <div
+            className={`max-w-4xl mx-auto flex items-center justify-between gap-2 p-1.5 pl-3 rounded-full border transition-all shadow-xs relative ${
+              isChannelConnected
+                ? "border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7] dark:bg-[#0C1712]"
+                : "bg-[#F0F4F1] dark:bg-[#14261D] border-amber-300/70 dark:border-amber-700/60 opacity-90"
+            }`}
+          >
             {/* Hidden Native File Input */}
             <input
               ref={fileInputRef}
@@ -781,8 +843,9 @@ export default function ChatWorkspace({ onBackToList }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 rounded-full text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer shrink-0"
-              title={t("messages.attach_tooltip")}
+              disabled={!isChannelConnected}
+              className="p-2 rounded-full text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shrink-0"
+              title={isChannelConnected ? t("messages.attach_tooltip") : inputPlaceholder}
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -792,13 +855,14 @@ export default function ChatWorkspace({ onBackToList }) {
               <button
                 type="button"
                 onClick={() => setIsTemplateMenuOpen((prev) => !prev)}
-                className="p-2 rounded-full text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer shrink-0"
-                title={t("messages.template_tooltip")}
+                disabled={!isChannelConnected}
+                className="p-2 rounded-full text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shrink-0"
+                title={isChannelConnected ? t("messages.template_tooltip") : inputPlaceholder}
               >
                 <NotepadText className="w-4 h-4" />
               </button>
 
-              {isTemplateMenuOpen && (
+              {isTemplateMenuOpen && isChannelConnected && (
                 <div className="absolute bottom-full left-0 mb-3 w-72 max-w-[calc(100vw-3rem)] max-h-60 overflow-y-auto bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] rounded-2xl shadow-xl p-2 z-30 space-y-1 animate-in fade-in zoom-in-95 scrollbar-thin-subtle">
                   <div className="px-2 py-1 text-[10px] font-bold text-[#6B8075] dark:text-[#8EA096] uppercase">
                     {t("messages.quick_templates_title")}
@@ -825,25 +889,23 @@ export default function ChatWorkspace({ onBackToList }) {
             {/* Text Input */}
             <input
               ref={inputRef}
+              data-testid="chat-message-input"
               type="text"
-              placeholder={
-                isEmail
-                  ? t("messages.reply_placeholder_email")
-                  : t("messages.reply_placeholder_chat")
-              }
+              placeholder={inputPlaceholder}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 text-xs bg-transparent text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] dark:placeholder-[#6E8578] focus:outline-none px-2"
+              disabled={!isChannelConnected}
+              className="flex-1 text-xs bg-transparent text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] dark:placeholder-[#6E8578] focus:outline-none px-2 disabled:cursor-not-allowed disabled:text-[#8EA096] dark:disabled:text-[#6E8578]"
             />
 
             {/* Send Button */}
             <button
               type="button"
               onClick={handleSend}
-              disabled={!inputMessage.trim() && !selectedFile}
+              disabled={!isChannelConnected || (!inputMessage.trim() && !selectedFile)}
               className="w-9 h-9 rounded-full bg-[#12281F] hover:bg-[#1C3B2E] dark:bg-[#18362B] dark:text-[#B8F55C] disabled:opacity-30 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0 shadow-xs transition-all active:scale-95 cursor-pointer border border-[#234235]"
-              title={t("messages.send_tooltip")}
+              title={isChannelConnected ? t("messages.send_tooltip") : inputPlaceholder}
             >
               <Send className="w-4 h-4 text-[#B8F55C]" />
             </button>

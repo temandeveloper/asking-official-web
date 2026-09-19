@@ -28,7 +28,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { CATEGORY_OPTIONS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "../views/TicketsView";
+import { CATEGORY_OPTIONS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "../../constants/ticketConstants";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -50,17 +50,30 @@ const formatFileSize = (bytes) => {
   return `${Math.round(bytes / 1024)} KB`;
 };
 
-function TicketAttachmentItem({ item, onRemove, readOnlyForm }) {
+const isImageAttachment = (item) =>
+  item.type?.startsWith("image/") ||
+  item.name?.match(/\.(jpg|jpeg|png|webp|gif)$/i) ||
+  Boolean(item.thumbnailBase64);
+
+function TicketAttachmentItem({
+  item,
+}) {
   const { t } = useTranslation();
-  const isImg = item.type?.startsWith("image/") || item.name?.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+  const isImg = isImageAttachment(item);
+  const preview = item.previewUrl || item.thumbnailBase64 || item.url || item.dataBase64;
+  const downloadUrl =
+    item.thumbnailBase64 || item.previewUrl || item.url || item.dataBase64;
 
   return (
-    <div className="flex items-center justify-between p-2.5 rounded-xl border border-[#DEE7DF] dark:border-[#1F382B] bg-white dark:bg-[#162B21] shadow-2xs group hover:border-[#CFE2D3] dark:hover:border-[#234235] transition-all">
+    <div
+      data-testid={`attachment-item-${item.name || "file"}`}
+      className="flex items-center justify-between p-2.5 rounded-xl border border-[#DEE7DF] dark:border-[#1F382B] bg-white dark:bg-[#162B21] shadow-2xs group hover:border-[#CFE2D3] dark:hover:border-[#234235] transition-all"
+    >
       <div className="flex items-center gap-2.5 min-w-0">
-        {isImg && item.previewUrl ? (
+        {isImg && preview ? (
           <img
-            src={item.previewUrl}
-            alt={item.name}
+            src={preview}
+            alt={item.name || "Attachment"}
             className="w-8 h-8 rounded-lg object-cover border border-[#DEE7DF] dark:border-[#1F382B] shrink-0"
           />
         ) : (
@@ -70,7 +83,7 @@ function TicketAttachmentItem({ item, onRemove, readOnlyForm }) {
         )}
         <div className="min-w-0">
           <p className="text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] truncate max-w-[180px] sm:max-w-[240px]">
-            {item.name || t("messages.file_attachment")}
+            {item.name || t("messages.file_attachment") || "Attachment"}
           </p>
           <p className="text-[10px] text-[#6B8075] dark:text-[#8EA096]">
             {formatFileSize(item.size)}
@@ -79,31 +92,19 @@ function TicketAttachmentItem({ item, onRemove, readOnlyForm }) {
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
-        <button
-          type="button"
-          onClick={() => {
-            if (item.previewUrl) {
-              const a = document.createElement("a");
-              a.href = item.previewUrl;
-              a.download = item.name || "attachment";
-              a.click();
-            } else {
-              alert(`${t("common.download")} ${item.name}`);
-            }
-          }}
-          className="p-1.5 rounded-lg text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer"
-          title={t("messages.download_file")}
-        >
-          <Download className="w-3.5 h-3.5" />
-        </button>
-        {!readOnlyForm && (
+        {downloadUrl && isImg && (
           <button
             type="button"
-            onClick={onRemove}
-            className="p-1.5 rounded-lg text-[#6B8075] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-            title={t("tickets.remove_attachment")}
+            onClick={() => {
+              const a = document.createElement("a");
+              a.href = downloadUrl;
+              a.download = item.name || "attachment";
+              a.click();
+            }}
+            className="p-1.5 rounded-lg text-[#6B8075] hover:text-[#11231B] dark:text-[#8EA096] dark:hover:text-[#F2F7F4] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer"
+            title={t("messages.download_file")}
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
@@ -172,12 +173,13 @@ function TicketDrawerForm({
     () => editingTicket?.description || ""
   );
   const [ticketAttachments, setTicketAttachments] = useState(
-    () => (Array.isArray(editingTicket?.attachments) ? editingTicket.attachments : [])
+    () => (Array.isArray(editingTicket?.attach) ? editingTicket.attach : Array.isArray(editingTicket?.attachments) ? editingTicket.attachments : [])
   );
   const fileInputRef = useRef(null);
 
   // Tiptap Rich Text Editor Setup for Ticket Description
   const editor = useEditor({
+    immediatelyRender: false,
     editable: !readOnlyForm,
     extensions: [
       StarterKit.configure({
@@ -291,6 +293,7 @@ function TicketDrawerForm({
       contactPhone: ticketContactPhone.trim(),
       deadline: fullDeadline,
       description: ticketDescription.trim(),
+      attach: ticketAttachments,
       attachments: ticketAttachments,
       activity,
     };
@@ -675,26 +678,6 @@ function TicketDrawerForm({
               </span>
             </div>
 
-            {!readOnlyForm && (
-              <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.csv"
-                  className="hidden"
-                  onChange={handleAddFiles}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#D7E4D9] dark:border-[#31523F] bg-[#F8FAF7] dark:bg-[#162B21] text-[10px] font-bold text-[#184530] dark:text-[#B8F55C] hover:bg-[#EBF1EB] dark:hover:bg-[#1D3A2C] transition-colors cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>{t("tickets.add_attachment")}</span>
-                </button>
-              </>
-            )}
           </div>
 
           {ticketAttachments.length > 0 ? (
@@ -703,8 +686,6 @@ function TicketDrawerForm({
                 <TicketAttachmentItem
                   key={`${att.name}-${idx}`}
                   item={att}
-                  onRemove={() => handleRemoveAttachment(idx)}
-                  readOnlyForm={readOnlyForm}
                 />
               ))}
             </div>

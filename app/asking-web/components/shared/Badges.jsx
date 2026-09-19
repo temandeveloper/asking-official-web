@@ -14,7 +14,7 @@ export function PriorityBadge({ priority = "medium", className = "" }) {
       return (
         <span className={`badge badge-error badge-soft font-bold text-[10px] gap-1 shrink-0 ${className}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-          <span>{t("tickets.priority_urgent")}</span>
+          <span>Urgent</span>
         </span>
       );
     case "high":
@@ -22,7 +22,7 @@ export function PriorityBadge({ priority = "medium", className = "" }) {
       return (
         <span className={`badge badge-warning badge-soft font-bold text-[10px] gap-1 shrink-0 ${className}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-          <span>{t("tickets.priority_high")}</span>
+          <span>High</span>
         </span>
       );
     case "medium":
@@ -30,7 +30,7 @@ export function PriorityBadge({ priority = "medium", className = "" }) {
       return (
         <span className={`badge badge-warning badge-outline font-bold text-[10px] gap-1 shrink-0 ${className}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-          <span>{t("tickets.priority_medium")}</span>
+          <span>Medium</span>
         </span>
       );
     case "low":
@@ -38,21 +38,20 @@ export function PriorityBadge({ priority = "medium", className = "" }) {
       return (
         <span className={`badge badge-success badge-soft font-bold text-[10px] gap-1 shrink-0 ${className}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span>{t("tickets.priority_low")}</span>
+          <span>Low</span>
         </span>
       );
     default:
       return (
         <span className={`badge badge-ghost font-bold text-[10px] gap-1 shrink-0 ${className}`}>
           <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-          <span>{t("tickets.priority_lowest")}</span>
+          <span>Lowest</span>
         </span>
       );
   }
 }
 
 export function StatusBadge({ status = "New", className = "" }) {
-  const { t } = useTranslation();
   const s = status || "New";
 
   switch (s) {
@@ -60,14 +59,14 @@ export function StatusBadge({ status = "New", className = "" }) {
     case "Baru":
       return (
         <span className={`badge badge-info badge-soft font-bold text-[10px] shrink-0 ${className}`}>
-          {t("tickets.status_new")}
+          New
         </span>
       );
     case "In Progress":
     case "Dalam Proses":
       return (
         <span className={`badge badge-warning badge-soft font-bold text-[10px] shrink-0 ${className}`}>
-          {t("tickets.status_in_progress")}
+          In Progress
         </span>
       );
     case "Under Review":
@@ -75,7 +74,7 @@ export function StatusBadge({ status = "New", className = "" }) {
     case "Menunggu Review":
       return (
         <span className={`badge badge-secondary badge-soft font-bold text-[10px] shrink-0 ${className}`}>
-          {t("tickets.status_under_review")}
+          Under Review
         </span>
       );
     case "Completed":
@@ -83,14 +82,14 @@ export function StatusBadge({ status = "New", className = "" }) {
     case "Selesai":
       return (
         <span className={`badge badge-success badge-soft font-bold text-[10px] shrink-0 ${className}`}>
-          {t("tickets.status_completed")}
+          Completed
         </span>
       );
     case "Cancelled":
     case "Dibatalkan":
       return (
         <span className={`badge badge-error badge-soft font-bold text-[10px] shrink-0 ${className}`}>
-          {t("tickets.status_cancelled")}
+          Cancelled
         </span>
       );
     default:
@@ -103,20 +102,19 @@ export function StatusBadge({ status = "New", className = "" }) {
 }
 
 export function CategoryBadge({ category = "support", className = "" }) {
-  const { t } = useTranslation();
   const cat = (category || "support").toLowerCase();
   const label =
     cat === "technical"
-      ? t("tickets.cat_technical")
+      ? "Technical"
       : cat === "issue"
-        ? t("tickets.cat_issue")
+        ? "Issue"
         : cat === "marketing"
-          ? t("tickets.cat_marketing")
+          ? "Marketing"
           : cat === "billing"
-            ? t("tickets.cat_billing")
+            ? "Billing"
             : cat === "support"
-              ? t("tickets.cat_support")
-              : t("tickets.cat_general");
+              ? "Support"
+              : "General";
 
   return (
     <span className={`badge badge-neutral badge-soft text-[10px] font-semibold uppercase tracking-wider shrink-0 ${className}`}>

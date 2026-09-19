@@ -128,6 +128,24 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
   const [replyingToMessage, setReplyingToMessage] = useState(null);
   const [isMobileChatActive, setIsMobileChatActive] = useState(false);
 
+  // Live Omnichannel connection statuses from Desktop
+  const [channelStatuses, setChannelStatuses] = useState({
+    whatsapp: "close",
+    telegram: "close",
+    email: "close",
+  });
+
+  const fetchChannelStatuses = useCallback(async () => {
+    try {
+      const data = await remotePeerClient.sendRequest("channels", "get-status");
+      if (data && typeof data === "object") {
+        setChannelStatuses(data);
+      }
+    } catch (err) {
+      console.warn("[AskingContext] fetchChannelStatuses warning:", err.message);
+    }
+  }, []);
+
   const activeJidRef = React.useRef(activeJid);
   useEffect(() => {
     activeJidRef.current = activeJid;
@@ -257,6 +275,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
             fetchSchedules(),
             fetchTemplates(),
             fetchContacts(),
+            fetchChannelStatuses(),
           ]);
           setHasInitialDataLoaded(true);
         } finally {
@@ -284,6 +303,12 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
         await fetchDashboardOverview();
       } else if (signal.scope === "contacts") {
         await fetchContacts();
+      } else if (signal.scope === "channels") {
+        if (signal.meta && typeof signal.meta === "object") {
+          setChannelStatuses(signal.meta);
+        } else {
+          await fetchChannelStatuses();
+        }
       }
     });
 
@@ -295,6 +320,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
       fetchSchedules();
       fetchTemplates();
       fetchContacts();
+      fetchChannelStatuses();
     });
 
     return () => {
@@ -334,6 +360,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
       fetchDueTickets();
     } else if (activeTab === "scheduler") {
       fetchSchedules();
+      fetchTemplates();
     } else if (activeTab === "templates") {
       fetchTemplates();
     }
@@ -360,7 +387,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
       const targetJid = activeJid;
       const optimisticMsg = {
         id: "msg_out_" + Date.now(),
-        text: text.trim(),
+        text: text?.trim() || "",
         timestamp: Date.now(),
         fromMe: true,
         status: "sending",
@@ -374,7 +401,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
           if (c.jid !== targetJid) return c;
           return {
             ...c,
-            lastMessage: text.trim() || (attachments[0]?.name ? `Lampiran: ${attachments[0].name}` : "Pesan dikirim"),
+            lastMessage: text?.trim() || (attachments[0]?.name ? `Lampiran: ${attachments[0].name}` : "Pesan dikirim"),
             lastMessageTime: new Date().toISOString(),
             lastMessageFromMe: true,
             messages: [...(c.messages || []), optimisticMsg],
@@ -387,18 +414,21 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
       try {
         await remotePeerClient.sendRequest("messages", "send-message", {
           jid: targetJid,
-          text: text.trim(),
+          text: text?.trim() || "",
           attach: attachments[0] || null,
           quotedMsgId: replyTo?.id,
           quotedMsgText: replyTo?.text,
           channel: extra.channel || "whatsapp",
         });
         await fetchChatHistory(targetJid);
+        await fetchConversations();
       } catch (err) {
         addToast(err.message || "Gagal mengirim pesan melalui AsKing Desktop.", "error");
+        await fetchChatHistory(targetJid);
+        await fetchConversations();
       }
     },
-    [activeJid, addToast, fetchChatHistory]
+    [activeJid, addToast, fetchChatHistory, fetchConversations]
   );
 
   const toggleConversationHumanSupport = useCallback((jid) => {
@@ -510,12 +540,38 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
   );
 
   const dispatchScheduledItem = useCallback(
-    (item) => {
-      addToast(t("common.toast_schedule_sending"), "info");
-      // Simulated trigger
+    async (item) => {
+      try {
+        addToast(t("common.toast_schedule_sending"), "info");
+        // Optimistically set item status to "sending" immediately in web state!
+        setSchedules((prev) =>
+          prev.map((s) => (s.id === item.id ? { ...s, status: "sending" } : s))
+        );
+        await remotePeerClient.sendRequest("scheduler", "dispatch", {
+          id: item.id,
+          item,
+        });
+        await fetchSchedules();
+        await fetchDashboardOverview();
+      } catch (err) {
+        addToast(err.message || "Gagal mengirim jadwal sekarang.", "error");
+        await fetchSchedules();
+      }
     },
-    [addToast, t]
+    [addToast, fetchSchedules, fetchDashboardOverview, t]
   );
+
+  // Auto-refresh schedules while any schedule is currently "sending"
+  useEffect(() => {
+    const hasSending = schedules.some((s) => s.status === "sending");
+    if (!hasSending || remotePeerClient.status !== "CONNECTED") return;
+
+    const interval = setInterval(() => {
+      fetchSchedules();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [schedules, fetchSchedules]);
 
   // 7. CRM Tickets Management (routed through Desktop)
   const [ticketSearchQuery, setTicketSearchQuery] = useState("");
@@ -714,6 +770,8 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
     removeToast,
 
     // Conversations & Messages
+    channelStatuses,
+    fetchChannelStatuses,
     conversations,
     activeJid,
     setActiveJid,
