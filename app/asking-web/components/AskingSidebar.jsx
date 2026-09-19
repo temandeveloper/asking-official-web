@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAsking } from "../data/AskingContext";
 import { useTranslation } from "../data/TranslationContext";
 import ContactAvatar from "./shared/ContactAvatar";
+import { SidebarDueTicketsSkeleton } from "./common/daisySkeletons";
 import {
   Home,
   MessageSquare,
@@ -42,6 +43,9 @@ export default function AskingSidebar() {
     tickets,
     userProfile,
     handleOpenReadOnlyTicket,
+    isRemoteLoading,
+    dueTodayList,
+    dueTomorrowList,
   } = useAsking();
   const { language, toggleLanguage, t } = useTranslation();
 
@@ -58,6 +62,13 @@ export default function AskingSidebar() {
 
   // Due Today and Due Tomorrow tickets for the sidebar tracker
   const { dueTodayTickets, dueTomorrowTickets } = useMemo(() => {
+    if (dueTodayList?.length || dueTomorrowList?.length) {
+      return {
+        dueTodayTickets: dueTodayList || [],
+        dueTomorrowTickets: dueTomorrowList || [],
+      };
+    }
+
     const todayStr = new Date().toISOString().split("T")[0];
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -71,7 +82,7 @@ export default function AskingSidebar() {
       dueTodayTickets: active.filter((tkt) => tkt.deadline.startsWith(todayStr)),
       dueTomorrowTickets: active.filter((tkt) => tkt.deadline.startsWith(tomorrowStr)),
     };
-  }, [tickets]);
+  }, [tickets, dueTodayList, dueTomorrowList]);
 
   return (
     <aside className="w-64 h-full bg-white dark:bg-[#0C1712] border-r border-[#DEE7DF] dark:border-[#1F382B] flex flex-col justify-between shrink-0 select-none transition-colors duration-200">
@@ -113,6 +124,7 @@ export default function AskingSidebar() {
         </div>
 
         {/* Navigation Items */}
+
         <nav className="space-y-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
@@ -166,7 +178,9 @@ export default function AskingSidebar() {
               </span>
             </div>
 
-            {dueTodayTickets.length === 0 ? (
+            {isRemoteLoading ? (
+              <SidebarDueTicketsSkeleton />
+            ) : dueTodayTickets.length === 0 ? (
               <p className="text-[11px] text-[#8EA096] dark:text-[#6B8075] italic px-2">
                 {t("sidebar.no_tickets_today") || "Tidak ada tiket jatuh tempo hari ini"}
               </p>
@@ -205,7 +219,9 @@ export default function AskingSidebar() {
               </span>
             </div>
 
-            {dueTomorrowTickets.length === 0 ? (
+            {isRemoteLoading ? (
+              <SidebarDueTicketsSkeleton />
+            ) : dueTomorrowTickets.length === 0 ? (
               <p className="text-[11px] text-[#8EA096] dark:text-[#6B8075] italic px-2">
                 {t("sidebar.no_tickets_tomorrow") || "Tidak ada tiket jatuh tempo besok"}
               </p>

@@ -325,7 +325,7 @@ export const UI_STRINGS = {
       "col_category": "Kategori",
       "col_priority": "Prioritas",
       "col_status": "Status",
-      "col_deadline": "Deadline & SLA",
+      "col_deadline": "Jatuh Tempo",
       "col_actions": "Aksi",
       "empty_tickets": "Belum ada tiket yang sesuai dengan filter yang dipilih",
       "empty_tickets_sub": "Klik tombol 'Buat Tiket Baru' di atas untuk menambahkan tiket layanan pertama Anda.",
@@ -1443,6 +1443,21 @@ export const UI_STRINGS = {
       "architecture_label": "Arsitektur Backend & Engine:",
       "capabilities_label": "Kapabilitas Utama:",
       "quick_nav_label": "Navigasi Cepat Menu:"
+    },
+    "network": {
+      "connected": "P2P Terhubung",
+      "connected_latency": "P2P {latency}ms",
+      "connecting": "Menghubungkan...",
+      "reconnecting": "Menyambung Ulang ({attempt}/5)",
+      "reconnecting_default": "Menyambung Ulang...",
+      "unauthorized": "Akses Ditolak",
+      "offline": "Desktop Offline",
+      "p2p_title": "Status Konektivitas P2P",
+      "status_label": "Status:",
+      "latency_label": "Latensi RTT:",
+      "target_host": "Target Host:",
+      "retry_btn": "Coba Hubungkan Sekarang",
+      "disclaimer": "Koneksi ini terenkripsi langsung (P2P). Jika sambungan terhambat, pastikan firewall jaringan Anda mengizinkan sambungan WebRTC atau beralih ke jaringan lain."
     }
   },
   "en": {
@@ -2885,6 +2900,21 @@ export const UI_STRINGS = {
       "architecture_label": "Backend & Engine Architecture:",
       "capabilities_label": "Key Capabilities:",
       "quick_nav_label": "Quick Navigation:"
+    },
+    "network": {
+      "connected": "P2P Connected",
+      "connected_latency": "P2P {latency}ms",
+      "connecting": "Connecting...",
+      "reconnecting": "Reconnecting ({attempt}/5)",
+      "reconnecting_default": "Reconnecting...",
+      "unauthorized": "Access Denied",
+      "offline": "Desktop Offline",
+      "p2p_title": "P2P Connectivity Status",
+      "status_label": "Status:",
+      "latency_label": "RTT Latency:",
+      "target_host": "Target Host:",
+      "retry_btn": "Retry Connection Now",
+      "disclaimer": "This is a direct peer-to-peer (P2P) encrypted link. If blocked, verify that your network/firewall allows WebRTC connections or switch to another network."
     }
   }
 };

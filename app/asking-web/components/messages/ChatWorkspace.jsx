@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import EmailMessageRow from "./EmailMessageRow";
 import EmailComposeDrawer from "./EmailComposeDrawer";
+import { ChatThreadSkeleton } from "../common/daisySkeletons";
 import { useTranslation } from "../../data/TranslationContext";
 
 export default function ChatWorkspace({ onBackToList }) {
@@ -41,6 +42,7 @@ export default function ChatWorkspace({ onBackToList }) {
     handleQuickCreateTicketFromChat,
     toggleConversationHumanSupport,
     deleteConversation,
+    isRemoteLoading,
     addToast,
   } = useAsking();
   const { language, t } = useTranslation();
@@ -446,7 +448,9 @@ export default function ChatWorkspace({ onBackToList }) {
 
       {/* Messages Stream Area */}
       <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 scrollbar-thin-subtle">
-        {isEmail ? (
+        {isRemoteLoading ? (
+          <ChatThreadSkeleton />
+        ) : isEmail ? (
           <div className="space-y-3 max-w-4xl mx-auto w-full">
             {(activeConversation.messages || []).map((msg) => (
               <EmailMessageRow
@@ -550,13 +554,13 @@ export default function ChatWorkspace({ onBackToList }) {
                                       : "bg-[#F8FAF7] dark:bg-[#12241C] border-[#DEE7DF] dark:border-[#1F382B] text-[#11231B] dark:text-[#F2F7F4]"
                                     }`}
                                 >
-                                  {isImg && att.previewUrl && (
+                                  {isImg && (att.previewUrl || att.thumbnailBase64) && (
                                     <div className="w-full max-h-48 overflow-hidden bg-black/10">
                                       <img
-                                        src={att.previewUrl}
+                                        src={att.previewUrl || att.thumbnailBase64}
                                         alt={att.name || "Image"}
                                         className="w-full h-auto object-cover max-h-48 hover:scale-102 transition-transform cursor-pointer"
-                                        onClick={() => window.open(att.previewUrl, "_blank")}
+                                        onClick={() => window.open(att.previewUrl || att.thumbnailBase64, "_blank")}
                                       />
                                     </div>
                                   )}

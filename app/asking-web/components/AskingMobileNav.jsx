@@ -44,11 +44,12 @@ export function AskingMobileHeader() {
         </div>
       </div>
 
-      {/* Right Controls: Language Toggle & Theme Toggle Side-by-Side */}
+      {/* Right Controls: Language Toggle & Theme Toggle */}
       <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={toggleLanguage}
+
           className="h-8 px-2.5 rounded-xl flex items-center justify-center gap-1 text-[11px] font-bold font-mono text-[#556A60] dark:text-[#A5B8AD] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] hover:text-[#11231B] dark:hover:text-[#F2F7F4] transition-all cursor-pointer border border-[#DEE7DF] dark:border-[#1F382B]"
           title={t("sidebar.toggle_language") || "Ganti Bahasa (ID/EN)"}
           aria-label={t("sidebar.toggle_language") || "Ganti Bahasa (ID/EN)"}

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useAsking } from "../../data/AskingContext";
 import { useTranslation } from "../../data/TranslationContext";
 import { WhatsAppLogo, TelegramLogo, EmailLogo } from "../shared/ChannelBadge";
+import { SchedulerCardsSkeleton } from "../common/daisySkeletons";
 import {
   CalendarClock,
   Plus,
@@ -30,6 +31,7 @@ export default function SchedulerView() {
     setEditingSchedule,
     deleteScheduledMessage,
     dispatchScheduledItem,
+    isRemoteLoading,
     addToast,
   } = useAsking();
   const { t, language } = useTranslation();
@@ -279,7 +281,9 @@ export default function SchedulerView() {
 
       {/* 2-Column Cards Grid Stream */}
       <div className="flex-1 p-3.5 sm:p-6 overflow-y-auto pb-24 lg:pb-6 scrollbar-thin-subtle">
-        {filteredItems.length === 0 ? (
+        {isRemoteLoading ? (
+          <SchedulerCardsSkeleton />
+        ) : filteredItems.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center text-[#8EA096] dark:text-[#6E8578] space-y-3">
             <div className="w-14 h-14 rounded-2xl bg-[#EBF1EB] dark:bg-[#18362B] border border-[#DEE7DF] dark:border-[#1F382B] flex items-center justify-center shadow-xs">
               <CalendarClock className="w-7 h-7 text-[#184530] dark:text-[#B8F55C]" />

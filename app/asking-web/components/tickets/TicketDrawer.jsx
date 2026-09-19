@@ -25,6 +25,8 @@ import {
   Clock,
   SquarePen,
   ImageIcon,
+  Copy,
+  Check,
 } from "lucide-react";
 import { CATEGORY_OPTIONS, STATUS_OPTIONS, PRIORITY_OPTIONS } from "../views/TicketsView";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -38,7 +40,7 @@ const getDeadlineParts = (deadline) => {
   const match = value.match(/^(\d{4}-\d{2}-\d{2})(?:[T\s](\d{2}:\d{2}))?/);
   return {
     date: match?.[1] || "",
-    time: match?.[2] || "17:00",
+    time: match?.[2] || "",
   };
 };
 
@@ -117,11 +119,36 @@ function TicketDrawerForm({
   onSwitchToEdit,
 }) {
   const { t, language } = useTranslation();
-  const { saveTicket, deleteTicket, appendTicketNote, addToast } = useAsking();
+  const { saveTicket, deleteTicket, appendTicketNote, addToast, getNextTicketId } = useAsking();
 
   const [ticketId, setTicketId] = useState(() => editingTicket?.id || "");
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    if (!editingTicket?.id && !ticketId && getNextTicketId) {
+      getNextTicketId().then((nextId) => {
+        if (nextId) setTicketId(nextId);
+      });
+    }
+  }, [editingTicket, ticketId, getNextTicketId]);
+
+  const handleCopyTicketId = async () => {
+    if (!ticketId) return;
+    try {
+      await navigator.clipboard.writeText(ticketId);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+      addToast(t("tickets.copied_id", { id: ticketId }) || `ID Tiket #${ticketId} tersalin!`, "info");
+    } catch {
+      // ignore
+    }
+  };
+
   const [ticketChannel, setTicketChannel] = useState(
-    () => editingTicket?.channel || initialContact?.channel || "whatsapp"
+    () =>
+      editingTicket?.channel ||
+      initialContact?.channel ||
+      (initialContact?.jid?.startsWith("tg_") ? "telegram" : "whatsapp")
   );
   const [ticketTitle, setTicketTitle] = useState(() => editingTicket?.title || "");
   const [ticketCategory, setTicketCategory] = useState(() => editingTicket?.category || "support");
@@ -136,10 +163,10 @@ function TicketDrawerForm({
 
   const initialDeadline = getDeadlineParts(editingTicket?.deadline);
   const [ticketDeadlineDate, setTicketDeadlineDate] = useState(
-    initialDeadline.date || new Date().toISOString().split("T")[0]
+    initialDeadline.date || ""
   );
   const [ticketDeadlineTime, setTicketDeadlineTime] = useState(
-    initialDeadline.time || "17:00"
+    initialDeadline.time || ""
   );
   const [ticketDescription, setTicketDescription] = useState(
     () => editingTicket?.description || ""
@@ -158,7 +185,9 @@ function TicketDrawerForm({
       }),
       Underline,
       Placeholder.configure({
-        placeholder: t("tickets.drawer_desc_ph") || "Tuliskan catatan teknis...",
+        placeholder:
+          t("tickets.drawer_desc_ph") ||
+          "Jelaskan rincian keluhan pelanggan, langkah investigasi, atau catatan penyelesaian...",
       }),
       Markdown,
     ],
@@ -243,26 +272,22 @@ function TicketDrawerForm({
       addToast(`${t("tickets.drawer_title")} ${t("common.required")}`, "error");
       return;
     }
-    if (!ticketContactName.trim()) {
-      addToast(`${t("tickets.drawer_contact_name")} ${t("common.required")}`, "error");
-      return;
-    }
 
     const fullDeadline = ticketDeadlineDate
       ? ticketDeadlineTime
-        ? `${ticketDeadlineDate}T${ticketDeadlineTime}`
+        ? `${ticketDeadlineDate} ${ticketDeadlineTime}`
         : ticketDeadlineDate
       : "";
 
     const payload = {
       ...(editingTicket || {}),
-      id: editingTicket?.id,
+      id: ticketId || editingTicket?.id,
       title: ticketTitle.trim(),
       category: ticketCategory,
       status: ticketStatus,
       priority: ticketPriority,
       channel: ticketChannel,
-      contactName: ticketContactName.trim(),
+      contactName: ticketContactName.trim() || "Direct Client",
       contactPhone: ticketContactPhone.trim(),
       deadline: fullDeadline,
       description: ticketDescription.trim(),
@@ -270,7 +295,7 @@ function TicketDrawerForm({
       activity,
     };
 
-    saveTicket(payload);
+    saveTicket(payload, Boolean(editingTicket));
   };
 
   const handleDelete = () => {
@@ -282,12 +307,40 @@ function TicketDrawerForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
-      <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4.5 scrollbar-thin-subtle">
-        {/* Field 1: Category & Channel */}
+      <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 scrollbar-thin-subtle">
+        {/* Field 1: Ticket ID + Category */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
-              {t("tickets.drawer_category")}
+              {t("tickets.col_id") || "ID Tiket"}
+            </label>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={ticketId}
+                readOnly
+                className="w-full pl-3 pr-8 py-2 rounded-xl border border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7] dark:bg-[#162B21] text-xs font-mono font-bold text-[#6B8075] dark:text-[#8EA096] focus:outline-none cursor-default"
+              />
+              <div className="absolute right-2 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleCopyTicketId}
+                  className="p-1 hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] rounded text-[#6B8075] hover:text-[#11231B] transition-colors cursor-pointer"
+                  title={t("tickets.copy_id") || "Salin ID"}
+                >
+                  {isCopied ? (
+                    <Check className="w-3 h-3 text-[#22C55E]" />
+                  ) : (
+                    <Copy className="w-3 h-3" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
+              {t("tickets.col_category") || "Kategori"}
             </label>
             <div className="relative">
               <select
@@ -297,7 +350,7 @@ function TicketDrawerForm({
                 className={`w-full pl-3.5 pr-8 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] appearance-none focus:outline-none capitalize ${
                   readOnlyForm
                     ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default opacity-80"
-                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
+                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C] cursor-pointer"
                 }`}
               >
                 {CATEGORY_OPTIONS.map((cat) => (
@@ -311,58 +364,34 @@ function TicketDrawerForm({
               )}
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
-              {t("tickets.drawer_channel")}
-            </label>
-            <div className="relative">
-              <select
-                value={ticketChannel}
-                disabled={readOnlyForm}
-                onChange={(e) => setTicketChannel(e.target.value)}
-                className={`w-full pl-3.5 pr-8 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] appearance-none focus:outline-none capitalize ${
-                  readOnlyForm
-                    ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default opacity-80"
-                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
-                }`}
-              >
-                <option value="whatsapp">WhatsApp</option>
-                <option value="telegram">Telegram</option>
-                <option value="email">Email</option>
-              </select>
-              {!readOnlyForm && (
-                <ChevronDown className="w-4 h-4 absolute right-3 top-2.5 text-[#6B8075] pointer-events-none" />
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Field 2: Judul Tiket */}
         <div>
           <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
-            {t("tickets.drawer_title")} {!readOnlyForm && <span className="text-rose-500">*</span>}
+            {t("tickets.col_title") || "Judul Tiket"}{" "}
+            {!readOnlyForm && <span className="text-rose-500">*</span>}
           </label>
           <input
             type="text"
             required={!readOnlyForm}
             readOnly={readOnlyForm}
-            placeholder={t("tickets.drawer_title_placeholder")}
+            placeholder={t("tickets.drawer_title_ph") || "Contoh: Kendala Pembayaran Paket Pro via Virtual Account"}
             value={ticketTitle}
             onChange={(e) => setTicketTitle(e.target.value)}
-            className={`w-full px-3.5 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none ${
+            className={`w-full px-3.5 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none transition-colors ${
               readOnlyForm
                 ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default"
-                : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C]"
+                : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C]"
             }`}
           />
         </div>
 
-        {/* Field 3 & 4: Status & Prioritas */}
+        {/* Field 3 & 4: Status + Priority */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
-              {t("common.status")}
+              {t("tickets.col_status") || "Status"}
             </label>
             <div className="relative">
               <select
@@ -372,7 +401,7 @@ function TicketDrawerForm({
                 className={`w-full pl-3.5 pr-8 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] appearance-none focus:outline-none ${
                   readOnlyForm
                     ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default opacity-80"
-                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
+                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C] cursor-pointer"
                 }`}
               >
                 {STATUS_OPTIONS.map((st) => (
@@ -389,7 +418,7 @@ function TicketDrawerForm({
 
           <div>
             <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
-              {t("common.priority")}
+              {t("tickets.col_priority") || "Prioritas"}
             </label>
             <div className="relative">
               <select
@@ -399,7 +428,7 @@ function TicketDrawerForm({
                 className={`w-full pl-3.5 pr-8 py-2 rounded-xl border text-xs font-semibold text-[#11231B] dark:text-[#F2F7F4] appearance-none focus:outline-none capitalize ${
                   readOnlyForm
                     ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default opacity-80"
-                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
+                    : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C] cursor-pointer"
                 }`}
               >
                 {PRIORITY_OPTIONS.map((pri) => (
@@ -415,11 +444,11 @@ function TicketDrawerForm({
           </div>
         </div>
 
-        {/* Field 5: Deadline (Date & Time) */}
+        {/* Field 5: Deadline (Jatuh Tempo) */}
         <div>
           <label className="text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1 flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-[#184530] dark:text-[#B8F55C]" />
-            <span>{t("tickets.drawer_deadline")}</span>
+            <span>{t("tickets.col_deadline") || "Jatuh Tempo"}</span>
           </label>
           <div className="grid grid-cols-2 gap-2">
             <input
@@ -431,7 +460,7 @@ function TicketDrawerForm({
               className={`w-full px-3.5 py-2 rounded-xl border text-xs font-medium text-[#11231B] dark:text-[#F2F7F4] focus:outline-none ${
                 readOnlyForm
                   ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default"
-                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C] cursor-pointer"
               }`}
             />
             <input
@@ -440,58 +469,99 @@ function TicketDrawerForm({
               readOnly={readOnlyForm}
               disabled={readOnlyForm}
               onChange={(e) => setTicketDeadlineTime(e.target.value)}
+              aria-label={t("tickets.deadline_time_label") || "Waktu deadline"}
               className={`w-full px-3.5 py-2 rounded-xl border text-xs font-medium text-[#11231B] dark:text-[#F2F7F4] focus:outline-none ${
                 readOnlyForm
                   ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default"
-                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C] cursor-pointer"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C] cursor-pointer"
               }`}
             />
           </div>
         </div>
 
-        {/* Field 6: Client Contact */}
-        <div className="space-y-1.5">
+        {/* Field: Channel Platform (Saluran Kontak) */}
+        <div>
+          <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
+            {t("tickets.channel_label") || "Saluran Kontak"}
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={readOnlyForm}
+              onClick={() => setTicketChannel("telegram")}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
+                ticketChannel === "telegram"
+                  ? "bg-[#229ED9]/15 border-[#229ED9] text-[#229ED9] shadow-xs"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] text-[#6B8075] dark:text-[#8EA096] hover:text-[#11231B]"
+              } ${readOnlyForm ? "opacity-80 cursor-default" : "cursor-pointer"}`}
+            >
+              <TelegramLogo className="w-4 h-4 shrink-0" />
+              <span>Telegram</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={readOnlyForm}
+              onClick={() => setTicketChannel("whatsapp")}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
+                ticketChannel === "whatsapp"
+                  ? "bg-[#25D366]/15 border-[#25D366] text-[#128C7E] dark:text-[#25D366] shadow-xs"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] text-[#6B8075] dark:text-[#8EA096] hover:text-[#11231B]"
+              } ${readOnlyForm ? "opacity-80 cursor-default" : "cursor-pointer"}`}
+            >
+              <WhatsAppLogo className="w-4 h-4 shrink-0" />
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Field 6: Pelanggan / Kontak */}
+        <div className="space-y-2">
           <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6]">
-            {t("tickets.col_client")}
+            {t("tickets.col_client") || "Pelanggan / Kontak"}
           </label>
           <div className="grid grid-cols-2 gap-2">
             <input
               type="text"
-              placeholder={t("tickets.drawer_contact_name")}
+              placeholder={t("contacts.name_placeholder") || "Nama Kontak"}
               value={ticketContactName}
               readOnly={readOnlyForm}
               onChange={(e) => setTicketContactName(e.target.value)}
               className={`w-full px-3.5 py-2 rounded-xl border text-xs text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none ${
                 readOnlyForm
                   ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default"
-                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C]"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C]"
               }`}
             />
             <input
               type="text"
-              placeholder={t("tickets.drawer_contact_phone")}
+              placeholder={
+                ticketChannel === "telegram"
+                  ? t("tickets.telegram_identifier_placeholder") || "Username (@user) atau ID"
+                  : t("contacts.phone_placeholder") || "Contoh: 6281234567890"
+              }
               value={ticketContactPhone}
               readOnly={readOnlyForm}
               onChange={(e) => setTicketContactPhone(e.target.value)}
               className={`w-full px-3.5 py-2 rounded-xl border text-xs text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none ${
                 readOnlyForm
                   ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B] cursor-default"
-                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#184530] dark:focus:border-[#B8F55C]"
+                  : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus:border-[#12281F] dark:focus:border-[#B8F55C]"
               }`}
             />
           </div>
         </div>
 
-        {/* Field 7: Ticket Description with Tiptap Rich Text Editor */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6]">
-            {t("tickets.drawer_description")}
+        {/* Field 7: Ticket Description */}
+        <div>
+          <label className="block text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6] mb-1">
+            {t("tickets.drawer_desc") || "Deskripsi Kendala & Catatan Penanganan"}
           </label>
           <div
-            className={`rounded-2xl border transition-colors overflow-hidden ${
+            className={`rounded-xl border transition-colors overflow-hidden ${
               readOnlyForm
                 ? "bg-[#EBF1EB] dark:bg-[#18362B] border-[#DEE7DF] dark:border-[#1F382B]"
-                : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus-within:border-[#184530] dark:focus-within:border-[#B8F55C]"
+                : "bg-[#F8FAF7] dark:bg-[#162B21] border-[#DEE7DF] dark:border-[#1F382B] focus-within:border-[#12281F] dark:focus-within:border-[#B8F55C]"
             }`}
           >
             {/* Formatting Toolbar */}

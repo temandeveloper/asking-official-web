@@ -20,8 +20,16 @@ export default function NewChatModal() {
     isNewChatModalOpen,
     setIsNewChatModalOpen,
     startNewChat,
+    contacts,
     conversations,
+    fetchContacts,
   } = useAsking();
+
+  React.useEffect(() => {
+    if (isNewChatModalOpen && fetchContacts) {
+      fetchContacts();
+    }
+  }, [isNewChatModalOpen, fetchContacts]);
 
   const [tab, setTab] = useState("direct"); // 'direct' | 'contact'
   const [channel, setChannel] = useState("whatsapp"); // 'whatsapp' | 'telegram' | 'email'
@@ -74,12 +82,30 @@ export default function NewChatModal() {
     });
   };
 
-  const filteredContacts = (conversations || []).filter((c) => {
+  const allAvailableContacts = React.useMemo(() => {
+    const map = new Map();
+    if (Array.isArray(contacts)) {
+      for (const c of contacts) {
+        const key = c.jid || c.phone || c.email;
+        if (key) map.set(key, c);
+      }
+    }
+    if (Array.isArray(conversations)) {
+      for (const c of conversations) {
+        const key = c.jid || c.phone || c.email;
+        if (key && !map.has(key)) map.set(key, c);
+      }
+    }
+    return Array.from(map.values());
+  }, [contacts, conversations]);
+
+  const filteredContacts = allAvailableContacts.filter((c) => {
     const query = contactFilter.toLowerCase();
     return (
       (c.name || "").toLowerCase().includes(query) ||
       (c.phone || "").includes(query) ||
-      (c.email || "").toLowerCase().includes(query)
+      (c.email || "").toLowerCase().includes(query) ||
+      (c.jid || "").toLowerCase().includes(query)
     );
   });
 
@@ -137,7 +163,7 @@ export default function NewChatModal() {
                 : "text-[#556A60] dark:text-[#A5B8AD] hover:text-[#11231B] dark:hover:text-[#F2F7F4]"
               }`}
           >
-            {t("new_chat.tab_contact", { count: conversations.length })}
+            {t("new_chat.tab_contact", { count: allAvailableContacts.length }) || `Dari Kontak (${allAvailableContacts.length})`}
           </button>
         </div>
 
@@ -273,7 +299,7 @@ export default function NewChatModal() {
                   {t("new_chat.no_contacts_found")}
                 </div>
               ) : (
-                filteredContacts.map((c) => {
+                filteredContacts.map((c, idx) => {
                   const isEmail =
                     c.channel === "email" || c.jid?.startsWith("email:");
                   const isTg =
@@ -282,7 +308,7 @@ export default function NewChatModal() {
 
                   return (
                     <button
-                      key={c.jid}
+                      key={c.jid || c.id || c.phone || idx}
                       type="button"
                       onClick={() => handleSelectContact(c)}
                       className="w-full p-2.5 rounded-xl hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] text-left transition-all flex items-center justify-between cursor-pointer group pt-2"

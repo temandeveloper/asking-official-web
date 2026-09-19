@@ -16,6 +16,7 @@ import ModulePlaceholderView from "./views/ModulePlaceholderView";
 import TicketDrawer from "./tickets/TicketDrawer";
 import NewScheduleModal from "./scheduler/NewScheduleModal";
 import ToastContainer from "./shared/ToastContainer";
+import RemoteLoadingOverlay from "./common/RemoteLoadingOverlay";
 
 export default function AskingShell() {
   const { activeTab, theme, isMobileChatActive } = useAsking();
@@ -57,10 +58,11 @@ export default function AskingShell() {
       {/* Mobile Bottom Navigation Bar (< lg) */}
       <AskingMobileBottomNav />
 
-      {/* Global Ticket Drawer, Schedule Modal & Toast Container */}
+      {/* Global Ticket Drawer, Schedule Modal, Toast Container & Remote Connection Overlay */}
       <TicketDrawer />
       <NewScheduleModal />
       <ToastContainer />
+      <RemoteLoadingOverlay />
     </div>
   );
 }

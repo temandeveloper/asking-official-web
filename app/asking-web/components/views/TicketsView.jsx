@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAsking } from "../../data/AskingContext";
 import { useTranslation } from "../../data/TranslationContext";
 import { WhatsAppLogo, TelegramLogo, EmailLogo } from "../shared/ChannelBadge";
+import { TicketsTableSkeleton } from "../common/daisySkeletons";
 import {
   Search,
   Plus,
@@ -23,8 +24,8 @@ export const CATEGORY_OPTIONS = [
   { id: "issue", label: "Issue" },
   { id: "marketing", label: "Marketing" },
   { id: "support", label: "Support" },
-  { id: "billing", label: "Billing" },
-  { id: "general", label: "General" },
+  { id: "sales", label: "Sales" },
+  { id: "feedback", label: "Feedback" },
 ];
 
 export const STATUS_OPTIONS = [
@@ -47,6 +48,7 @@ export default function TicketsView() {
   const { t } = useTranslation();
   const {
     tickets,
+    fetchTickets,
     ticketFilters,
     setTicketSearchQuery,
     setTicketCategoryFilter,
@@ -60,8 +62,13 @@ export default function TicketsView() {
     deleteTicket,
     setActiveJid,
     setActiveTab,
+    isRemoteLoading,
     addToast,
   } = useAsking();
+
+  useEffect(() => {
+    fetchTickets?.();
+  }, [fetchTickets]);
 
   const normalizePriority = (p) => {
     if (!p) return "medium";
@@ -131,12 +138,13 @@ export default function TicketsView() {
       const ticketCat = (ticket.category || "support").toLowerCase();
 
       // 1. Search Query
-      const q = (ticketFilters.search || "").toLowerCase();
+      const q = (ticketFilters.search || "").trim().toLowerCase();
       const matchesSearch =
-        t.title?.toLowerCase().includes(q) ||
-        t.id?.toLowerCase().includes(q) ||
-        t.contactName?.toLowerCase().includes(q) ||
-        t.description?.toLowerCase().includes(q);
+        !q ||
+        (ticket.title && ticket.title.toLowerCase().includes(q)) ||
+        (ticket.id && String(ticket.id).toLowerCase().includes(q)) ||
+        (ticket.contactName && ticket.contactName.toLowerCase().includes(q)) ||
+        (ticket.description && ticket.description.toLowerCase().includes(q));
 
       // 2. Category Filter
       const matchesCategory =
@@ -155,8 +163,8 @@ export default function TicketsView() {
 
       // 5. Create Date Filter
       let matchesDate = true;
-      if (ticketFilters.date && ticketFilters.date !== "all" && t.createdAt) {
-        const tDate = new Date(t.createdAt);
+      if (ticketFilters.date && ticketFilters.date !== "all" && ticket.createdAt) {
+        const tDate = new Date(ticket.createdAt);
         const targetDate = new Date();
         if (ticketFilters.date === "today") {
           matchesDate = tDate.toDateString() === targetDate.toDateString();
@@ -172,10 +180,10 @@ export default function TicketsView() {
       // 6. Deadline Filter
       let matchesDeadline = true;
       if (ticketFilters.deadline !== "all") {
-        if (!t.deadline) {
+        if (!ticket.deadline) {
           matchesDeadline = ticketFilters.deadline === "none";
         } else {
-          const dDate = new Date(t.deadline);
+          const dDate = new Date(ticket.deadline);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
@@ -623,7 +631,9 @@ export default function TicketsView() {
 
       {/* Mobile Responsive Cards Stream (lg:hidden) */}
       <div className="lg:hidden flex-1 overflow-y-auto p-4 space-y-3 pb-24 scrollbar-thin-subtle">
-        {filteredTickets.length === 0 ? (
+        {isRemoteLoading ? (
+          <TicketsTableSkeleton />
+        ) : filteredTickets.length === 0 ? (
           <div className="h-48 flex flex-col items-center justify-center text-center text-[#8EA096] dark:text-[#6E8578] space-y-2">
             <Tag className="w-8 h-8 text-[#184530] dark:text-[#B8F55C]" />
             <p className="text-xs font-bold text-[#2D3E35] dark:text-[#D1DDD6]">
@@ -751,7 +761,13 @@ export default function TicketsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EEF3EF] dark:divide-[#1F382B] text-[#11231B] dark:text-[#F2F7F4]">
-                {filteredTickets.length === 0 ? (
+                {isRemoteLoading ? (
+                  <tr>
+                    <td colSpan={8} className="py-6 px-4">
+                      <TicketsTableSkeleton />
+                    </td>
+                  </tr>
+                ) : filteredTickets.length === 0 ? (
                   <tr>
                     <td
                       colSpan={8}

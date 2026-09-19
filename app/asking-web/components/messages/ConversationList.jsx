@@ -5,6 +5,7 @@ import { useAsking } from "../../data/AskingContext";
 import { useTranslation } from "../../data/TranslationContext";
 import ContactAvatar from "../shared/ContactAvatar";
 import { WhatsAppLogo, TelegramLogo, EmailLogo } from "../shared/ChannelBadge";
+import { MessagesListSkeleton } from "../common/daisySkeletons";
 import {
   Search,
   MessageSquareDot,
@@ -25,6 +26,7 @@ export default function ConversationList({ onSelectConversation }) {
     filterUnreadOnly,
     setFilterUnreadOnly,
     setIsNewChatModalOpen,
+    isRemoteLoading,
     addToast,
   } = useAsking();
   const { t } = useTranslation();
@@ -32,6 +34,17 @@ export default function ConversationList({ onSelectConversation }) {
   // Filter conversations
   const filteredConversations = useMemo(() => {
     return (conversations || []).filter((c) => {
+      // Only display conversations that have actual messages or are currently active (matching Desktop logic)
+      const hasMessage = Boolean(
+        (c.lastMessage &&
+          c.lastMessage.trim().length > 0 &&
+          c.lastMessage !== "No messages yet") ||
+          (c.unreadCount && c.unreadCount > 0),
+      );
+      if (!hasMessage && c.jid !== activeJid) {
+        return false;
+      }
+
       const q = (searchConversationQuery || "").toLowerCase();
       const matchesSearch =
         (c.name || "").toLowerCase().includes(q) ||
@@ -44,7 +57,7 @@ export default function ConversationList({ onSelectConversation }) {
       }
       return matchesSearch;
     });
-  }, [conversations, searchConversationQuery, filterUnreadOnly]);
+  }, [conversations, activeJid, searchConversationQuery, filterUnreadOnly]);
 
   const formatTimestamp = (ts) => {
     if (!ts) return "";
@@ -97,7 +110,9 @@ export default function ConversationList({ onSelectConversation }) {
 
       {/* Conversations Scrollable List */}
       <div className="flex-1 overflow-y-auto divide-y divide-[#EEF3EF] dark:divide-[#1F382B]/60 scrollbar-thin-subtle pb-20 lg:pb-2">
-        {filteredConversations.length === 0 ? (
+        {isRemoteLoading ? (
+          <MessagesListSkeleton />
+        ) : filteredConversations.length === 0 ? (
           <div className="p-8 text-center text-[#8EA096] dark:text-[#6E8578] space-y-2">
             <p className="text-xs font-semibold">{t("messages.empty_desc") || "Tidak ada percakapan ditemukan"}</p>
             {filterUnreadOnly && (

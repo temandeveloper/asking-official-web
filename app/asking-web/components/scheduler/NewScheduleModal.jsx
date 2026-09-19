@@ -107,12 +107,20 @@ function formatDurationDisplay(ms, lang = "id") {
 function NewScheduleModalContent({ onClose, editingSchedule }) {
   const {
     conversations,
+    contacts,
+    fetchContacts,
     templates,
     schedules,
     addScheduledMessage,
     updateScheduledMessage,
   } = useAsking();
   const { t, language } = useTranslation();
+
+  React.useEffect(() => {
+    if (fetchContacts) {
+      fetchContacts();
+    }
+  }, [fetchContacts]);
 
   const PAGE_SIZE = 15;
 
@@ -301,10 +309,27 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
     }
   };
 
-  // Contacts list derived from conversations
+  const allAvailableContacts = useMemo(() => {
+    const map = new Map();
+    if (Array.isArray(contacts)) {
+      for (const c of contacts) {
+        const key = c.jid || c.phone || c.email;
+        if (key) map.set(key, c);
+      }
+    }
+    if (Array.isArray(conversations)) {
+      for (const c of conversations) {
+        const key = c.jid || c.phone || c.email;
+        if (key && !map.has(key)) map.set(key, c);
+      }
+    }
+    return Array.from(map.values());
+  }, [contacts, conversations]);
+
+  // Contacts list based on chosen channel
   const filteredContacts = useMemo(() => {
     const query = contactSearch.toLowerCase();
-    return (conversations || []).filter((c) => {
+    return allAvailableContacts.filter((c) => {
       const isEmail = c.channel === "email" || c.jid?.startsWith("email:");
       const isTg =
         !isEmail && (c.channel === "telegram" || c.jid?.startsWith("tg_"));
@@ -320,7 +345,7 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
         (c.jid || "").toLowerCase().includes(query)
       );
     });
-  }, [conversations, contactSearch, channel]);
+  }, [allAvailableContacts, contactSearch, channel]);
 
   const visibleContacts = useMemo(() => {
     return filteredContacts.slice(0, displayLimit);
@@ -709,6 +734,12 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                 }
                 value={manualPhone}
                 onChange={(e) => setManualPhone(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddManualContact(e);
+                  }
+                }}
                 className="flex-1 p-2 text-xs rounded-xl bg-[#F8FAF7] dark:bg-[#162B21] border border-[#DEE7DF] dark:border-[#1F382B] text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none"
               />
               <input
@@ -716,11 +747,18 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
                 placeholder={t("scheduler.modal_contact_name_ph")}
                 value={manualName}
                 onChange={(e) => setManualName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddManualContact(e);
+                  }
+                }}
                 className="w-28 sm:w-36 p-2 text-xs rounded-xl bg-[#F8FAF7] dark:bg-[#162B21] border border-[#DEE7DF] dark:border-[#1F382B] text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none"
               />
               <button
                 type="button"
                 onClick={handleAddManualContact}
+                data-testid="add-manual-target"
                 className="p-2 rounded-xl bg-[#EBF1EB] dark:bg-[#18362B] hover:bg-[#12281F] hover:text-[#B8F55C] text-[#2D3E35] dark:text-[#D1DDD6] text-xs font-semibold transition-colors cursor-pointer border border-[#DEE7DF]/50 dark:border-[#234235]"
                 title={t("scheduler.modal_manual_contact")}
               >
@@ -1087,6 +1125,7 @@ function NewScheduleModalContent({ onClose, editingSchedule }) {
           <button
             type="submit"
             form="new-schedule-form"
+            onClick={handleSubmit}
             disabled={
               selectedTargets.length === 0 ||
               !editorText.trim() ||
