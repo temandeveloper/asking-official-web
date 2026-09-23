@@ -83,6 +83,13 @@ export default function ProfilePage() {
   const [copiedBca, setCopiedBca] = useState(false);
   const [showQrConfirmation, setShowQrConfirmation] = useState(false);
 
+  // Top Up AI Credit Modal State
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const [selectedTopUpPackage, setSelectedTopUpPackage] = useState("growth"); // 'starter' | 'growth' | 'pro'
+  const [topUpPaymentAccordion, setTopUpPaymentAccordion] = useState("bca");
+  const [copiedTopUpBca, setCopiedTopUpBca] = useState(false);
+  const [showTopUpQrConfirmation, setShowTopUpQrConfirmation] = useState(false);
+
   // Email Verification State (Pure Verification Link)
   const [isSendingVerification, setIsSendingVerification] = useState(false);
   const [verificationCooldown, setVerificationCooldown] = useState(0);
@@ -175,6 +182,12 @@ export default function ProfilePage() {
     navigator.clipboard.writeText("2631261801");
     setCopiedBca(true);
     setTimeout(() => setCopiedBca(false), 2000);
+  };
+
+  const handleCopyTopUpBca = () => {
+    navigator.clipboard.writeText("2631261801");
+    setCopiedTopUpBca(true);
+    setTimeout(() => setCopiedTopUpBca(false), 2000);
   };
 
   const handleUpdateName = async (e) => {
@@ -455,6 +468,28 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
     whatsappMessage
   )}&type=phone_number&app_absent=0`;
 
+  // Top-Up Package Selection & WhatsApp URL
+  const selectedTopUp =
+    PRICING_CONFIG.aiCreditPackages?.find((pkg) => pkg.id === selectedTopUpPackage) ||
+    PRICING_CONFIG.aiCreditPackages?.[1] ||
+    PRICING_CONFIG.aiCreditPackages?.[0];
+
+  const topupPackageName = language === "en" ? selectedTopUp?.nameEn : selectedTopUp?.nameId;
+  const topupWhatsappMessage = `Halo Admin AsKing, saya telah melakukan pembayaran top up AI Credit:
+
+• Nama: ${customerName}
+• Email: ${customerEmail}
+• Paket: ${topupPackageName} (${selectedTopUp?.credits?.toLocaleString("id-ID")} Credit)
+• Harga: Rp ${selectedTopUp?.price}
+• Metode: Transfer Bank BCA (2631261801 a.n. Ahmad Fadil)
+• Tanggal: ${paymentDateStr}
+
+Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon untuk segera diverifikasi dan kuota credit AI ditambahkan ke akun saya. Terima kasih!`;
+
+  const topupWhatsappUrl = `https://api.whatsapp.com/send/?phone=${whatsappNumber}&text=${encodeURIComponent(
+    topupWhatsappMessage
+  )}&type=phone_number&app_absent=0`;
+
   return (
     <div className="min-h-screen bg-[#F8FAF7] flex flex-col justify-between text-[#11231B]">
       {/* Top Navbar */}
@@ -647,23 +682,41 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               </div>
             </div>
 
-            {/* Action Button to Open Upgrade Modal */}
-            <button
-              type="button"
-              onClick={() => {
-                trackMetaCustomEvent("StartUpgrade", {
-                  action: hasPaidPlan ? "renew" : "upgrade",
-                  current_plan: isProPlus ? "pro_plus_business" : isPro ? "pro_business" : "free_trial",
-                });
-                setSelectedPlan(isProPlus ? "pro_plus" : "pro");
-                setShowQrConfirmation(false);
-                setIsUpgradeModalOpen(true);
-              }}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer shrink-0"
-            >
-              <CreditCard className="w-3.5 h-3.5 text-[#B8F55C]" />
-              <span>{hasPaidPlan ? t("profile.renew_plan_btn") : t("profile.upgrade_plan_btn")}</span>
-            </button>
+            {/* Action Buttons to Open Modals */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  trackMetaCustomEvent("StartTopUpAiCredit", {
+                    current_plan: isProPlus ? "pro_plus_business" : isPro ? "pro_business" : "free_trial",
+                    current_budget: requestBudget,
+                  });
+                  setShowTopUpQrConfirmation(false);
+                  setIsTopUpModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#E5EFE7] hover:bg-[#D5E5D8] text-[#184530] text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer shrink-0 border border-[#CFE2D3]"
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
+                <span>{t("profile.topup_ai_btn")}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  trackMetaCustomEvent("StartUpgrade", {
+                    action: hasPaidPlan ? "renew" : "upgrade",
+                    current_plan: isProPlus ? "pro_plus_business" : isPro ? "pro_business" : "free_trial",
+                  });
+                  setSelectedPlan(isProPlus ? "pro_plus" : "pro");
+                  setShowQrConfirmation(false);
+                  setIsUpgradeModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-xs font-bold transition-all shadow-xs active:scale-98 cursor-pointer shrink-0"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>{hasPaidPlan ? t("profile.renew_plan_btn") : t("profile.upgrade_plan_btn")}</span>
+              </button>
+            </div>
           </div>
 
           {/* Billing Cards Grid */}
@@ -685,17 +738,40 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
             </div>
 
             {/* Card 2: AI Request Budget */}
-            <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
-              <span className="text-[11px] font-semibold text-[#6B8075] uppercase tracking-wider block">
-                {t("profile.plan_ai_budget")}
-              </span>
-              <div className="text-base font-black text-[#11231B] flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-amber-600" />
-                <span>{requestBudget} Requests</span>
+            <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-[#6B8075] uppercase tracking-wider block">
+                    {t("profile.plan_ai_budget")}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
+                    AI Credit
+                  </span>
+                </div>
+                <div className="text-base font-black text-[#11231B] flex items-center gap-1.5 mt-1.5">
+                  <Zap className="w-4 h-4 text-amber-600 fill-amber-500" />
+                  <span>{Number(requestBudget).toLocaleString(language === "en" ? "en-US" : "id-ID")} Credit</span>
+                </div>
+                <span className="text-[10px] text-[#556A60] block leading-tight mt-1">
+                  {t("profile.plan_ai_budget_desc")}
+                </span>
               </div>
-              <span className="text-[10px] text-[#556A60] block leading-tight">
-                {t("profile.plan_ai_budget_desc")}
-              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  trackMetaCustomEvent("StartTopUpAiCredit", {
+                    current_plan: isProPlus ? "pro_plus_business" : isPro ? "pro_business" : "free_trial",
+                    current_budget: requestBudget,
+                  });
+                  setShowTopUpQrConfirmation(false);
+                  setIsTopUpModalOpen(true);
+                }}
+                className="w-full mt-3 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-xs font-bold transition-all shadow-2xs active:scale-98 cursor-pointer"
+              >
+                <Zap className="w-3.5 h-3.5 text-[#B8F55C]" />
+                <span>{t("profile.topup_ai_btn")}</span>
+              </button>
             </div>
 
             {/* Card 3: Activated Date */}
@@ -1278,6 +1354,345 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
           </div>
         )
       }
+
+      {/* ========================================================================= */}
+      {/* MODAL: TOP UP AI CREDIT */}
+      {/* ========================================================================= */}
+      {isTopUpModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl bg-white rounded-3xl border border-[#DEE7DF] shadow-2xl overflow-hidden my-8 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="relative bg-[#12281F] text-white p-6 sm:p-7 flex items-center justify-between overflow-hidden">
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#B8F55C]/15 rounded-full blur-2xl pointer-events-none" />
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-400/30 flex items-center justify-center shadow-xs">
+                  <Zap className="w-5 h-5 fill-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                    {t("profile.modal_topup_title")}
+                  </h3>
+                  <p className="text-xs text-[#A5B8AD] mt-0.5">
+                    {t("profile.modal_topup_subtitle")}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsTopUpModalOpen(false)}
+                className="p-2 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+                title="Tutup Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 sm:p-7 space-y-6 max-h-[75vh] overflow-y-auto">
+              {!showTopUpQrConfirmation ? (
+                <>
+                  {/* Step 1: Select AI Credit Package */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
+                        {t("profile.modal_topup_select_pack")}
+                      </h4>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        Tanpa Kedaluwarsa
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {PRICING_CONFIG.aiCreditPackages?.map((pkg) => {
+                        const isSelected = selectedTopUpPackage === pkg.id;
+                        const pkgName = language === "en" ? pkg.nameEn : pkg.nameId;
+                        const pkgDesc = language === "en" ? pkg.descEn : pkg.descId;
+
+                        return (
+                          <div
+                            key={pkg.id}
+                            onClick={() => setSelectedTopUpPackage(pkg.id)}
+                            className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${isSelected
+                              ? "bg-[#F2F7F3] border-[#184530] shadow-xs"
+                              : "bg-white border-[#DEE7DF] hover:border-[#CFE2D3]"
+                              }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-1 mb-1.5">
+                                <span className="text-xs font-black text-[#11231B]">
+                                  {pkgName}
+                                </span>
+                              </div>
+
+                              <div className="flex items-baseline gap-1 my-1">
+                                <span className="text-xl font-black text-[#184530]">
+                                  {pkg.credits.toLocaleString("id-ID")}
+                                </span>
+                                <span className="text-[10px] font-bold text-[#556A60]">
+                                  Credit
+                                </span>
+                              </div>
+
+                              <p className="text-[10px] text-[#556A60] leading-tight mt-1 min-h-[26px]">
+                                {pkgDesc}
+                              </p>
+                            </div>
+
+                            <div className="pt-2 mt-2 border-t border-[#DEE7DF] flex items-center justify-between">
+                              <span className="text-xs font-black text-[#11231B]">
+                                Rp {pkg.price}
+                              </span>
+                              <div
+                                className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected
+                                  ? "border-[#184530] bg-[#184530] text-[#B8F55C]"
+                                  : "border-[#BACCC0] bg-white"
+                                  }`}
+                              >
+                                {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <p className="text-[11px] text-[#556A60] flex items-center gap-1.5 bg-[#F8FAF7] p-2.5 rounded-xl border border-[#DEE7DF]">
+                      <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>{t("profile.modal_topup_note")}</span>
+                    </p>
+                  </div>
+
+                  {/* Step 2: Payment Method Accordion */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
+                      {t("profile.modal_payment_method")}
+                    </h4>
+
+                    {/* Accordion 1: BCA Transfer */}
+                    <div className="rounded-2xl border border-[#DEE7DF] overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setTopUpPaymentAccordion("bca")}
+                        className="w-full p-4 bg-[#F8FAF7] hover:bg-[#F2F7F3] flex items-center justify-between text-left transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-xs">
+                            BCA
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-[#11231B] block">
+                              {t("profile.modal_bca_title")}
+                            </span>
+                            <span className="text-[10px] text-[#556A60]">
+                              Transfer Manual & Verifikasi Cepat
+                            </span>
+                          </div>
+                        </div>
+                        <ChevronDown
+                          className={`w-4 h-4 text-[#556A60] transition-transform ${topUpPaymentAccordion === "bca" ? "rotate-180" : ""
+                            }`}
+                        />
+                      </button>
+
+                      {topUpPaymentAccordion === "bca" && (
+                        <div className="p-4 bg-white border-t border-[#DEE7DF] space-y-3">
+                          <div className="p-3.5 rounded-xl bg-[#F2F7F3] border border-[#DEE7DF] space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-[#556A60] font-medium">
+                                {t("profile.modal_bca_acc_num")}:
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-black text-[#11231B] text-sm sm:text-base">
+                                  2631261801
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={handleCopyTopUpBca}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#DEE7DF] hover:bg-[#EAF3EC] text-[#184530] text-[11px] font-bold transition-all shadow-2xs cursor-pointer"
+                                >
+                                  {copiedTopUpBca ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-emerald-600" />
+                                      <span>{t("profile.modal_bca_copied")}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span>{t("profile.modal_bca_copy_btn")}</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs pt-1 border-t border-[#DEE7DF]">
+                              <span className="text-[#556A60] font-medium">
+                                {t("profile.modal_bca_acc_name")}:
+                              </span>
+                              <span className="font-bold text-[#11231B]">
+                                Ahmad Fadil
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs pt-1 border-t border-[#DEE7DF]">
+                              <span className="text-[#556A60] font-medium">
+                                Total Transfer:
+                              </span>
+                              <span className="font-black text-[#184530] text-sm">
+                                Rp {selectedTopUp?.price}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Important Account Verification Note */}
+                          <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <span>
+                              Pastikan nominal transfer tepat{" "}
+                              <strong className="font-bold">Rp {selectedTopUp?.price}</strong>{" "}
+                              dan nama rekening penerima adalah <strong>Ahmad Fadil</strong>.
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Accordion 2: QRIS (Coming Soon) */}
+                    <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] opacity-75">
+                      <div className="w-full p-4 flex items-center justify-between text-left">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center font-bold text-xs">
+                            <QrCode className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-[#11231B] block">
+                              {t("profile.modal_qris_title")}
+                            </span>
+                            <span className="text-[10px] text-[#556A60]">
+                              Pembayaran Otomatis GoPay, OVO, ShopeePay
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E5EFE7] text-[#184530]">
+                          {t("profile.modal_qris_coming_soon")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Help Callout Banner */}
+                  <div className="p-3.5 rounded-2xl bg-[#E5EFE7] border border-[#CFE2D3] flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 text-[#184530]">
+                      <Headphones className="w-4 h-4 text-[#184530] shrink-0" />
+                      <span className="font-semibold text-[11px] leading-tight">
+                        {language === "en"
+                          ? "Need help with AI credit top-up?"
+                          : "Butuh bantuan top up credit AI?"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSupportContext("payment");
+                        setIsSupportModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] text-[11px] font-bold shrink-0 cursor-pointer"
+                    >
+                      {language === "en" ? "Chat CS" : "Hubungi CS"}
+                    </button>
+                  </div>
+
+                  {/* Confirmation Button */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackMetaCustomEvent("SubmitTopUpPaymentConfirmation", {
+                          package_id: selectedTopUp?.id,
+                          credits: selectedTopUp?.credits,
+                          price: selectedTopUp?.rawAmount,
+                          payment_method: "bca_transfer",
+                        });
+                        setShowTopUpQrConfirmation(true);
+                      }}
+                      className="w-full py-3.5 px-6 rounded-2xl bg-[#184530] hover:bg-[#12281F] text-[#B8F55C] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>{t("profile.modal_topup_confirm_btn")}</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* STEP 3: QR CODE CONFIRMATION SCREEN */
+                <div className="space-y-6 text-center py-2">
+                  <div className="space-y-2">
+                    <h4 className="text-base font-black text-[#11231B]">
+                      {t("profile.modal_topup_qr_title")}
+                    </h4>
+                    <p className="text-xs text-[#556A60] max-w-md mx-auto leading-relaxed">
+                      {t("profile.modal_topup_qr_desc")}
+                    </p>
+                  </div>
+
+                  {/* QR Code Graphic */}
+                  <div className="flex justify-center my-4">
+                    <div className="p-4 rounded-3xl bg-white border-2 border-[#184530] shadow-lg inline-block">
+                      <QRCodeSVG
+                        value={topupWhatsappUrl}
+                        size={210}
+                        level="M"
+                        includeMargin={true}
+                        className="w-48 h-48 sm:w-52 sm:h-52"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Summary of what will be sent */}
+                  <div className="p-3.5 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] max-w-sm mx-auto text-left text-xs space-y-1">
+                    <div className="flex justify-between text-[#556A60]">
+                      <span>Paket:</span>
+                      <span className="font-bold text-[#11231B]">{topupPackageName}</span>
+                    </div>
+                    <div className="flex justify-between text-[#556A60]">
+                      <span>Kuota:</span>
+                      <span className="font-black text-[#184530]">
+                        +{selectedTopUp?.credits?.toLocaleString("id-ID")} Credit
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-[#556A60]">
+                      <span>Total Biaya:</span>
+                      <span className="font-bold text-[#11231B]">Rp {selectedTopUp?.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Direct WhatsApp Link Button */}
+                  <div className="space-y-3 pt-2">
+                    <a
+                      href={topupWhatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3.5 px-6 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-md active:scale-98"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>{t("profile.modal_open_wa_btn")}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowTopUpQrConfirmation(false)}
+                      className="text-xs font-semibold text-[#556A60] hover:text-[#11231B] underline cursor-pointer"
+                    >
+                      ← Kembali ke Pilihan Pembayaran
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* VERIFICATION LINK SENT MODAL POPUP */}
