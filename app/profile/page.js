@@ -7,6 +7,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { ensureUserPayment } from "@/lib/supabase/payment";
 import { AsKingLogo } from "../components/Navbar";
 import ContactSupportModal from "../components/ContactSupportModal";
+import OpenAppModal from "../components/OpenAppModal";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { trackMetaEvent, trackMetaCustomEvent } from "@/lib/metaPixel";
@@ -39,6 +40,7 @@ import {
   Headphones,
   Inbox,
   Headset,
+  Laptop,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -60,6 +62,9 @@ export default function ProfilePage() {
   // Support Modal State
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [supportContext, setSupportContext] = useState("general"); // 'general' | 'payment'
+
+  // App Launch / Download Modal State
+  const [isAppModalOpen, setIsAppModalOpen] = useState(false);
 
   // Billing / Payment state
   const [paymentData, setPaymentData] = useState(null);
@@ -590,25 +595,28 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
             </div>
 
             <div className="flex flex-col gap-2.5 self-stretch sm:self-auto">
-              <Link
-                href="https://apps.microsoft.com/detail/9NWF08NXV3GS"
-                onClick={() => trackMetaCustomEvent("ClickMicrosoftStore", { placement: "profile_download" })}
-                className="relative w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              <button
+                type="button"
+                onClick={() => setIsAppModalOpen(true)}
+                className="relative w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-bold shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer text-left"
               >
                 <div className="flex items-center gap-2.5 text-left">
                   <div className="w-8 h-8 rounded-full bg-[#11281F] text-[#B8F55C] flex items-center justify-center shrink-0">
-                    <WindowsIcon className="w-4 h-4 fill-current" />
+                    <Laptop className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="text-[9px] uppercase tracking-wider font-extrabold text-[#193F2D] flex items-center gap-1">
-                      <span>{t("cta.ms_store_desc")}</span>
+                      <span>{t("profile.modal_app_badge")}</span>
                     </div>
                     <div className="text-xs sm:text-sm font-black text-[#0B1A13] tracking-tight leading-tight">
-                      {t("cta.btn_download")}
+                      {t("profile.open_app_btn")}
                     </div>
                   </div>
                 </div>
-              </Link>
+                <div className="w-6 h-6 rounded-full bg-[#11281F]/10 flex items-center justify-center shrink-0">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#11281F]" />
+                </div>
+              </button>
 
               <button
                 type="button"
@@ -628,10 +636,6 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
           {!isEmailVerified && (
             <div className="bg-gradient-to-r from-[#F4F9F5] via-[#F8FAF7] to-amber-50/50 border-t border-[#DEE7DF] px-6 py-3.5 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
               <div className="flex items-start sm:items-center gap-3">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#184530] text-[#B8F55C] text-[10px] font-extrabold uppercase tracking-wider shrink-0 shadow-2xs">
-                  <ThumbsUp className="w-3 h-3 text-[#B8F55C]" />
-                  <span>{t("profile.unverified_header_caption_badge")}</span>
-                </span>
                 <p className="text-[#3E5348] text-xs leading-relaxed">
                   {t("profile.unverified_header_caption_text")}
                 </p>
@@ -742,9 +746,6 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-semibold text-[#6B8075] uppercase tracking-wider block">
-                    {t("profile.plan_ai_budget")}
-                  </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
                     AI Credit
                   </span>
                 </div>
@@ -1821,6 +1822,12 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
         user={user}
         planName={selectedPlan === "pro" ? "Pro Business" : "Pro+ Business"}
         amount={selectedPlan === "pro" ? PRICING_CONFIG.proPrice : PRICING_CONFIG.proPlusPrice}
+      />
+
+      <OpenAppModal
+        isOpen={isAppModalOpen}
+        onClose={() => setIsAppModalOpen(false)}
+        user={user}
       />
 
       {/* Footer */}

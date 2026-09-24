@@ -186,6 +186,18 @@ export default function TermsPage() {
                       </ul>
                       <p className="mt-2">Panduan ini hanya mengurangi risiko dan bukan jaminan bahwa akun tidak akan dibatasi atau diblokir.</p>
                     </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-100/80 border border-amber-300/80 text-amber-950 text-xs sm:text-sm leading-relaxed space-y-2 mt-3">
+                      <p className="font-bold text-amber-900">
+                        Batasan Pencegahan Sistem & Risiko Laporan Pengguna (User Report):
+                      </p>
+                      <p>
+                        Meskipun sistem AsKing telah dilengkapi dengan berbagai mekanisme dan proteksi cerdas untuk meminimalisir potensi terjadinya pemblokiran, <b>terdapat hal yang secara mutlak tidak dapat dicegah oleh sistem teknologi mana pun</b>: yaitu <b>laporan dari penerima pesan (User Report / Spam Report)</b>.
+                      </p>
+                      <p>
+                        Apabila beberapa penerima pesan menandai nomor Anda sebagai spam, melakukan blokir kontak, atau melaporkan nomor Anda ke pihak WhatsApp, sistem algoritma keamanan Meta akan <b>langsung melakukan pemblokiran (ban) secara instan</b> tanpa toleransi dan tanpa peringatan terlebih dahulu. Oleh karena itu, pastikan untuk selalu mengirimkan pesan hanya kepada kontak yang telah memberikan izin (<em>opt-in</em>), hindari pengiriman pesan massal acak tanpa persetujuan, dan <b>harap gunakan aplikasi ini secara bijak</b> serta penuh tanggung jawab.
+                      </p>
+                    </div>
                   </div>
                 </section>
 
@@ -619,6 +631,18 @@ export default function TermsPage() {
                         <li>Avoid sudden traffic spikes or burst traffic, as abrupt high-volume activity may trigger automated review by Meta systems.</li>
                       </ul>
                       <p className="mt-2">This guidance only reduces risk and is not a guarantee against account restrictions or bans.</p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-100/80 border border-amber-300/80 text-amber-950 text-xs sm:text-sm leading-relaxed space-y-2 mt-3">
+                      <p className="font-bold text-amber-900">
+                        System Limitations & User Report (Spam Report) Risks:
+                      </p>
+                      <p>
+                        Although the AsKing system incorporates sophisticated mechanisms designed to minimize the risk of bans, <b>there is an external factor that cannot be prevented by any technical safeguard</b>: namely, <b>recipient reports (User Report / Spam Report)</b>.
+                      </p>
+                      <p>
+                        If recipients report your number as spam, block your contact, or submit complaints to WhatsApp, Meta’s automated security systems will <b>instantly ban or restrict your number</b> without prior warning or tolerance. Therefore, always ensure that your recipients have explicitly opted in, refrain from sending unsolicited mass messages, and <b>please use this application responsibly and wisely</b>.
+                      </p>
                     </div>
                   </div>
                 </section>
