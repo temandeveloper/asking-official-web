@@ -47,7 +47,7 @@ function DesktopAuthBridge() {
         } = await supabase.auth.getSession();
 
         if (error || !session || !session.user) {
-          setStatus("unauthenticated");
+          router.replace("/login?next=/auth/desktop");
           return;
         }
 

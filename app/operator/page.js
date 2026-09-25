@@ -719,13 +719,18 @@ export default function OperatorDashboardPage() {
                         <td className="py-4 px-5 min-w-[155px]">
                           <div className="space-y-0.5">
                             <span className="font-mono text-[11px] text-[#556A60] block">
-                              {expiredDate}
+                              {row.jenis_plan === 2 ? "Akses Seumur Hidup" : expiredDate}
                             </span>
                             <span
-                              className={`text-[10px] font-bold block ${isExp ? "text-rose-600" : "text-[#184530]"
-                                }`}
+                              className={`text-[10px] font-bold block ${
+                                row.jenis_plan === 2
+                                  ? "text-emerald-700"
+                                  : isExp
+                                  ? "text-rose-600"
+                                  : "text-[#184530]"
+                              }`}
                             >
-                              {isExp ? "Telah Lewat" : `Sisa ${daysLeft} Hari`}
+                              {row.jenis_plan === 2 ? "Lifetime" : isExp ? "Telah Lewat" : `Sisa ${daysLeft} Hari`}
                             </span>
                           </div>
                         </td>

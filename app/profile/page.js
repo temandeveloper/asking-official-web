@@ -378,11 +378,26 @@ export default function ProfilePage() {
   const planType = paymentData?.jenis_plan ?? 0;
   const isPro = planType === 1;
   const isProPlus = planType === 2;
-  const planName = isProPlus
-    ? t("profile.plan_pro_plus_business")
-    : isPro
-      ? t("profile.plan_pro_business")
-      : t("profile.plan_free_trial");
+
+  const formatNotePlan = (str) => {
+    if (!str || typeof str !== "string") return "";
+    return str
+      .trim()
+      .split(/(\s+|-)/)
+      .map((part) => {
+        if (/^\s+$/.test(part) || part === "-") return part;
+        return part.replace(/^([(\[]?)([a-zA-Z])/, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
+      })
+      .join("");
+  };
+
+  const planName = paymentData?.note_plan && String(paymentData.note_plan).trim()
+    ? formatNotePlan(paymentData.note_plan)
+    : isProPlus
+      ? t("profile.plan_pro_plus_business")
+      : isPro
+        ? t("profile.plan_pro_business")
+        : t("profile.plan_free_trial");
 
   const startMs = paymentData?.datetime_payment ? Number(paymentData.datetime_payment) : Date.now();
   const expiredMs = paymentData?.datetime_expired ? Number(paymentData.datetime_expired) : Date.now() + 15 * 24 * 60 * 60 * 1000;
@@ -392,8 +407,8 @@ export default function ProfilePage() {
   const rawStatus = String(paymentData?.status || "active").trim().toLowerCase();
   const isTrial = String(paymentData?.note_plan || "").toLowerCase().includes("free trial");
   const isSuspended = rawStatus === "suspended";
-  const isExpired = rawStatus === "expired" || (!isSuspended && (nowMs > expiredMs));
-  const daysRemaining = (isExpired || isSuspended) ? 0 : Math.max(0, Math.ceil((expiredMs - nowMs) / (1000 * 60 * 60 * 24)));
+  const isExpired = !isProPlus && (rawStatus === "expired" || (!isSuspended && (nowMs > expiredMs)));
+  const daysRemaining = (isExpired || isSuspended || isProPlus) ? 0 : Math.max(0, Math.ceil((expiredMs - nowMs) / (1000 * 60 * 60 * 24)));
 
   const statusBadge = isSuspended
     ? {
@@ -407,13 +422,19 @@ export default function ProfilePage() {
         badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
         dotClass: "bg-rose-500",
       }
-      : {
-        label: language === "id" ? "Aktif" : "Active",
-        badgeClass: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
-        dotClass: "bg-emerald-500 animate-pulse",
-      };
+      : isProPlus
+        ? {
+          label: language === "id" ? "Lifetime Aktif" : "Lifetime Active",
+          badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          dotClass: "bg-emerald-500 animate-pulse",
+        }
+        : {
+          label: language === "id" ? "Aktif" : "Active",
+          badgeClass: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
+          dotClass: "bg-emerald-500 animate-pulse",
+        };
 
-  if (!isSuspended && !isExpired && isTrial) {
+  if (!isSuspended && !isExpired && isTrial && !isProPlus) {
     statusBadge.label = language === "id" ? "Trial Aktif" : "Active Trial";
   }
 
@@ -795,24 +816,29 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                 {t("profile.plan_expires")}
               </span>
               <div className="text-sm font-bold text-[#11231B] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-purple-600" />
-                <span>{expiredDateFormatted}</span>
+                <Clock className={`w-3.5 h-3.5 ${isProPlus ? "text-emerald-600" : "text-purple-600"}`} />
+                <span>{isProPlus ? t("profile.plan_lifetime") : expiredDateFormatted}</span>
               </div>
               <span
-                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${isSuspended
-                  ? "bg-amber-100 text-amber-800"
-                  : isExpired
+                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  isProPlus
+                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                    : isSuspended
+                    ? "bg-amber-100 text-amber-800"
+                    : isExpired
                     ? "bg-rose-100 text-rose-700"
                     : "bg-purple-100 text-purple-800"
-                  }`}
+                }`}
               >
-                {isSuspended
+                {isProPlus
+                  ? t("profile.plan_lifetime_badge")
+                  : isSuspended
                   ? language === "id"
                     ? "Akun Ditangguhkan"
                     : "Account Suspended"
                   : isExpired
-                    ? t("profile.plan_expired_badge")
-                    : t("profile.plan_remaining_days", { days: daysRemaining })}
+                  ? t("profile.plan_expired_badge")
+                  : t("profile.plan_remaining_days", { days: daysRemaining })}
               </span>
             </div>
           </div>
