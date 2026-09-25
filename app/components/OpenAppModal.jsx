@@ -67,19 +67,32 @@ export default function OpenAppModal({ isOpen, onClose, user = null }) {
 
       if (isSupabaseConfigured()) {
         const supabase = createClient();
+
+        // Validate user session actively against server
+        const {
+          data: { user: currentUser },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+          await supabase.auth.signOut().catch(() => {});
+          window.location.href = "/login?next=/profile";
+          return;
+        }
+
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session && user) {
+        if (session && currentUser) {
           const params = new URLSearchParams({
             access_token: session.access_token || "",
             refresh_token: session.refresh_token || "",
             expires_at: String(session.expires_at || Date.now() + 3600 * 1000),
-            user_id: user.id || "",
-            email: user.email || "",
+            user_id: currentUser.id || "",
+            email: currentUser.email || "",
             full_name:
-              user.user_metadata?.full_name || user.email || "AsKing User",
+              currentUser.user_metadata?.full_name || currentUser.email || "AsKing User",
           });
           targetDeepLink = `asking://auth/callback?${params.toString()}`;
         }

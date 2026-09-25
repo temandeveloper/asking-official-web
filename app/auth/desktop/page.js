@@ -39,19 +39,49 @@ function DesktopAuthBridge() {
 
     const supabase = createClient();
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      if (event === "SIGNED_OUT" || (!currentSession && event !== "INITIAL_SESSION")) {
+        router.replace("/login?next=/auth/desktop");
+      }
+    });
+
     async function authorizeDesktop() {
       try {
+        // 1. Actively validate user against Supabase Auth server (handles token expiration and auto-refreshes)
         const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+          data: { user: currentUser },
+          error: userError,
+        } = await supabase.auth.getUser();
 
-        if (error || !session || !session.user) {
+        if (userError || !currentUser) {
+          // Session is expired or revoked. Clear stale storage and redirect to login immediately.
+          await supabase.auth.signOut().catch(() => {});
           router.replace("/login?next=/auth/desktop");
           return;
         }
 
-        const currentUser = session.user;
+        // 2. Retrieve fresh active session with valid tokens
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError || !session || !session.user) {
+          await supabase.auth.signOut().catch(() => {});
+          router.replace("/login?next=/auth/desktop");
+          return;
+        }
+
+        // 3. Double check expiration timestamp
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        if (session.expires_at && session.expires_at <= nowSeconds) {
+          await supabase.auth.signOut().catch(() => {});
+          router.replace("/login?next=/auth/desktop");
+          return;
+        }
+
         setUser(currentUser);
         setStatus("authorizing");
 
@@ -101,6 +131,10 @@ function DesktopAuthBridge() {
     }
 
     authorizeDesktop();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   const handleManualOpen = () => {
