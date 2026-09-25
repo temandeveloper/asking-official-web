@@ -583,7 +583,7 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                       <span className="text-[10px] underline font-extrabold ml-0.5 text-amber-900">
                         {verificationCooldown > 0
                           ? `${verificationCooldown}s`
-                          : t("profile.send_verification_btn")}
+                          : ''}
                       </span>
                     </button>
                   )}
@@ -820,25 +820,24 @@ Saya lampirkan bukti transfer pembayarannya (silakan cek lampiran gambar). Mohon
                 <span>{isProPlus ? t("profile.plan_lifetime") : expiredDateFormatted}</span>
               </div>
               <span
-                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  isProPlus
+                className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${isProPlus
                     ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                     : isSuspended
-                    ? "bg-amber-100 text-amber-800"
-                    : isExpired
-                    ? "bg-rose-100 text-rose-700"
-                    : "bg-purple-100 text-purple-800"
-                }`}
+                      ? "bg-amber-100 text-amber-800"
+                      : isExpired
+                        ? "bg-rose-100 text-rose-700"
+                        : "bg-purple-100 text-purple-800"
+                  }`}
               >
                 {isProPlus
                   ? t("profile.plan_lifetime_badge")
                   : isSuspended
-                  ? language === "id"
-                    ? "Akun Ditangguhkan"
-                    : "Account Suspended"
-                  : isExpired
-                  ? t("profile.plan_expired_badge")
-                  : t("profile.plan_remaining_days", { days: daysRemaining })}
+                    ? language === "id"
+                      ? "Akun Ditangguhkan"
+                      : "Account Suspended"
+                    : isExpired
+                      ? t("profile.plan_expired_badge")
+                      : t("profile.plan_remaining_days", { days: daysRemaining })}
               </span>
             </div>
           </div>
