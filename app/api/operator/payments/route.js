@@ -164,63 +164,79 @@ export async function PUT(request) {
       );
     }
 
-    // Update using RPC update_operator_payment
+    // Safely parse parameters so null, 0, or empty string are handled correctly
+    const expMs =
+      datetime_expired !== undefined && datetime_expired !== null && datetime_expired !== ""
+        ? Number(datetime_expired)
+        : null;
+    const parsedExpired = expMs !== null && !isNaN(expMs) && expMs > 0 ? expMs : null;
+
+    const payMs =
+      datetime_payment !== undefined && datetime_payment !== null && datetime_payment !== ""
+        ? Number(datetime_payment)
+        : null;
+    const parsedPayment = payMs !== null && !isNaN(payMs) && payMs > 0 ? payMs : null;
+
+    const budgetNum =
+      request_budget !== undefined && request_budget !== null && request_budget !== ""
+        ? Number(request_budget)
+        : null;
+    const parsedBudget = budgetNum !== null && !isNaN(budgetNum) && budgetNum >= 0 ? budgetNum : null;
+
+    const parsedPlan =
+      jenis_plan !== undefined && jenis_plan !== null && !isNaN(Number(jenis_plan))
+        ? Number(jenis_plan)
+        : null;
+
+    const parsedBasePrice =
+      base_price !== undefined && base_price !== null && !isNaN(Number(base_price))
+        ? Number(base_price)
+        : null;
+
+    const parsedDiscount =
+      discount !== undefined && discount !== null && !isNaN(Number(discount))
+        ? Number(discount)
+        : null;
+
+    const parsedPrice =
+      price !== undefined && price !== null && !isNaN(Number(price))
+        ? Number(price)
+        : null;
+
+    const parsedStatus =
+      status !== undefined && status !== null ? String(status).toLowerCase() : null;
+
+    const parsedNote =
+      note_plan !== undefined && note_plan !== null ? String(note_plan) : null;
+
+    const parsedBusinessRequirement =
+      business_requirement !== undefined
+        ? business_requirement !== null
+          ? String(business_requirement)
+          : ""
+        : null;
+
+    // Update atomically using RPC update_operator_payment (SECURITY DEFINER)
     const { data: updated, error } = await supabase.rpc("update_operator_payment", {
       p_uid: uid,
-      p_jenis_plan: jenis_plan !== undefined ? Number(jenis_plan) : null,
-      p_note_plan: note_plan !== undefined ? String(note_plan) : null,
-      p_datetime_payment: datetime_payment !== undefined ? Number(datetime_payment) : null,
-      p_datetime_expired: datetime_expired !== undefined ? Number(datetime_expired) : null,
-      p_request_budget: request_budget !== undefined ? Number(request_budget) : null,
-      p_status: status !== undefined ? String(status).toLowerCase() : null,
-      p_base_price: base_price !== undefined ? Number(base_price) : null,
-      p_discount: discount !== undefined ? Number(discount) : null,
-      p_price: price !== undefined ? Number(price) : null,
+      p_jenis_plan: parsedPlan,
+      p_note_plan: parsedNote,
+      p_datetime_payment: parsedPayment,
+      p_datetime_expired: parsedExpired,
+      p_request_budget: parsedBudget,
+      p_status: parsedStatus,
+      p_base_price: parsedBasePrice,
+      p_discount: parsedDiscount,
+      p_price: parsedPrice,
+      p_business_requirement: parsedBusinessRequirement,
     });
 
-    // If business_requirement provided, update it in tb_payment
-    if (business_requirement !== undefined) {
-      await supabase
-        .from("tb_payment")
-        .update({ business_requirement: business_requirement || null })
-        .eq("uid", uid);
-    }
-
     if (error) {
-      console.error("[Operator Payments PUT] Error:", error.message);
-      // Fallback direct update
-      const updatePayload = {
-        jenis_plan: Number(jenis_plan),
-        datetime_payment: Number(datetime_payment),
-        datetime_expired: Number(datetime_expired),
-        request_budget: Number(request_budget),
-        status: String(status).toLowerCase(),
-        note_plan: String(note_plan),
-        updated_at: new Date().toISOString(),
-      };
-      if (base_price !== undefined) updatePayload.base_price = Number(base_price);
-      if (discount !== undefined) updatePayload.discount = Number(discount);
-      if (price !== undefined) updatePayload.price = Number(price);
-
-      const { data: fallbackUpdated, error: fallbackError } = await supabase
-        .from("tb_payment")
-        .update(updatePayload)
-        .eq("uid", uid)
-        .select()
-        .maybeSingle();
-
-      if (fallbackError) {
-        return NextResponse.json(
-          { success: false, message: fallbackError.message },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: fallbackUpdated,
-        message: "Data langganan berhasil diperbarui.",
-      });
+      console.error("[Operator Payments PUT] RPC Error:", error.message);
+      return NextResponse.json(
+        { success: false, message: `Gagal memperbarui data: ${error.message}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({

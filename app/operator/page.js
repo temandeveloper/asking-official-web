@@ -220,12 +220,10 @@ export default function OperatorDashboardPage() {
         },
         body: JSON.stringify({
           uid: editingRecord.uid,
-          user_email: editingRecord.user_email,
-          user_name: editingRecord.user_name,
           jenis_plan: Number(editingRecord.jenis_plan),
           note_plan: editingRecord.note_plan,
-          datetime_payment: Number(editingRecord.datetime_payment),
-          datetime_expired: Number(editingRecord.datetime_expired),
+          datetime_payment: editingRecord.datetime_payment ? Number(editingRecord.datetime_payment) : null,
+          datetime_expired: editingRecord.datetime_expired ? Number(editingRecord.datetime_expired) : null,
           request_budget: Number(editingRecord.request_budget),
           status: editingRecord.status,
           base_price: Number(editingRecord.base_price ?? 199000),
@@ -576,9 +574,11 @@ export default function OperatorDashboardPage() {
                     const statusBadge =
                       row.status === "active"
                         ? { label: "Active", bg: "bg-emerald-50 text-emerald-800 border-emerald-200" }
-                        : row.status === "suspended"
-                          ? { label: "Suspended", bg: "bg-amber-50 text-amber-800 border-amber-200" }
-                          : { label: "Expired", bg: "bg-rose-50 text-rose-800 border-rose-200" };
+                        : row.status === "pending"
+                          ? { label: "Pending", bg: "bg-amber-50 text-amber-800 border-amber-200" }
+                          : row.status === "suspended"
+                            ? { label: "Suspended", bg: "bg-purple-50 text-purple-800 border-purple-200" }
+                            : { label: "Expired", bg: "bg-rose-50 text-rose-800 border-rose-200" };
 
                     const paymentDate = row.datetime_payment
                       ? new Date(Number(row.datetime_payment)).toLocaleDateString("id-ID", {
@@ -869,25 +869,33 @@ export default function OperatorDashboardPage() {
             {/* Modal Body Form */}
             <form onSubmit={handleSaveEdit} className="p-6 sm:p-7 space-y-5 text-xs text-[#11231B]">
 
-              {/* Customer Name & Email */}
+              {/* Customer Name & Email (Auth Account Identifiers) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-bold text-[#2D3E35]">Nama Pelanggan</label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#2D3E35]">Nama Pelanggan</label>
+                    <span className="text-[10px] text-[#6B8075] font-normal">(Akun Auth)</span>
+                  </div>
                   <input
                     type="text"
-                    value={editingRecord.user_name || ""}
-                    onChange={(e) => setEditingRecord({ ...editingRecord, user_name: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F]"
+                    readOnly
+                    disabled
+                    value={editingRecord.user_name || "Tanpa Nama"}
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#EEF3EF] border border-[#DEE7DF] text-[#556A60] cursor-not-allowed font-medium"
                     placeholder="Nama Lengkap"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-bold text-[#2D3E35]">Email Pelanggan</label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#2D3E35]">Email Pelanggan</label>
+                    <span className="text-[10px] text-[#6B8075] font-normal">(Akun Auth)</span>
+                  </div>
                   <input
                     type="email"
-                    value={editingRecord.user_email || ""}
-                    onChange={(e) => setEditingRecord({ ...editingRecord, user_email: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F]"
+                    readOnly
+                    disabled
+                    value={editingRecord.user_email || "-"}
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#EEF3EF] border border-[#DEE7DF] text-[#556A60] cursor-not-allowed font-mono font-medium"
                     placeholder="user@example.com"
                   />
                 </div>
@@ -1038,30 +1046,39 @@ export default function OperatorDashboardPage() {
                 {/* Datetime Expired */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-[#2D3E35]">Tgl Expired</label>
+                    <div className="flex items-center gap-1.5">
+                      <label className="font-bold text-[#2D3E35]">Tgl Expired</label>
+                      {editingRecord.jenis_plan === 2 && (
+                        <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          Lifetime
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
+                          const baseTime = Math.max(Date.now(), Number(editingRecord.datetime_expired) || 0);
                           setEditingRecord({
                             ...editingRecord,
-                            datetime_expired:
-                              (Number(editingRecord.datetime_expired) || Date.now()) + 30 * 86400000,
-                          })
-                        }
+                            datetime_expired: baseTime + 30 * 86400000,
+                            status: editingRecord.status === "expired" ? "active" : editingRecord.status,
+                          });
+                        }}
                         className="text-[10.5px] font-bold text-[#184530] hover:underline cursor-pointer"
                       >
                         +30 Hari
                       </button>
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
+                          const baseTime = Math.max(Date.now(), Number(editingRecord.datetime_expired) || 0);
                           setEditingRecord({
                             ...editingRecord,
-                            datetime_expired:
-                              (Number(editingRecord.datetime_expired) || Date.now()) + 365 * 86400000,
-                          })
-                        }
+                            datetime_expired: baseTime + 365 * 86400000,
+                            status: editingRecord.status === "expired" ? "active" : editingRecord.status,
+                          });
+                        }}
                         className="text-[10.5px] font-bold text-[#184530] hover:underline cursor-pointer"
                       >
                         +1 Tahun
@@ -1079,14 +1096,23 @@ export default function OperatorDashboardPage() {
                     }
                     className="w-full px-3.5 py-2 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] text-[#11231B] focus:outline-none focus:border-[#12281F] cursor-pointer"
                   />
-                  <span className="text-[10px] text-[#6B8075] block">
-                    {editingRecord.datetime_expired
-                      ? new Date(Number(editingRecord.datetime_expired)).toLocaleString("id-ID", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })
-                      : "-"}
-                  </span>
+                  <div className="flex items-center justify-between text-[10px] text-[#6B8075]">
+                    <span>
+                      {editingRecord.datetime_expired
+                        ? new Date(Number(editingRecord.datetime_expired)).toLocaleString("id-ID", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })
+                        : "-"}
+                    </span>
+                    {editingRecord.datetime_expired && Number(editingRecord.datetime_expired) > 0 && (
+                      <span className={Date.now() > Number(editingRecord.datetime_expired) ? "text-rose-600 font-bold" : "text-emerald-700 font-bold"}>
+                        {Date.now() > Number(editingRecord.datetime_expired)
+                          ? "Sudah Expired"
+                          : `Sisa ${Math.ceil((Number(editingRecord.datetime_expired) - Date.now()) / 86400000)} hari`}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

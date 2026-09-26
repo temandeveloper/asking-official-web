@@ -116,6 +116,11 @@ END;
 $function$;
 
 -- 4. Stored Procedure: update_operator_payment()
+-- Drop any previous overloaded signatures to avoid PGRST203 candidate ambiguity
+DROP FUNCTION IF EXISTS public.update_operator_payment(uuid, integer, text, bigint, bigint, integer, text);
+DROP FUNCTION IF EXISTS public.update_operator_payment(uuid, integer, text, bigint, bigint, integer, text, bigint, bigint, bigint);
+DROP FUNCTION IF EXISTS public.update_operator_payment(uuid, integer, text, bigint, bigint, numeric, text, bigint, bigint, bigint);
+
 CREATE OR REPLACE FUNCTION public.update_operator_payment(
   p_uid uuid,
   p_jenis_plan integer DEFAULT NULL::integer,
@@ -126,11 +131,13 @@ CREATE OR REPLACE FUNCTION public.update_operator_payment(
   p_status text DEFAULT NULL::text,
   p_base_price bigint DEFAULT NULL::bigint,
   p_discount bigint DEFAULT NULL::bigint,
-  p_price bigint DEFAULT NULL::bigint
+  p_price bigint DEFAULT NULL::bigint,
+  p_business_requirement text DEFAULT NULL::text
 )
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path TO 'public'
 AS $function$
 DECLARE
   v_result RECORD;
@@ -146,6 +153,7 @@ BEGIN
     base_price = COALESCE(p_base_price, base_price),
     discount = COALESCE(p_discount, discount),
     price = COALESCE(p_price, price),
+    business_requirement = COALESCE(p_business_requirement, business_requirement),
     updated_at = now()
   WHERE uid = p_uid
   RETURNING * INTO v_result;
