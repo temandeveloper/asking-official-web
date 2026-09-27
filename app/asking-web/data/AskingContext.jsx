@@ -580,7 +580,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
   const [ticketStatusFilter, setTicketStatusFilter] = useState("all");
   const [ticketDateFilter, setTicketDateFilter] = useState("all");
   const [ticketDeadlineFilter, setTicketDeadlineFilter] = useState("all");
-  const [ticketViewMode, setTicketViewMode] = useState("table");
+  const [ticketViewMode, setTicketViewMode] = useState("pipeline"); // 'pipeline' (Kanban) | 'table'
 
   // Modals & Drawer State
   const [isTicketDrawerOpen, setIsTicketDrawerOpen] = useState(false);
@@ -592,6 +592,9 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
   const updateTicketStatus = useCallback(
     async (ticketId, newStatus) => {
       try {
+        setTickets((prev) =>
+          prev.map((t) => (t.id === ticketId ? { ...t, status: newStatus } : t))
+        );
         await remotePeerClient.sendRequest("tickets", "update", {
           id: ticketId,
           updates: { status: newStatus },
@@ -601,6 +604,7 @@ export function AskingProvider({ children, shareCode = "", userSession = null })
         await fetchDueTickets();
       } catch (err) {
         addToast(err.message || "Gagal memperbarui status tiket.", "error");
+        await fetchTickets();
       }
     },
     [addToast, fetchTickets, fetchDueTickets, t]

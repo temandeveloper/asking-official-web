@@ -6,6 +6,8 @@ import { useTranslation } from "../../data/TranslationContext";
 import { WhatsAppLogo, TelegramLogo, EmailLogo } from "../shared/ChannelBadge";
 import { TicketsTableSkeleton } from "../common/daisySkeletons";
 import {
+  Kanban,
+  Table as TableIcon,
   Search,
   Plus,
   ChevronDown,
@@ -17,6 +19,7 @@ import {
   SlidersHorizontal,
   X,
   RotateCcw,
+  Download,
 } from "lucide-react";
 import {
   CATEGORY_OPTIONS,
@@ -39,6 +42,9 @@ export default function TicketsView() {
     setTicketStatusFilter,
     setTicketDateFilter,
     setTicketDeadlineFilter,
+    ticketViewMode,
+    setTicketViewMode,
+    updateTicketStatus,
     handleOpenCreateTicket,
     handleOpenEditTicket,
     handleOpenReadOnlyTicket,
@@ -52,6 +58,38 @@ export default function TicketsView() {
   useEffect(() => {
     fetchTickets?.();
   }, [fetchTickets]);
+
+  // Drag and Drop States for Kanban
+  const [draggedTicketId, setDraggedTicketId] = useState(null);
+  const [dragOverColumnId, setDragOverColumnId] = useState(null);
+
+  const handleDragStart = (e, id) => {
+    setDraggedTicketId(id);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(id));
+  };
+
+  const handleDragOver = (e, columnId) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverColumnId !== columnId) {
+      setDragOverColumnId(columnId);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverColumnId(null);
+  };
+
+  const handleDrop = async (e, targetStatus) => {
+    e.preventDefault();
+    setDragOverColumnId(null);
+    const id = e.dataTransfer.getData("text/plain") || draggedTicketId;
+    if (!id) return;
+
+    await updateTicketStatus(id, targetStatus);
+    setDraggedTicketId(null);
+  };
 
   const normalizePriority = (p) => {
     if (!p) return "medium";
@@ -211,6 +249,54 @@ export default function TicketsView() {
     setActiveTab("chat");
   };
 
+  const handleExportCsv = () => {
+    if (!filteredTickets || filteredTickets.length === 0) {
+      addToast(t("tickets.no_tickets_to_export") || "Tidak ada tiket untuk diekspor", "info");
+      return;
+    }
+
+    const headers = [
+      "Ticket ID",
+      "Title",
+      "Category",
+      "Priority",
+      "Status",
+      "Deadline",
+      "Client Name",
+      "Client Phone",
+      "Created At",
+      "Description",
+    ];
+
+    const rows = filteredTickets.map((ticket) => [
+      `"${ticket.id || ""}"`,
+      `"${(ticket.title || "").replace(/"/g, '""')}"`,
+      `"${ticket.category || ""}"`,
+      `"${ticket.priority || ""}"`,
+      `"${ticket.status || ""}"`,
+      `"${ticket.deadline || ""}"`,
+      `"${(ticket.contactName || "").replace(/"/g, '""')}"`,
+      `"${ticket.contactPhone || ticket.contactJid || ""}"`,
+      `"${ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : ""}"`,
+      `"${(ticket.description || "").replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `asking_tickets_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const getCategoryBadge = (cat) => {
     const key = (cat || "support").toLowerCase();
     const opt =
@@ -325,6 +411,17 @@ export default function TicketsView() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Export CSV Button (visible on desktop/tablet) */}
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#EBF1EB] hover:bg-[#DEE7DF] text-[#184530] dark:bg-[#18362B] dark:hover:bg-[#224A3B] dark:text-[#B8F55C] text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer border border-[#DEE7DF] dark:border-[#234235]"
+            title={t("tickets.btn_export_csv") || "Export CSV"}
+          >
+            <Download className="w-4 h-4 text-[#184530] dark:text-[#B8F55C]" />
+            <span>{t("tickets.btn_export_csv") || "Export CSV"}</span>
+          </button>
+
           {/* Create Ticket Button */}
           <button
             type="button"
@@ -337,7 +434,7 @@ export default function TicketsView() {
         </div>
       </div>
 
-      {/* 1. Desktop Control Bar: Search & Status Filter (hidden on mobile) */}
+      {/* 1. Desktop Control Bar: Search & Status Filter & View Mode Switcher (hidden on mobile) */}
       <div className="hidden lg:flex px-6 py-3 border-b border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7]/80 dark:bg-[#0C1712]/80 items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2 flex-wrap flex-1">
           {/* Filter 1: Category */}
@@ -424,16 +521,50 @@ export default function TicketsView() {
           </div>
         </div>
 
-        {/* Desktop Search Input Box */}
-        <div className="relative w-64 max-w-sm">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#6B8075] dark:text-[#8EA096] pointer-events-none" />
-          <input
-            type="text"
-            placeholder={t("tickets.search_placeholder")}
-            value={ticketFilters.search || ""}
-            onChange={(e) => setTicketSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#F8FAF7] dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] text-xs text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] dark:focus:border-[#B8F55C] transition-colors shadow-2xs"
-          />
+        {/* Search & View Mode Toggle (Desktop only) */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="relative w-56 max-w-sm">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#6B8075] dark:text-[#8EA096] pointer-events-none" />
+            <input
+              type="text"
+              placeholder={t("tickets.search_placeholder")}
+              value={ticketFilters.search || ""}
+              onChange={(e) => setTicketSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#F8FAF7] dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] text-xs text-[#11231B] dark:text-[#F2F7F4] placeholder-[#8EA096] focus:outline-none focus:border-[#12281F] dark:focus:border-[#B8F55C] transition-colors shadow-2xs"
+            />
+          </div>
+
+          {/* View Mode Toggle: Table vs Pipeline Kanban */}
+          <div className="flex items-center rounded-xl bg-[#EBF1EB] dark:bg-[#18362B] p-0.5 border border-[#DEE7DF] dark:border-[#1F382B]">
+            <button
+              type="button"
+              data-testid="tickets-view-table-btn"
+              onClick={() => setTicketViewMode("table")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                ticketViewMode === "table"
+                  ? "bg-[#12281F] text-white dark:bg-[#12241C] dark:text-[#B8F55C] shadow-2xs"
+                  : "text-[#556A60] dark:text-[#A5B8AD] hover:text-[#11231B] dark:hover:text-[#F2F7F4]"
+              }`}
+              title="Table List View"
+            >
+              <TableIcon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t("tickets.view_table") || "Tampilan Tabel"}</span>
+            </button>
+            <button
+              type="button"
+              data-testid="tickets-view-pipeline-btn"
+              onClick={() => setTicketViewMode("pipeline")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                ticketViewMode === "pipeline"
+                  ? "bg-[#12281F] text-white dark:bg-[#12241C] dark:text-[#B8F55C] shadow-2xs"
+                  : "text-[#556A60] dark:text-[#A5B8AD] hover:text-[#11231B] dark:hover:text-[#F2F7F4]"
+              }`}
+              title="Pipeline Kanban View"
+            >
+              <Kanban className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t("tickets.view_pipeline") || "Pipeline Kanban"}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -694,182 +825,348 @@ export default function TicketsView() {
         )}
       </div>
 
-      {/* Desktop Main Container: Dedicated Table View (hidden on mobile) */}
+      {/* Desktop Main Container: Pipeline Kanban or Dedicated Table View (hidden on mobile, mobile is strictly table/card stream) */}
       <div className="hidden lg:flex flex-1 p-6 overflow-hidden flex-col min-w-0">
-        <div className="flex-1 bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] rounded-2xl shadow-xs overflow-hidden flex flex-col min-h-0">
-          <div className="flex-1 overflow-auto scrollbar-thin-subtle">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7] dark:bg-[#162B21] text-[11px] font-bold text-[#556A60] dark:text-[#A5B8AD] uppercase tracking-wider sticky top-0 z-10 backdrop-blur-xs">
-                  <th className="py-3 px-4">{t("tickets.col_id")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_title")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_category")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_priority")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_deadline")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_client")}</th>
-                  <th className="py-3 px-4">{t("tickets.col_status")}</th>
-                  <th className="py-3 px-4 text-right">{t("tickets.col_actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#EEF3EF] dark:divide-[#1F382B] text-[#11231B] dark:text-[#F2F7F4]">
-                {isRemoteLoading ? (
-                  <tr>
-                    <td colSpan={8} className="py-6 px-4">
-                      <TicketsTableSkeleton />
-                    </td>
-                  </tr>
-                ) : filteredTickets.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="py-16 text-center text-[#8EA096] text-xs space-y-1"
-                    >
-                      <p className="font-semibold text-sm text-[#2D3E35] dark:text-[#D1DDD6]">
-                        {t("tickets.empty_title")}
-                      </p>
-                      <p className="text-[11px]">
-                        {t("tickets.empty_desc")}
-                      </p>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredTickets.map((ticket) => {
-                    const ticketIsOverdue = isOverdue(ticket.deadline, ticket.status);
-                    const isTg =
-                      ticket.channel === "telegram" ||
-                      ticket.contactJid?.startsWith("tg_");
-                    const isEmail =
-                      ticket.channel === "email" ||
-                      ticket.contactJid?.startsWith("email:");
+        {ticketViewMode === "pipeline" ? (
+          /* STATUS WORKFLOW PIPELINE KANBAN */
+          <div className="flex-1 flex gap-4 overflow-x-auto pb-2 select-none min-h-0 scrollbar-thin-subtle">
+            {STATUS_COLUMNS.map((col) => {
+              const colTickets = filteredTickets.filter(
+                (t) => normalizeStatus(t.status) === col.id
+              );
+              const isOver = dragOverColumnId === col.id;
+              const isFilteredOut =
+                ticketFilters.status !== "all" &&
+                ticketFilters.status !== col.id;
 
-                    return (
-                      <tr
-                        key={ticket.id}
-                        className="hover:bg-[#F8FAF7] dark:hover:bg-[#162B21] transition-colors"
-                      >
-                        {/* ID + Channel */}
-                        <td className="py-3 px-4 font-mono font-bold text-[#6B8075] dark:text-[#8EA096] text-[11px] whitespace-nowrap">
-                          <div className="flex items-center gap-1.5">
-                            <span>#{ticket.id}</span>
-                            {isTg ? (
-                              <TelegramLogo className="w-3.5 h-3.5" />
-                            ) : isEmail ? (
-                              <EmailLogo className="w-3.5 h-3.5" />
-                            ) : (
-                              <WhatsAppLogo className="w-3.5 h-3.5" />
-                            )}
-                          </div>
-                        </td>
+              return (
+                <div
+                  key={col.id}
+                  onDragOver={(e) => handleDragOver(e, col.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, col.id)}
+                  className={`flex-1 min-w-[270px] max-w-[340px] flex flex-col rounded-2xl bg-[#EBF1EB] dark:bg-[#12241C] border ${
+                    isOver
+                      ? "border-[#12281F] bg-[#E5EFE7] dark:bg-[#18362B] ring-2 ring-[#12281F]/30 dark:ring-[#B8F55C]/30"
+                      : "border-[#DEE7DF] dark:border-[#1F382B]"
+                  } ${isFilteredOut ? "opacity-40" : "opacity-100"} transition-all duration-150 h-full overflow-hidden shadow-2xs`}
+                >
+                  {/* Column Header */}
+                  <div
+                    className={`p-3.5 bg-white dark:bg-[#162B21] border-b border-[#DEE7DF] dark:border-[#1F382B] border-t-4 ${col.accentBorder} flex items-center justify-between shrink-0`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full ${col.dotColor}`}
+                      />
+                      <h3 className="text-xs font-bold text-[#11231B] dark:text-[#F2F7F4] tracking-tight">
+                        {col.title}
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-[#EBF1EB] dark:bg-[#18362B] text-[10px] font-bold text-[#184530] dark:text-[#B8F55C]">
+                        {colTickets.length}
+                      </span>
+                    </div>
+                  </div>
 
-                        {/* Title & Description */}
-                        <td className="py-3 px-4 max-w-sm">
+                  {/* Ticket List in Status Column */}
+                  <div className="flex-1 p-3 overflow-y-auto space-y-3 scrollbar-thin-subtle">
+                    {colTickets.length === 0 ? (
+                      <div className="h-32 border-2 border-dashed border-[#DEE7DF] dark:border-[#1F382B] rounded-xl flex items-center justify-center text-[#8EA096] dark:text-[#6E8578] text-xs font-medium text-center p-4">
+                        {t("tickets.drag_hint")}
+                      </div>
+                    ) : (
+                      colTickets.map((ticket) => {
+                        const ticketIsOverdue = isOverdue(
+                          ticket.deadline,
+                          ticket.status
+                        );
+                        const isTg =
+                          ticket.channel === "telegram" ||
+                          ticket.contactJid?.startsWith("tg_");
+                        const isEmail =
+                          ticket.channel === "email" ||
+                          ticket.contactJid?.startsWith("email:");
+
+                        return (
                           <div
+                            key={ticket.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, ticket.id)}
                             onClick={() => handleOpenReadOnlyTicket(ticket)}
-                            className="cursor-pointer group"
+                            className="p-3.5 rounded-xl bg-white dark:bg-[#162B21] border border-[#DEE7DF] dark:border-[#1F382B] shadow-2xs hover:shadow-md hover:border-[#12281F] dark:hover:border-[#B8F55C] transition-all cursor-grab active:cursor-grabbing group space-y-2.5"
                           >
-                            <p className="font-bold text-xs text-[#11231B] dark:text-[#F2F7F4] group-hover:text-[#184530] dark:group-hover:text-[#B8F55C] transition-colors line-clamp-1">
+                            {/* Ticket ID & Category Badge */}
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[10px] font-bold text-[#6B8075] dark:text-[#8EA096] bg-[#EBF1EB] dark:bg-[#18362B] px-1.5 py-0.5 rounded">
+                                  #{ticket.id}
+                                </span>
+                                {isTg ? (
+                                  <TelegramLogo className="w-3.5 h-3.5 text-[#229ED9]" />
+                                ) : isEmail ? (
+                                  <EmailLogo className="w-3.5 h-3.5" />
+                                ) : (
+                                  <WhatsAppLogo className="w-3.5 h-3.5 text-[#25D366]" />
+                                )}
+                              </div>
+                              {getCategoryBadge(ticket.category)}
+                            </div>
+
+                            {/* Ticket Title */}
+                            <h4 className="text-xs font-bold text-[#11231B] dark:text-[#F2F7F4] group-hover:text-[#184530] dark:group-hover:text-[#B8F55C] transition-colors line-clamp-2 leading-snug">
                               {ticket.title}
-                            </p>
-                            {ticket.description && (
-                              <p className="text-[10.5px] text-[#6B8075] dark:text-[#8EA096] line-clamp-1 mt-0.5">
-                                {ticket.description}
-                              </p>
-                            )}
+                            </h4>
+
+                            {/* Priority and Deadline Badges */}
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              {getPriorityBadge(ticket.priority)}
+
+                              {ticket.deadline && (
+                                <span
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                    ticketIsOverdue
+                                      ? "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
+                                      : "bg-[#EBF1EB] dark:bg-[#18362B] text-[#2D3E35] dark:text-[#D1DDD6]"
+                                  }`}
+                                >
+                                  <Calendar className="w-3 h-3" />
+                                  <span>{ticket.deadline}</span>
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Client Contact Info & Quick Actions */}
+                            <div className="flex items-center justify-between pt-1 border-t border-[#EEF3EF] dark:border-[#1F382B] text-[11px] text-[#6B8075] dark:text-[#8EA096]">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <div className="w-5 h-5 rounded-full bg-[#EBF1EB] dark:bg-[#18362B] flex items-center justify-center font-bold text-[10px] text-[#2D3E35] dark:text-[#D1DDD6] shrink-0">
+                                  {ticket.contactName?.charAt(0) || "C"}
+                                </div>
+                                <span className="truncate font-medium">
+                                  {ticket.contactName || "Client"}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                {(ticket.contactPhone ||
+                                  ticket.contactJid ||
+                                  ticket.contactEmail) && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleJumpToChat(ticket);
+                                    }}
+                                    className="p-1 rounded-md hover:bg-[#E5EFE7] dark:hover:bg-[#18362B] text-[#184530] dark:text-[#B8F55C] transition-colors cursor-pointer"
+                                    title={
+                                      isTg
+                                        ? "Chat on Telegram"
+                                        : isEmail
+                                          ? "Chat on Email"
+                                          : "Chat on WhatsApp"
+                                    }
+                                  >
+                                    <MessageSquare className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenEditTicket(ticket);
+                                  }}
+                                  className="p-1 rounded-md hover:bg-[#E5EFE7] dark:hover:bg-[#18362B] text-[#6B8075] dark:text-[#8EA096] hover:text-[#11231B] dark:hover:text-[#F2F7F4] transition-colors cursor-pointer"
+                                  title={t("tickets.edit_ticket")}
+                                >
+                                  <SquarePen className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                        </td>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          /* Table View */
+          <div className="flex-1 bg-white dark:bg-[#12241C] border border-[#DEE7DF] dark:border-[#1F382B] rounded-2xl shadow-xs overflow-hidden flex flex-col min-h-0">
+            <div className="flex-1 overflow-auto scrollbar-thin-subtle">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-[#DEE7DF] dark:border-[#1F382B] bg-[#F8FAF7] dark:bg-[#162B21] text-[11px] font-bold text-[#556A60] dark:text-[#A5B8AD] uppercase tracking-wider sticky top-0 z-10 backdrop-blur-xs">
+                    <th className="py-3 px-4">{t("tickets.col_id")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_title")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_category")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_priority")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_deadline")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_client")}</th>
+                    <th className="py-3 px-4">{t("tickets.col_status")}</th>
+                    <th className="py-3 px-4 text-right">{t("tickets.col_actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EEF3EF] dark:divide-[#1F382B] text-[#11231B] dark:text-[#F2F7F4]">
+                  {isRemoteLoading ? (
+                    <tr>
+                      <td colSpan={8} className="py-6 px-4">
+                        <TicketsTableSkeleton />
+                      </td>
+                    </tr>
+                  ) : filteredTickets.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className="py-16 text-center text-[#8EA096] text-xs space-y-1"
+                      >
+                        <p className="font-semibold text-sm text-[#2D3E35] dark:text-[#D1DDD6]">
+                          {t("tickets.empty_title")}
+                        </p>
+                        <p className="text-[11px]">
+                          {t("tickets.empty_desc")}
+                        </p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredTickets.map((ticket) => {
+                      const ticketIsOverdue = isOverdue(ticket.deadline, ticket.status);
+                      const isTg =
+                        ticket.channel === "telegram" ||
+                        ticket.contactJid?.startsWith("tg_");
+                      const isEmail =
+                        ticket.channel === "email" ||
+                        ticket.contactJid?.startsWith("email:");
 
-                        {/* Category */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {getCategoryBadge(ticket.category)}
-                        </td>
+                      return (
+                        <tr
+                          key={ticket.id}
+                          className="hover:bg-[#F8FAF7] dark:hover:bg-[#162B21] transition-colors"
+                        >
+                          {/* ID + Channel */}
+                          <td className="py-3 px-4 font-mono font-bold text-[#6B8075] dark:text-[#8EA096] text-[11px] whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <span>#{ticket.id}</span>
+                              {isTg ? (
+                                <TelegramLogo className="w-3.5 h-3.5" />
+                              ) : isEmail ? (
+                                <EmailLogo className="w-3.5 h-3.5" />
+                              ) : (
+                                <WhatsAppLogo className="w-3.5 h-3.5" />
+                              )}
+                            </div>
+                          </td>
 
-                        {/* Priority */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {getPriorityBadge(ticket.priority)}
-                        </td>
-
-                        {/* Deadline */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {ticket.deadline ? (
-                            <span
-                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold text-[11px] ${ticketIsOverdue
-                                ? "bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 font-bold border border-rose-200 dark:border-rose-900/60"
-                                : "bg-[#EBF1EB] dark:bg-[#18362B] text-[#4A5F54] dark:text-[#A5B8AD]"
-                                }`}
+                          {/* Title & Description */}
+                          <td className="py-3 px-4 max-w-sm">
+                            <div
+                              onClick={() => handleOpenReadOnlyTicket(ticket)}
+                              className="cursor-pointer group"
                             >
-                              <Calendar className="w-3 h-3" />
-                              {ticketIsOverdue && <span>{t("dashboard.overdue", { deadline: "" })} </span>}
-                              <span>{ticket.deadline}</span>
-                            </span>
-                          ) : (
-                            <span className="text-[#8EA096] text-[11px] italic">
-                              {t("tickets.filter_deadline_none")}
-                            </span>
-                          )}
-                        </td>
+                              <p className="font-bold text-xs text-[#11231B] dark:text-[#F2F7F4] group-hover:text-[#184530] dark:group-hover:text-[#B8F55C] transition-colors line-clamp-1">
+                                {ticket.title}
+                              </p>
+                              {ticket.description && (
+                                <p className="text-[10.5px] text-[#6B8075] dark:text-[#8EA096] line-clamp-1 mt-0.5">
+                                  {ticket.description}
+                                </p>
+                              )}
+                            </div>
+                          </td>
 
-                        {/* Client Info */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-[#11231B] dark:text-[#F2F7F4]">
-                              {ticket.contactName || t("tickets.col_client")}
-                            </span>
-                            {(ticket.contactPhone || ticket.contactEmail) && (
-                              <span className="text-[10px] text-[#6B8075] dark:text-[#8EA096]">
-                                {ticket.contactPhone || ticket.contactEmail}
+                          {/* Category */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {getCategoryBadge(ticket.category)}
+                          </td>
+
+                          {/* Priority */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {getPriorityBadge(ticket.priority)}
+                          </td>
+
+                          {/* Deadline */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {ticket.deadline ? (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold text-[11px] ${ticketIsOverdue
+                                  ? "bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 font-bold border border-rose-200 dark:border-rose-900/60"
+                                  : "bg-[#EBF1EB] dark:bg-[#18362B] text-[#4A5F54] dark:text-[#A5B8AD]"
+                                  }`}
+                              >
+                                <Calendar className="w-3 h-3" />
+                                {ticketIsOverdue && <span>{t("dashboard.overdue", { deadline: "" })} </span>}
+                                <span>{ticket.deadline}</span>
+                              </span>
+                            ) : (
+                              <span className="text-[#8EA096] text-[11px] italic">
+                                {t("tickets.filter_deadline_none")}
                               </span>
                             )}
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* Status */}
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {getStatusBadge(ticket.status)}
-                        </td>
+                          {/* Client Info */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-[#11231B] dark:text-[#F2F7F4]">
+                                {ticket.contactName || t("tickets.col_client")}
+                              </span>
+                              {(ticket.contactPhone || ticket.contactEmail) && (
+                                <span className="text-[10px] text-[#6B8075] dark:text-[#8EA096]">
+                                  {ticket.contactPhone || ticket.contactEmail}
+                                </span>
+                              )}
+                            </div>
+                          </td>
 
-                        {/* Actions */}
-                        <td className="py-3 px-4 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-1">
-                            {/* Edit Drawer */}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditTicket(ticket)}
-                              className="p-1.5 rounded-lg text-[#6B8075] dark:text-[#8EA096] hover:text-[#11231B] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer"
-                              title={t("tickets.edit_ticket")}
-                            >
-                              <SquarePen className="w-4 h-4" />
-                            </button>
+                          {/* Status */}
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {getStatusBadge(ticket.status)}
+                          </td>
 
-                            {/* Delete */}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    t("tickets.delete_confirm", {
-                                      id: ticket.id,
-                                      title: ticket.title,
-                                    })
-                                  )
-                                ) {
-                                  deleteTicket(ticket.id);
-                                }
-                              }}
-                              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
-                              title={t("tickets.delete_ticket")}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          {/* Actions */}
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1">
+                              {/* Edit Drawer */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditTicket(ticket)}
+                                className="p-1.5 rounded-lg text-[#6B8075] dark:text-[#8EA096] hover:text-[#11231B] hover:bg-[#EBF1EB] dark:hover:bg-[#18362B] transition-colors cursor-pointer"
+                                title={t("tickets.edit_ticket")}
+                              >
+                                <SquarePen className="w-4 h-4" />
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (
+                                    confirm(
+                                      t("tickets.delete_confirm", {
+                                        id: ticket.id,
+                                        title: ticket.title,
+                                      })
+                                    )
+                                  ) {
+                                    deleteTicket(ticket.id);
+                                  }
+                                }}
+                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                                title={t("tickets.delete_ticket")}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
