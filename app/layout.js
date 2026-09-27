@@ -28,7 +28,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id" className={`${plusJakartaSans.variable} font-sans scroll-smooth`}>
+    <html lang="id" data-theme="light" className={`${plusJakartaSans.variable} font-sans scroll-smooth`}>
       <body className="bg-[#F8FAF7] text-[#11231B] antialiased selection:bg-[#B8F55C] selection:text-[#11281F]">
         <LanguageProvider>{children}</LanguageProvider>
         <MetaPixel pixelId={metaPixelId} />
