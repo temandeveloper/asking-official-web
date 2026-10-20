@@ -184,7 +184,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Single Primary Action Button: Dapatkan Sekarang */}
+          {/* Single Primary Action Button: Dapatkan Lisensi */}
           <a
             href={CHECKOUT_URL}
             target="_blank"
