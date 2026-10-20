@@ -9,16 +9,17 @@ import {
   GalleryThumbnails,
   Globe,
   Download,
-  Sparkles,
   ShieldCheck,
-  MessageSquare,
-  Kanban,
   Check,
-  Headset
+  ToolCase,
+  ArrowRight
 } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
-import ContactSupportModal from "./ContactSupportModal";
+import { trackMetaLinkEvent } from "@/lib/metaPixel";
+import { PRICING_CONFIG } from "@/lib/config/pricing";
+
+const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
 
 export function AsKingLogo({ className = "w-9 h-9" }) {
   return (
@@ -42,15 +43,12 @@ export function AsKingLogo({ className = "w-9 h-9" }) {
   );
 }
 
-// Backward compatibility alias for any existing imports
 export const ClauseLogo = AsKingLogo;
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   const { t, language, setLanguage, toggleLanguage } = useTranslation();
 
@@ -78,8 +76,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full bg-[#F8FAF7]/90 backdrop-blur-md border-b border-[#12281F]/5 transition-all">
+    <header className="sticky top-0 z-50 w-full bg-[#F8FAF7]/90 backdrop-blur-md border-b border-[#12281F]/5 transition-all">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center group">
@@ -95,59 +92,13 @@ export default function Navbar() {
             <ShieldCheck className="w-4 h-4 text-[#184530]" />
             <span>{t("nav.data_privacy")}</span>
           </a>
-          {/* Solutions Dropdown */}
-          <div className="relative group">
-            <button
-              onClick={() => setSolutionsOpen(!solutionsOpen)}
-              onMouseEnter={() => setSolutionsOpen(true)}
-              className="flex items-center gap-1 hover:text-[#11231B] transition-colors py-2 cursor-pointer"
-            >
-              <span>{t("nav.solutions")}</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${solutionsOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </button>
-
-            {solutionsOpen && (
-              <div
-                onMouseLeave={() => setSolutionsOpen(false)}
-                className="absolute top-full left-0 mt-1 w-64 rounded-2xl bg-white p-2.5 shadow-xl border border-[#DEE7DF] animate-in fade-in slide-in-from-top-2 duration-150 space-y-1"
-              >
-                <a
-                  href="/#omnichannel"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F2F7F3] text-[#11231B] font-medium transition-colors"
-                >
-                  <MessageSquare className="w-4 h-4 text-[#184530]" />
-                  <div>
-                    <div className="font-bold text-[#11231B]">Omnichannel Hub</div>
-                    <div className="text-[11px] text-[#556A60]">WhatsApp, Telegram, LiveChat</div>
-                  </div>
-                </a>
-                <a
-                  href="/#features"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F2F7F3] text-[#11231B] font-medium transition-colors"
-                >
-                  <Kanban className="w-4 h-4 text-[#184530]" />
-                  <div>
-                    <div className="font-bold text-[#11231B]">Kanban & Tickets</div>
-                    <div className="text-[11px] text-[#556A60]">Visual Workflow & Deadlines</div>
-                  </div>
-                </a>
-                <a
-                  href="/#features"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs hover:bg-[#F2F7F3] text-[#11231B] font-medium transition-colors"
-                >
-                  <Sparkles className="w-4 h-4 text-[#184530]" />
-                  <div>
-                    <div className="font-bold text-[#11231B]">AsKing AI Assistant</div>
-                    <div className="text-[11px] text-[#556A60]">24/7 Agent & Manager Guidance</div>
-                  </div>
-                </a>
-              </div>
-            )}
-          </div>
-
+          <a
+            href="/#features"
+            className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
+          >
+            <ToolCase className="w-4 h-4 text-[#184530]" />
+            <span>{t("nav.solutions")}</span>
+          </a>
           <a
             href="/#appshowcase"
             className="hover:text-[#11231B] transition-colors py-2 flex items-center gap-1.5"
@@ -198,10 +149,11 @@ export default function Navbar() {
                     setLanguage("id");
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "id"
-                    ? "bg-[#12281F] text-[#B8F55C]"
-                    : "text-[#3D5247] hover:bg-[#F2F7F3]"
-                    }`}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                    language === "id"
+                      ? "bg-[#12281F] text-[#B8F55C]"
+                      : "text-[#3D5247] hover:bg-[#F2F7F3]"
+                  }`}
                 >
                   <div className="flex items-center gap-2">
                     <span>🇮🇩</span>
@@ -216,10 +168,11 @@ export default function Navbar() {
                     setLanguage("en");
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "en"
-                    ? "bg-[#12281F] text-[#B8F55C]"
-                    : "text-[#3D5247] hover:bg-[#F2F7F3]"
-                    }`}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                    language === "en"
+                      ? "bg-[#12281F] text-[#B8F55C]"
+                      : "text-[#3D5247] hover:bg-[#F2F7F3]"
+                  }`}
                 >
                   <div className="flex items-center gap-2">
                     <span>🇬🇧</span>
@@ -231,66 +184,51 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* User Auth Buttons */}
-          {user ? (
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setIsDemoModalOpen(true)}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#18362B] hover:bg-[#1E4537] text-[#B8F55C] text-xs font-bold transition-all shadow-xs border border-[#2A5241] cursor-pointer"
-              >
-                <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
-                <span>{t("nav.request_demo")}</span>
-              </button>
-              <Link
-                href="/profile"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs border border-[#234235]"
-              >
-                <div className="w-5 h-5 rounded-full bg-[#B8F55C] text-[#12281F] flex items-center justify-center text-[10px] font-black">
-                  {(user.user_metadata?.full_name || user.email || "U")
-                    .charAt(0)
-                    .toUpperCase()}
-                </div>
-                <span className="max-w-[120px] truncate">
-                  {user.user_metadata?.full_name || t("nav.profile")}
-                </span>
-              </Link>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="text-xs font-bold text-[#3D5247] hover:text-[#11231B] px-3.5 py-2 transition-colors"
-              >
-                {t("nav.login")}
-              </Link>
-              <button
-                type="button"
-                onClick={() => setIsDemoModalOpen(true)}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs active:scale-98 border border-[#234235] cursor-pointer"
-              >
-                <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
-                <span>{t("nav.request_demo")}</span>
-              </button>
-            </div>
-          )}
+          {/* Single Primary Action Button: Dapatkan Sekarang */}
+          <a
+            href={CHECKOUT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(event) =>
+              trackMetaLinkEvent(event, "InitiateCheckout", {
+                content_name: "AsKing Lisensi Sekali Bayar",
+                content_category: "software",
+                currency: "IDR",
+                value: PRICING_CONFIG.proPlusRawAmount,
+              })
+            }
+            className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs active:scale-98 border border-[#234235] cursor-pointer"
+          >
+            <span>{t("nav.get_now")}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#B8F55C]" />
+          </a>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Header Action & Menu Button */}
         <div className="md:hidden flex items-center gap-2">
-          {/* Quick Mobile Language Switcher */}
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#EBF1EB] border border-[#CFE2D3] text-xs font-bold text-[#184530]"
+          {/* Compact Primary CTA Button on Mobile Top Bar */}
+          <a
+            href={CHECKOUT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(event) =>
+              trackMetaLinkEvent(event, "InitiateCheckout", {
+                content_name: "AsKing Lisensi Sekali Bayar",
+                content_category: "software",
+                currency: "IDR",
+                value: PRICING_CONFIG.proPlusRawAmount,
+              })
+            }
+            className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-[11px] sm:text-xs font-bold transition-all shadow-xs active:scale-95 border border-[#234235] whitespace-nowrap cursor-pointer"
           >
-            <span>{language === "id" ? "🇮🇩 ID" : "🇬🇧 EN"}</span>
-          </button>
+            <span>{t("nav.get_now")}</span>
+            <ArrowRight className="w-3 h-3 text-[#B8F55C]" />
+          </a>
 
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-[#12281F] hover:bg-[#EBF1EB] transition-colors"
+            className="p-2 rounded-xl text-[#12281F] hover:bg-[#EBF1EB] transition-colors cursor-pointer"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? (
@@ -304,7 +242,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-b border-[#DEE7DF] px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-200">
+        <div className="md:hidden bg-white/95 backdrop-blur-xl border-b border-[#DEE7DF] px-6 py-6 space-y-5 animate-in slide-in-from-top-4 duration-200">
           <nav className="flex flex-col space-y-3 font-semibold text-sm text-[#3D5247]">
             <a
               href="/#concern"
@@ -343,62 +281,67 @@ export default function Navbar() {
             </a>
           </nav>
 
-          <div className="pt-4 border-t border-[#DEE7DF] flex flex-col gap-2.5">
-            {user ? (
-              <>
-                <Link
-                  href="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs"
-                >
-                  {t("nav.profile")}
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsDemoModalOpen(true);
-                  }}
-                  className="w-full py-2.5 rounded-full border border-[#2A5241] bg-[#18362B] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
-                  <span>{t("nav.request_demo")}</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-full border border-[#DEE7DF] font-bold text-xs text-[#11231B]"
-                >
-                  {t("nav.login")}
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsDemoModalOpen(true);
-                  }}
-                  className="w-full text-center py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Headset className="w-3.5 h-3.5 text-[#B8F55C]" />
-                  <span>{t("nav.request_demo")}</span>
-                </button>
-              </>
-            )}
+          {/* Pengaturan Bahasa di Dalam Mobile Drawer */}
+          <div className="pt-4 border-t border-[#DEE7DF] space-y-2.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#556A60]">
+              <Globe className="w-3.5 h-3.5 text-[#184530]" />
+              <span>{language === "id" ? "Pilihan Bahasa" : "Select Language"}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-[#F2F7F3] border border-[#DEE7DF]">
+              <button
+                type="button"
+                onClick={() => setLanguage("id")}
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  language === "id"
+                    ? "bg-[#12281F] text-[#B8F55C] shadow-2xs"
+                    : "text-[#4B6055] hover:text-[#11231B]"
+                }`}
+              >
+                <span>🇮🇩</span>
+                <span>Indonesia</span>
+                {language === "id" && <Check className="w-3 h-3 text-[#B8F55C]" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  language === "en"
+                    ? "bg-[#12281F] text-[#B8F55C] shadow-2xs"
+                    : "text-[#4B6055] hover:text-[#11231B]"
+                }`}
+              >
+                <span>🇬🇧</span>
+                <span>English</span>
+                {language === "en" && <Check className="w-3 h-3 text-[#B8F55C]" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Action CTA Button di Mobile Drawer */}
+          <div className="pt-2">
+            <a
+              href={CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => {
+                setMobileMenuOpen(false);
+                trackMetaLinkEvent(event, "InitiateCheckout", {
+                  content_name: "AsKing Lisensi Sekali Bayar",
+                  content_category: "software",
+                  currency: "IDR",
+                  value: PRICING_CONFIG.proPlusRawAmount,
+                });
+              }}
+              className="w-full text-center py-3 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 transition-all"
+            >
+              <span>{t("nav.get_now")}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#B8F55C]" />
+            </a>
           </div>
         </div>
       )}
-      </header>
-
-      {/* Request Demo Support Modal */}
-      <ContactSupportModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-        context="demo"
-        user={user}
-      />
-    </>
+    </header>
   );
 }

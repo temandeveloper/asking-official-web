@@ -312,13 +312,6 @@ export default function FeaturesBento() {
 
                 {/* Viewport Toggles */}
                 <div className="flex items-center gap-1 bg-[#EBF1EB] p-1 rounded-lg text-xs">
-                  <div className="px-2 py-0.5 rounded bg-white text-[#184530] font-bold shadow-2xs flex items-center gap-1 text-[10px]">
-                    <Smartphone className="w-3 h-3" />
-                    <span>375px</span>
-                  </div>
-                  <div className="px-1.5 py-0.5 text-[#6B8075] flex items-center text-[10px]">
-                    <Monitor className="w-3 h-3" />
-                  </div>
                 </div>
               </div>
 
@@ -363,10 +356,6 @@ export default function FeaturesBento() {
 
                   {/* Performance Specs */}
                   <div className="pt-1.5 text-[11px] text-[#556A60] space-y-1">
-                    <div className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>{t("features.landing_tag_speed")}</span>
-                    </div>
                     <div className="flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       <span>{t("features.landing_feature_domain_desc")}</span>

@@ -56,7 +56,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li>
                 <a href="#omnichannel" className="hover:text-white transition-colors">
-                  Omnichannel Messaging
+                  Multi-Channel Messaging
                 </a>
               </li>
               <li>

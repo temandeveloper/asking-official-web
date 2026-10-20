@@ -11,15 +11,16 @@ import {
   Lock,
   Bot,
   Ticket,
-  Headset,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import ContactSupportModal from "./ContactSupportModal";
+import { trackMetaLinkEvent } from "@/lib/metaPixel";
+import { PRICING_CONFIG } from "@/lib/config/pricing";
+
+const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
 
 export default function Hero() {
   const { t } = useTranslation();
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -80,7 +81,6 @@ export default function Hero() {
           <div className="text-left pr-2">
             <div className="text-[11px] font-bold text-[#B8F55C] flex items-center gap-1">
               <span>{t("hero.badge_local_data")}</span>
-              <Lock className="w-3 h-3 text-[#B8F55C]" />
             </div>
             <p className="text-[10px] text-[#A5B8AD]">Local-first operational data</p>
           </div>
@@ -164,27 +164,28 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
-            <Link
-              href="/signup"
+            <a
+              href={CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) =>
+                trackMetaLinkEvent(event, "InitiateCheckout", {
+                  content_name: "AsKing Lisensi Sekali Bayar",
+                  content_category: "software",
+                  currency: "IDR",
+                  value: PRICING_CONFIG.proPlusRawAmount,
+                })
+              }
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] font-bold text-[15px] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 border border-[#234235]"
             >
-              <WindowsIcon className="w-4 h-4 fill-current" />
-              <span>{t("hero.cta_primary")}</span>
-            </Link>
-            {/* Mobile: Tombol "Minta Demo" dengan popup modal */}
-            <button
-              type="button"
-              onClick={() => setIsDemoModalOpen(true)}
-              className="sm:hidden w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all cursor-pointer"
-            >
-              <Headset className="w-4 h-4 text-[#12281F]" />
-              <span>{t("nav.request_demo")}</span>
-            </button>
+              <span>{t("nav.get_now")}</span>
+              <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
+            </a>
 
-            {/* Desktop: Tombol "Jelajahi Fitur" mengarah ke section #features */}
+            {/* Tombol "Jelajahi Fitur" mengarah ke section #features */}
             <a
               href="#features"
-              className="hidden sm:inline-flex sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-[#12281F] border border-[#D3DFD6] font-bold text-[15px] shadow-xs hover:bg-[#F3F7F4] hover:border-[#BFD0C3] transition-all"
             >
               <span>{t("hero.cta_secondary")}</span>
               <ArrowRight className="w-4 h-4" />
@@ -192,14 +193,6 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Minta Demo Modal */}
-      <ContactSupportModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-        context="demo"
-        user={user}
-      />
     </section>
   );
 }

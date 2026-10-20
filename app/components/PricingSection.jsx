@@ -1,304 +1,204 @@
 "use client";
 
-import { Check, ThumbsUp, Zap, ShieldCheck, ArrowRight, Building2, HelpCircle } from "lucide-react";
-import Link from "next/link";
+import { Check, ShieldCheck, ArrowRight, Laptop, Lock, HelpCircle, Flame } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 import { trackMetaLinkEvent } from "@/lib/metaPixel";
 
+const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
+
 export default function PricingSection() {
   const { t, language } = useTranslation();
 
-  const trialFeatures = t("pricing.trial_features") || [];
-  const proFeatures = t("pricing.pro_features") || [];
-  const proPlusFeatures = t("pricing.pro_plus_features") || [];
+  const includedItems = t("pricing.what_you_get_items") || [
+    "Aplikasi Desktop resmi AsKing Customer Manager",
+    "Web Landing Page Bisnis, gratis 1 subdomain",
+    "Lisensi aktivasi akun dan seluruh modul fitur utama",
+    "Kuota Credit AI untuk asisten dan pesan otomatis",
+    "Pembaruan aplikasi dan panduan penggunaan praktis",
+    "Layanan Bantuan",
+  ];
 
-  const displayOriginalPrice = t("pricing.pro_original_price") || `Rp ${PRICING_CONFIG.proOriginalPrice}`;
-  const displayPrice = t("pricing.pro_price") || `Rp ${PRICING_CONFIG.proPrice}`;
-  const displayDiscount = `${PRICING_CONFIG.proDiscountPercent}%`;
-  const displayProPlusOriginalPrice =
+  const displayOriginalPrice =
     t("pricing.pro_plus_original_price") || `Rp ${PRICING_CONFIG.proPlusOriginalPrice}`;
-  const displayProPlusPrice =
+  const displayPrice =
     t("pricing.pro_plus_price") || `Rp ${PRICING_CONFIG.proPlusPrice}`;
-  const displayProPlusDiscount = `${PRICING_CONFIG.proPlusDiscountPercent}%`;
+  const displayDiscount = `${PRICING_CONFIG.proPlusDiscountPercent}%`;
+  const promoLimitText =
+    t("pricing.pro_plus_promo_limit") || `Promo Terbatas • ${PRICING_CONFIG.proPlusPromoLimit}`;
 
   return (
-    <section id="pricing" className="py-24 px-6 sm:px-8 bg-[#F2F7F3] border-t border-[#DEE7DF] relative overflow-hidden">
-      {/* Background Decorative Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#B8F55C]/15 blur-[120px] rounded-full pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto relative z-10">
+    <section id="pricing" className="py-20 md:py-28 px-6 sm:px-8 bg-[#F8FAF7] border-t border-[#DEE7DF] relative overflow-hidden">
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E5EFE7] border border-[#CFE2D3] text-xs font-bold text-[#184530] shadow-2xs">
-            <Zap className="w-3.5 h-3.5 text-[#184530]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#184530]" />
             <span>{t("pricing.tag")}</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#11231B] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#11231B] tracking-tight leading-[1.2]">
             {t("pricing.title")}
           </h2>
 
-          <p className="text-sm sm:text-base text-[#4B6055] leading-relaxed max-w-2xl mx-auto font-medium">
+          <p className="text-sm sm:text-base text-[#4B6055] leading-relaxed max-w-2xl mx-auto font-normal">
             {t("pricing.subtitle")}
           </p>
         </div>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-
-          {/* 1. FREE TRIAL 15 HARI */}
-          <div className="rounded-3xl bg-white border border-[#DEE7DF] p-8 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#CFE2D3] transition-all relative">
-            <div className="space-y-6">
-              {/* Badge & Title */}
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F2F7F3] border border-[#DEE7DF] text-[11px] font-bold text-[#4B6055]">
-                  <span>{t("pricing.trial_badge")}</span>
+        {/* Master Offer Card (Split 2-Column Layout) */}
+        <div className="bg-white border border-[#DEE7DF] rounded-3xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+            {/* Left Column: What You Get & Feature List */}
+            <div className="lg:col-span-7 p-7 sm:p-10 lg:p-12 flex flex-col justify-between space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="text-xs font-extrabold tracking-wider uppercase text-[#184530]">
+                    Paket Lengkap
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
+                    {t("pricing.what_you_get_title")}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#556A60] leading-relaxed">
+                    Semua modul utama siap pakai langsung dari komputer Anda tanpa perlu berlangganan cloud CRM terpisah.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-black text-[#11231B] tracking-tight">
-                  {t("pricing.trial_title")}
-                </h3>
-                <p className="text-xs text-[#556A60] leading-relaxed min-h-[36px]">
-                  {t("pricing.trial_desc")}
-                </p>
+
+                {/* Inclusions List */}
+                <div className="pt-2">
+                  <ul className="space-y-3.5">
+                    {Array.isArray(includedItems) &&
+                      includedItems.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3 text-sm text-[#273B31]">
+                          <div className="w-5 h-5 rounded-full bg-[#E5EFE7] text-[#184530] border border-[#CFE2D3] flex items-center justify-center shrink-0 mt-0.5 font-black text-xs">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </div>
+                          <span className="font-semibold leading-snug">{item}</span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
               </div>
 
-              {/* Price */}
-              <div className="pt-2 pb-4 border-b border-[#EBF1EB]">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-[#11231B] tracking-tight">
-                    {t("pricing.trial_price")}
-                  </span>
-                  <span className="text-xs font-semibold text-[#556A60]">
-                    {t("pricing.trial_period")}
-                  </span>
+              {/* Local-First Architecture Guarantee Note */}
+              <div className="pt-6 border-t border-[#F2F7F3] flex items-center gap-3 text-xs text-[#556A60]">
+                <div className="w-8 h-8 rounded-xl bg-[#F2F7F3] text-[#184530] flex items-center justify-center shrink-0">
+                  <Lock className="w-4 h-4 text-[#184530]" />
                 </div>
-              </div>
-
-              {/* Features List */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
-                  {language === "id" ? "Fitur Termasuk:" : "Features Included:"}
+                <div className="leading-relaxed">
+                  <span className="font-bold text-[#11231B]">Privasi Terjamin:</span> Seluruh riwayat pesan, tiket, dan kontak pelanggan tersimpan di perangkat lokal Anda.
                 </div>
-                <ul className="space-y-2.5">
-                  {Array.isArray(trialFeatures) &&
-                    trialFeatures.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#4B6055]">
-                        <div className="w-4 h-4 rounded-full bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 mt-0.5 font-black text-[10px]">
-                          ✓
-                        </div>
-                        <span className="leading-tight">{feat}</span>
-                      </li>
-                    ))}
-                </ul>
               </div>
             </div>
 
-            {/* CTA Button */}
-            <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
-              <Link
-                href="/signup"
-                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
-                  content_name: "AsKing Free Trial",
-                  content_category: "pricing",
-                })}
-                className="w-full py-3.5 px-6 rounded-2xl bg-[#EBF1EB] hover:bg-[#DDE7DE] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
-              >
-                <span>{t("pricing.trial_cta")}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 2. PRO BUSINESS (MONTHLY) */}
-          <div className="rounded-3xl bg-white border border-[#DEE7DF] p-8 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#CFE2D3] transition-all relative">
-
-            <div className="space-y-6">
-              {/* Badge & Title */}
-              <div className="space-y-3">
+            {/* Right Column: Pricing Box & Action Button */}
+            <div className="lg:col-span-5 bg-[#12281F] text-white p-7 sm:p-10 lg:p-12 border-t lg:border-t-0 lg:border-l border-[#234235] flex flex-col justify-between space-y-8 relative overflow-hidden">
+              <div className="space-y-6">
+                {/* Badges */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-[11px] font-bold text-rose-700">
-                    <span>🔥 {t("pricing.pro_discount_badge")}</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-xs font-bold text-[#B8F55C]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#B8F55C]" />
+                    <span>{t("pricing.pro_plus_badge")}</span>
+                  </span>
+                </div>
+
+                {/* Plan Title & Subtitle */}
+                <div className="space-y-1.5">
+                  <h4 className="text-3xl font-black text-white tracking-tight">
+                    {t("pricing.pro_plus_title")}
+                  </h4>
+                  <p className="text-xs text-[#A1B8AC] leading-relaxed">
+                    {t("pricing.pro_plus_desc")}
+                  </p>
+                </div>
+
+                {/* Price Display */}
+                <div className="pt-3 pb-5 border-y border-[#234235] space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#8EA096] line-through">
+                      {displayOriginalPrice}
+                    </span>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs uppercase tracking-wider">
+                      {language === "id" ? `Hemat ${displayDiscount}` : `Save ${displayDiscount}`}
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl sm:text-5xl font-black text-[#B8F55C] tracking-tight">
+                      {displayPrice}
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] font-semibold text-[#A1B8AC] flex items-center gap-1.5 pt-1">
+                    <Laptop className="w-3.5 h-3.5 text-[#B8F55C]" />
+                    <span>{t("pricing.pro_plus_period")} (Lifetime License)</span>
                   </div>
                 </div>
-                <h3 className="text-2xl font-black text-[#11231B] tracking-tight">
-                  {t("pricing.pro_title")}
-                </h3>
-                <p className="text-xs text-[#556A60] leading-relaxed min-h-[36px]">
-                  {t("pricing.pro_desc")}
+
+                {/* Specs Note */}
+                <p className="text-[11px] text-[#A1B8AC] leading-relaxed">
+                  {t("pricing.specs_note")}
                 </p>
               </div>
 
-              {/* Price */}
-              <div className="pt-2 pb-4 border-b border-[#EBF1EB]">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-sm font-semibold text-[#8FA599] line-through">
-                    {displayOriginalPrice}
-                  </span>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs uppercase tracking-wider">
-                    {language === "id" ? `Hemat ${displayDiscount}` : `Save ${displayDiscount}`}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-[#11231B] tracking-tight">
-                    {displayPrice}
-                  </span>
-                  <span className="text-xs font-semibold text-[#556A60]">
-                    {t("pricing.pro_period")}
-                  </span>
-                </div>
-              </div>
+              {/* Action Button & Security Assurance */}
+              <div className="space-y-3.5 pt-4">
+                <a
+                  href={CHECKOUT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) =>
+                    trackMetaLinkEvent(event, "InitiateCheckout", {
+                      content_name: "AsKing Lisensi Sekali Bayar",
+                      content_category: "software",
+                      currency: "IDR",
+                      value: PRICING_CONFIG.proPlusRawAmount,
+                    })
+                  }
+                  className="w-full py-4 px-6 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-black text-base flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-xl active:scale-[0.99] cursor-pointer group"
+                >
+                  <span>{t("pricing.cta_claim_offer")}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
 
-              <p className="text-[11px] font-bold text-[#184530]">
-                {t("pricing.trial_payment_note")}
-              </p>
-
-              {/* Features List */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-[#11231B]">
-                  {language === "id" ? "Seluruh Fitur Unggulan:" : "Everything Included:"}
-                </div>
-                <ul className="space-y-2.5">
-                  {Array.isArray(proFeatures) &&
-                    proFeatures.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#4B6055]">
-                        <div className="w-4 h-4 rounded-full bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 mt-0.5 font-black text-[10px]">
-                          ✓
-                        </div>
-                        <span className="leading-tight">{feat}</span>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className="pt-8 mt-6 border-t border-[#EBF1EB]">
-              <Link
-                href="/signup?plan=pro"
-                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
-                  content_name: "AsKing Pro Business",
-                  content_category: "pricing",
-                  currency: "IDR",
-                  value: PRICING_CONFIG.proRawAmount,
-                })}
-                className="w-full py-3.5 px-6 rounded-2xl bg-[#EBF1EB] hover:bg-[#DDE7DE] text-[#184530] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
-              >
-                <span>{t("pricing.pro_cta")}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 3. PRO+ BUSINESS (FEATURED ONE-TIME PAYMENT) */}
-          <div className="rounded-3xl bg-[#12281F] border-2 border-[#B8F55C] p-8 shadow-xl flex flex-col justify-between relative transform lg:-translate-y-2 text-white">
-            <div className="space-y-6 pt-2">
-              {/* Badge & Title */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-[11px] font-bold text-[#B8F55C]">
-                    <ThumbsUp className="w-3.5 h-3.5 text-[#B8F55C]" />
-                    <span>{language === "id" ? "Rekomendasi Utama" : "Best Value"}</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-[11px] font-bold text-rose-300">
-                    <span>🔥 {language === "id" ? `Promo Terbatas • ${PRICING_CONFIG.proPlusPromoLimit}` : `Limited Promo • First ${PRICING_CONFIG.proPlusPromoLimit.replace(/\D/g, "")} Customers`}</span>
-                  </div>
-                </div>
-                <h3 className="text-3xl font-black text-white tracking-tight">
-                  {t("pricing.pro_plus_title")}
-                </h3>
-                <p className="text-xs text-[#A1B8AC] leading-relaxed min-h-[36px]">
-                  {t("pricing.pro_plus_desc")}
+                <p className="text-[10px] text-center text-[#8EA096] leading-tight">
+                  {t("pricing.secure_checkout_note")}
                 </p>
               </div>
-
-              {/* Price */}
-              <div className="pt-2 pb-4 border-b border-[#234235]">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-sm font-semibold text-[#8EA096] line-through">
-                    {displayProPlusOriginalPrice}
-                  </span>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500 text-white shadow-xs uppercase tracking-wider">
-                    {language === "id" ? `Hemat ${displayProPlusDiscount}` : `Save ${displayProPlusDiscount}`}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-[#B8F55C] tracking-tight">
-                    {displayProPlusPrice}
-                  </span>
-                </div>
-                <div className="mt-2 text-[11px] font-semibold text-[#A1B8AC] flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-[#B8F55C]" />
-                  <span>{t("pricing.pro_plus_period")}</span>
-                </div>
-              </div>
-              <p className="text-[11px] font-bold text-[#B8F55C]">
-                {t("pricing.trial_payment_note")}
-              </p>
-              {/* Features List */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-white">
-                  {language === "id" ? "Fitur Pro+ Business:" : "Pro+ Business Benefits:"}
-                </div>
-                <ul className="space-y-2.5">
-                  {Array.isArray(proPlusFeatures) &&
-                    proPlusFeatures.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs text-[#DEE7DF]">
-                        <div className="w-4 h-4 rounded-full bg-[#B8F55C] text-[#11281F] flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">
-                          +
-                        </div>
-                        <span className="leading-tight">{feat}</span>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className="pt-8 mt-6 border-t border-[#234235]">
-              <Link
-                href="/signup?plan=pro_plus"
-                onClick={(event) => trackMetaLinkEvent(event, "Lead", {
-                  content_name: "AsKing Pro+ Business",
-                  content_category: "pricing",
-                  currency: "IDR",
-                  value: PRICING_CONFIG.proPlusRawAmount,
-                })}
-                className="w-full py-4 px-6 rounded-2xl bg-[#B8F55C] hover:bg-[#A6EA47] text-[#11281F] font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl cursor-pointer group"
-              >
-                <span>{t("pricing.pro_plus_cta")}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
             </div>
           </div>
-
         </div>
 
-        {/* Bottom Trust & Guarantee Callout */}
-        <div className="mt-16 p-6 rounded-3xl bg-white border border-[#DEE7DF] shadow-xs flex flex-col md:flex-row items-center justify-between gap-6 max-w-4xl mx-auto">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
+        {/* Bottom Three Assurance Badges */}
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="p-4 rounded-2xl bg-white border border-[#DEE7DF] shadow-2xs flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 font-bold">
+              <Check className="w-4 h-4 text-[#184530]" />
             </div>
-            <div>
-              <div className="text-sm font-bold text-[#11231B]">
-                {language === "id" ? "Data Operasional Lokal" : "Local Operational Data"}
-              </div>
-              <div className="text-xs text-[#556A60]">
-                {language === "id"
-                  ? "Data operasional utama dikelola di perangkat Anda. Tidak ada biaya pesan tersembunyi."
-                  : "Core operational data is managed on your device. No hidden per-message fees."}
-              </div>
+            <div className="text-left">
+              <div className="text-xs font-bold text-[#11231B]">Lisensi Tetap</div>
+              <div className="text-[11px] text-[#556A60]">Tanpa biaya sewa bulanan</div>
             </div>
           </div>
 
-          <div className="text-xs text-[#556A60] font-medium shrink-0">
-            {language === "id"
-              ? "Pertanyaan seputar paket? "
-              : "Questions about plans? "}
-            <a href="mailto:asking@godiscus.com" className="text-[#184530] font-bold underline">
-              asking@godiscus.com
-            </a>
+          <div className="p-4 rounded-2xl bg-white border border-[#DEE7DF] shadow-2xs flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 font-bold">
+              <Lock className="w-4 h-4 text-[#184530]" />
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-bold text-[#11231B]">Data Lokal Mandiri</div>
+              <div className="text-[11px] text-[#556A60]">100% tersimpan di perangkat</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white border border-[#DEE7DF] shadow-2xs flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#E5EFE7] text-[#184530] flex items-center justify-center shrink-0 font-bold">
+              <HelpCircle className="w-4 h-4 text-[#184530]" />
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-bold text-[#11231B]">Dukungan Bantuan</div>
+              <div className="text-[11px] text-[#556A60]">Bantuan & panduan instalasi</div>
+            </div>
           </div>
         </div>
       </div>
