@@ -302,14 +302,23 @@ export async function POST(request) {
 
     console.log(`[Lynk Webhook] ✅ tb_payment saved for user ${authUser.id}:`, savedPayment.activation_code);
 
-    // 7. Send License Delivery Email asynchronously
-    sendLicenseDeliveryEmail({
-      customerEmail,
-      customerName: customer.name,
-      activationCode,
-    }).catch((emailErr) => {
-      console.error("[Lynk Webhook] Background email error:", emailErr);
-    });
+    // 7. Send License Delivery Email (awaited to ensure SMTP socket finishes before returning response)
+    let emailResult = { sent: false };
+    try {
+      emailResult = await sendLicenseDeliveryEmail({
+        customerEmail,
+        customerName: customer.name,
+        activationCode,
+      });
+      console.log(
+        `[Lynk Webhook] Email dispatch result for ${customerEmail}:`,
+        emailResult?.sent ? "SUCCESS" : "FAILED",
+        emailResult?.messageId || emailResult?.error || ""
+      );
+    } catch (emailErr) {
+      console.error("[Lynk Webhook] Email sending exception:", emailErr);
+      emailResult = { sent: false, error: emailErr.message };
+    }
 
     return NextResponse.json({
       success: true,
@@ -317,6 +326,8 @@ export async function POST(request) {
       activation_code: activationCode,
       user_id: authUser.id,
       is_new_user: isNew,
+      email_sent: Boolean(emailResult?.sent),
+      email_message_id: emailResult?.messageId || null,
     });
   } catch (error) {
     console.error("[Lynk Webhook] Uncaught handler error:", error);
