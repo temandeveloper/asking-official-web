@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
-import { sendLicenseDeliveryEmail } from "@/lib/email/licenseMailer";
+import {
+  sendLicenseDeliveryEmail,
+  sendTopUpConfirmationEmail,
+} from "@/lib/email/licenseMailer";
 
 /**
  * Validates the Lynk.id webhook signature using HMAC-SHA256 / SHA256 string hash.
@@ -216,26 +219,218 @@ export async function POST(request) {
 
     const supabase = getAdminSupabase();
 
-    // 3. Idempotency Check: check if this refId has already been recorded in tb_payment
-    const { data: existingRecords } = await supabase
+    // 3. Detect order type: Top Up AI Credit vs. Product Activation License
+    const items = Array.isArray(messageData?.items) ? messageData.items : [];
+    let topUpQty = 0;
+    for (const item of items) {
+      const title = (item.title || "").trim().toLowerCase();
+      if (
+        title === "asking - customer manager - top up ai credit".toLowerCase() ||
+        title.includes("top up ai credit") ||
+        title.includes("topup ai credit")
+      ) {
+        topUpQty += Number(item.qty) || 1;
+      }
+    }
+    const isTopUp = topUpQty > 0;
+
+    // =========================================================================
+    // FLOW A: TOP UP AI CREDIT
+    // =========================================================================
+    if (isTopUp) {
+      const creditsPerPack = Number(process.env.TOPUP_AI_CREDITS_PER_PACK) || 1500;
+      const creditsToAdd = topUpQty * creditsPerPack;
+      const cleanEmail = customerEmail.trim().toLowerCase();
+
+      console.log(
+        `[Lynk Webhook] Processing Top Up AI Credit for ${cleanEmail}: ${creditsToAdd} credits (${topUpQty} pack(s)), refId: ${refId}`
+      );
+
+      // Cari user dan record tb_payment berdasarkan email
+      let targetPayment = null;
+      let targetUid = null;
+
+      // 1. Coba cari di tb_payment via user_email
+      const { data: payByEmail, error: findByEmailErr } = await supabase
+        .from("tb_payment")
+        .select("id, uid, user_email, request_budget, payment_payload, activation_code, status")
+        .ilike("user_email", cleanEmail)
+        .maybeSingle();
+
+      if (payByEmail) {
+        targetPayment = payByEmail;
+        targetUid = payByEmail.uid;
+      }
+
+      // 2. Fallback: jika belum ada di tb_payment, cari uid dari auth.users lalu cari tb_payment via uid
+      if (!targetPayment) {
+        let page = 1;
+        while (!targetUid && page <= 5) {
+          const { data: listRes } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
+          const users = listRes?.users || [];
+          if (users.length === 0) break;
+          const foundAuthUser = users.find((u) => u.email?.trim().toLowerCase() === cleanEmail);
+          if (foundAuthUser) {
+            targetUid = foundAuthUser.id;
+            const { data: payByUid } = await supabase
+              .from("tb_payment")
+              .select("id, uid, user_email, request_budget, payment_payload, activation_code, status")
+              .eq("uid", targetUid)
+              .maybeSingle();
+            if (payByUid) {
+              targetPayment = payByUid;
+            }
+            break;
+          }
+          page++;
+        }
+      }
+
+      // 3. Jika pengguna belum terdaftar di AsKing
+      if (!targetPayment || !targetUid) {
+        console.warn(
+          `[Lynk Webhook TopUp] ⚠️ User with email ${cleanEmail} not found. RefId: ${refId}. Marked as pending_account.`
+        );
+        return NextResponse.json({
+          success: true,
+          status: "pending_account",
+          message: `Akun dengan email ${cleanEmail} belum terdaftar di AsKing. Top up (${creditsToAdd} kredit) dicatat dengan status pending_account.`,
+          ref_id: refId,
+          customer_email: cleanEmail,
+          credits_pending: creditsToAdd,
+        });
+      }
+
+      // 4. Idempotency check untuk transaksi Top Up (periksa riwayat di payment_payload)
+      const currentPayload =
+        targetPayment.payment_payload && typeof targetPayment.payment_payload === "object"
+          ? targetPayment.payment_payload
+          : {};
+      const topupHistory = Array.isArray(currentPayload.topup_history)
+        ? currentPayload.topup_history
+        : [];
+
+      const alreadyProcessed = topupHistory.find((entry) => entry.refId === refId);
+      if (alreadyProcessed) {
+        console.log(
+          `[Lynk Webhook TopUp] Transaction with refId ${refId} already processed for user ${targetUid} (idempotent).`
+        );
+        return NextResponse.json({
+          success: true,
+          message: "Top up already processed (idempotent).",
+          type: "topup",
+          user_id: targetUid,
+          ref_id: refId,
+          current_budget: targetPayment.request_budget,
+        });
+      }
+
+      // 5. Tambahkan request_budget secara akumulatif
+      const currentBudget = Math.max(0, Number(targetPayment.request_budget) || 0);
+      const newBudget = currentBudget + creditsToAdd;
+
+      const newHistoryEntry = {
+        refId,
+        messageId: messageId || null,
+        timestamp: Date.now(),
+        isoDate: new Date().toISOString(),
+        qty: topUpQty,
+        creditsAdded: creditsToAdd,
+        previousBudget: currentBudget,
+        newBudget,
+        amountPaid: Number(grandTotal) || 0,
+      };
+
+      const updatedPayload = {
+        ...currentPayload,
+        topup_history: [...topupHistory, newHistoryEntry],
+        last_topup_refId: refId,
+        last_topup_at: newHistoryEntry.isoDate,
+      };
+
+      const { data: updatedPayment, error: updateError } = await supabase
+        .from("tb_payment")
+        .update({
+          request_budget: newBudget,
+          payment_payload: updatedPayload,
+          datetime_payment: Date.now(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("uid", targetUid)
+        .select("id, uid, user_email, request_budget")
+        .single();
+
+      if (updateError) {
+        console.error("[Lynk Webhook TopUp] ❌ Failed to update request_budget:", updateError);
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Failed to persist updated request_budget.",
+            error: updateError.message,
+          },
+          { status: 500 }
+        );
+      }
+
+      console.log(
+        `[Lynk Webhook TopUp] ✅ Successfully added ${creditsToAdd} credits to user ${targetUid} (${cleanEmail}). New balance: ${newBudget}`
+      );
+
+      // 6. Kirim email konfirmasi Top Up
+      let emailResult = { sent: false };
+      try {
+        emailResult = await sendTopUpConfirmationEmail({
+          customerEmail: cleanEmail,
+          customerName: customer.name,
+          creditsAdded: creditsToAdd,
+          newTotalCredits: newBudget,
+          refId,
+        });
+        console.log(
+          `[Lynk Webhook TopUp] Confirmation email dispatch result for ${cleanEmail}:`,
+          emailResult?.sent ? "SUCCESS" : "FAILED"
+        );
+      } catch (emailErr) {
+        console.error("[Lynk Webhook TopUp] Email sending exception:", emailErr);
+        emailResult = { sent: false, error: emailErr.message };
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "AI credit top up completed successfully.",
+        type: "topup",
+        user_id: targetUid,
+        customer_email: cleanEmail,
+        credits_added: creditsToAdd,
+        previous_balance: currentBudget,
+        new_balance: newBudget,
+        ref_id: refId,
+        email_sent: Boolean(emailResult?.sent),
+        email_message_id: emailResult?.messageId || null,
+      });
+    }
+
+    // =========================================================================
+    // FLOW B: PRODUCT ACTIVATION LICENSE
+    // =========================================================================
+    // 3. Idempotency Check for License Activation
+    const { data: existingPaymentRecord } = await supabase
       .from("tb_payment")
       .select("id, uid, activation_code, status, payment_payload")
-      .limit(50);
+      .ilike("user_email", customerEmail.trim().toLowerCase())
+      .maybeSingle();
 
-    const alreadyProcessed = existingRecords?.find(
-      (r) =>
-        r.payment_payload?.data?.message_data?.refId === refId ||
-        r.payment_payload?.refId === refId
-    );
-
-    if (alreadyProcessed) {
+    if (
+      existingPaymentRecord?.payment_payload?.data?.message_data?.refId === refId ||
+      existingPaymentRecord?.payment_payload?.refId === refId
+    ) {
       console.log(
         `[Lynk Webhook] Transaction with refId ${refId} already processed (idempotent).`
       );
       return NextResponse.json({
         success: true,
         message: "Webhook already processed (idempotent).",
-        activation_code: alreadyProcessed.activation_code,
+        activation_code: existingPaymentRecord.activation_code,
       });
     }
 
@@ -251,7 +446,7 @@ export async function POST(request) {
       {
         full_name: customer.name || "",
         phone: customer.phone || "",
-        source: "lynk.id",
+        source: "checkout",
       }
     );
 
@@ -266,9 +461,9 @@ export async function POST(request) {
       activation_code: activationCode,
       deviceid: null, // Initial device is unbound; locks to 1st machine on desktop login
       payment_payload: payload,
-      request_budget: 1500, // 1,500 AI credits
+      request_budget: 1500, // 1,500 initial AI credits for new license
       jenis_plan: 2, // 2 = Pro+ Business (Lifetime / Sekali Bayar)
-      note_plan: "Lisensi Sekali Bayar (Lynk.id)",
+      note_plan: "Lisensi Sekali Bayar",
       status: "active",
       base_price: 1240000,
       discount: 88,
@@ -277,7 +472,7 @@ export async function POST(request) {
       user_name: customer.name || null,
       datetime_payment: nowMs,
       datetime_expired: null, // Lifetime (no expiration date)
-      business_requirement: customer.phone ? `No. HP Lynk: ${customer.phone}` : null,
+      business_requirement: customer.phone ? `No. HP: ${customer.phone}` : null,
       updated_at: new Date().toISOString(),
     };
 
@@ -302,7 +497,7 @@ export async function POST(request) {
 
     console.log(`[Lynk Webhook] ✅ tb_payment saved for user ${authUser.id}:`, savedPayment.activation_code);
 
-    // 7. Send License Delivery Email (awaited to ensure SMTP socket finishes before returning response)
+    // 7. Send License Delivery Email
     let emailResult = { sent: false };
     try {
       emailResult = await sendLicenseDeliveryEmail({
@@ -329,6 +524,7 @@ export async function POST(request) {
       email_sent: Boolean(emailResult?.sent),
       email_message_id: emailResult?.messageId || null,
     });
+
   } catch (error) {
     console.error("[Lynk Webhook] Uncaught handler error:", error);
     return NextResponse.json(
