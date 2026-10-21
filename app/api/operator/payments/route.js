@@ -89,7 +89,7 @@ export async function GET(request) {
       results = results.filter((p) => String(p.jenis_plan) === String(planFilter));
     }
 
-    // Filter by search query (UID, email, name, note)
+    // Filter by search query (UID, email, name, note, activation_code)
     if (searchQuery.trim()) {
       const qLower = searchQuery.trim().toLowerCase();
       results = results.filter((p) => {
@@ -97,7 +97,8 @@ export async function GET(request) {
         const emailMatch = (p.user_email || "").toLowerCase().includes(qLower);
         const nameMatch = (p.user_name || "").toLowerCase().includes(qLower);
         const noteMatch = (p.note_plan || "").toLowerCase().includes(qLower);
-        return uidMatch || emailMatch || nameMatch || noteMatch;
+        const codeMatch = (p.activation_code || "").toLowerCase().includes(qLower);
+        return uidMatch || emailMatch || nameMatch || noteMatch || codeMatch;
       });
     }
 

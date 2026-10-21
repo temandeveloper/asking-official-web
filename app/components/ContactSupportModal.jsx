@@ -78,6 +78,12 @@ Issue / Question: `;
 • Email: ${userEmail}
 
 Issue / Question: `;
+    } else if (context === "topup") {
+      supportMessage = `Hello AsKing Support Team, I recently topped up AI Credits and need assistance:
+
+• Email: ${userEmail}
+${user?.refId ? `• Ref ID: ${user.refId}\n` : ""}
+Issue / Question: `;
     } else {
       supportMessage = `Hello AsKing Support Team, I need assistance regarding AsKing:
 
@@ -122,6 +128,12 @@ Kendala / Pertanyaan: `;
 
 • Email: ${userEmail}
 
+Kendala / Pertanyaan: `;
+    } else if (context === "topup") {
+      supportMessage = `Halo Tim Support AsKing Customer Manager, saya baru saja melakukan Top Up AI Credit dan butuh bantuan:
+
+• Email: ${userEmail}
+${user?.refId ? `• Ref ID: ${user.refId}\n` : ""}
 Kendala / Pertanyaan: `;
     } else {
       supportMessage = `Halo Tim Support AsKing, saya butuh bantuan terkait aplikasi AsKing:
@@ -172,6 +184,10 @@ Pertanyaan / Kendala: `;
                   ? language === "en"
                     ? "Payment Assistance"
                     : "Bantuan Kendala Pembayaran"
+                  : context === "topup"
+                  ? language === "en"
+                    ? "AI Credit Top Up Assistance"
+                    : "Bantuan Top Up AI Credit"
                   : context === "demo"
                   ? language === "en"
                     ? "Request Product Demo"
@@ -185,6 +201,10 @@ Pertanyaan / Kendala: `;
                   ? language === "en"
                     ? "Schedule an interactive demo with our specialist"
                     : "Konsultasi & Jadwalkan Sesi Demo Interaktif"
+                  : context === "topup"
+                  ? language === "en"
+                    ? "AsKing Customer Manager Technical Support"
+                    : "Layanan Bantuan Resmi & Tim Support Cepat"
                   : language === "en"
                     ? "Official Customer Care & Technical Team"
                     : "Layanan Bantuan Resmi & Tim Support Cepat"}
@@ -215,6 +235,10 @@ Pertanyaan / Kendala: `;
                 ? language === "en"
                   ? "Having trouble with transfer or need immediate plan approval? Chat directly with our finance & support team."
                   : "Mengalami kendala saat transfer atau butuh persetujuan plan cepat? Hubungi langsung tim support kami."
+                : context === "topup"
+                ? language === "en"
+                  ? "Need verification or having issues with your AI Credit balance? Connect directly with our support team."
+                  : "Butuh verifikasi saldo kuota atau mengalami kendala sinkronisasi AI Credit? Hubungi langsung tim support kami."
                 : context === "demo"
                 ? language === "en"
                   ? "Scan the QR code or click the button below to connect with our team via WhatsApp to request an interactive product demo."

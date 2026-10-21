@@ -70,6 +70,7 @@ export default function OperatorDashboardPage() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [copiedUid, setCopiedUid] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(null);
 
   // Business Requirement Detail Modal State
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -265,12 +266,20 @@ export default function OperatorDashboardPage() {
     setTimeout(() => setCopiedUid(null), 2000);
   };
 
+  const handleCopyCode = (code) => {
+    if (!code) return;
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   // Filtered Payments List
   const filteredPayments = useMemo(() => {
     return payments.filter((p) => {
       const matchSearch =
         !searchQuery.trim() ||
         (p.uid || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        (p.activation_code || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_email || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_name || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.note_plan || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
@@ -315,6 +324,7 @@ export default function OperatorDashboardPage() {
 
     const headers = [
       "UID",
+      "Kode Aktivasi",
       "Nama Pelanggan",
       "Email",
       "Kebutuhan Bisnis",
@@ -328,6 +338,7 @@ export default function OperatorDashboardPage() {
 
     const rows = filteredPayments.map((p) => [
       p.uid,
+      `"${p.activation_code || "-"}"`,
       `"${p.user_name || "-"}"`,
       p.user_email || "-",
       `"${(p.business_requirement || "").replace(/"/g, '""')}"`,
@@ -531,13 +542,14 @@ export default function OperatorDashboardPage() {
         {/* Data Table */}
         <div className="rounded-3xl bg-white border border-[#DEE7DF] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs min-w-[1360px] border-collapse">
+            <table className="w-full text-left text-xs min-w-[1550px] border-collapse">
               <thead className="bg-[#F8FAF7] border-b border-[#DEE7DF] text-[#556A60] uppercase tracking-wider font-bold text-[10px]">
                 <tr>
                   <th className="py-4 px-4 sticky left-0 z-20 bg-[#F8FAF7] border-r border-[#DEE7DF] min-w-[125px] text-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)]">
                     Action
                   </th>
                   <th className="py-4 px-5 min-w-[210px]">UID & Pelanggan</th>
+                  <th className="py-4 px-5 min-w-[190px]">Kode Aktivasi</th>
                   <th className="py-4 px-5 min-w-[170px]">Kebutuhan Bisnis</th>
                   <th className="py-4 px-5 min-w-[130px]">Jenis Plan</th>
                   <th className="py-4 px-5 min-w-[140px]">Harga & Diskon</th>
@@ -551,14 +563,14 @@ export default function OperatorDashboardPage() {
               <tbody className="divide-y divide-[#EEF3EF] text-[#11231B]">
                 {loadingPayments ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={11} className="py-12 text-center text-[#556A60]">
                       <Loader2 className="w-6 h-6 animate-spin text-[#184530] mx-auto mb-2" />
                       <span>Memuat data tabel tb_payment...</span>
                     </td>
                   </tr>
                 ) : filteredPayments.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-[#556A60]">
+                    <td colSpan={11} className="py-12 text-center text-[#556A60]">
                       Tidak ada data pembayaran yang cocok dengan filter atau pencarian Anda.
                     </td>
                   </tr>
@@ -667,7 +679,32 @@ export default function OperatorDashboardPage() {
                           </div>
                         </td>
 
-                        {/* 3. Kebutuhan Bisnis */}
+                        {/* 3. Activation Code */}
+                        <td className="py-4 px-5 min-w-[190px]">
+                          {row.activation_code ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono text-[11px] font-bold text-[#184530] bg-[#E5EFE7] px-2.5 py-1 rounded-lg border border-[#CFE2D3] tracking-wide select-all">
+                                {row.activation_code}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyCode(row.activation_code)}
+                                className="p-1 rounded hover:bg-[#EBF1EB] text-[#6B8075] hover:text-[#11231B] transition-colors cursor-pointer"
+                                title="Salin Kode Aktivasi"
+                              >
+                                {copiedCode === row.activation_code ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-[#8FA599] italic">-</span>
+                          )}
+                        </td>
+
+                        {/* 4. Kebutuhan Bisnis */}
                         <td className="py-4 px-5 min-w-[170px]">
                           {row.business_requirement ? (
                             <button
@@ -900,6 +937,42 @@ export default function OperatorDashboardPage() {
                   />
                 </div>
               </div>
+
+              {/* Activation Code (if present) */}
+              {editingRecord.activation_code && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#2D3E35]">Kode Aktivasi Lisensi</label>
+                    <span className="text-[10px] text-emerald-700 font-bold">Lisensi Desktop</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={editingRecord.activation_code}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#E5EFE7] border border-[#CFE2D3] text-[#184530] font-mono font-bold select-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(editingRecord.activation_code)}
+                      className="px-3 py-2 rounded-xl bg-[#F0F4F1] hover:bg-[#E5EFE7] border border-[#DEE7DF] text-[#184530] font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                      title="Salin Kode Aktivasi"
+                    >
+                      {copiedCode === editingRecord.activation_code ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Tersalin</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Salin</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Plan & Status Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
