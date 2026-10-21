@@ -185,16 +185,16 @@ Pertanyaan / Kendala: `;
                     ? "Payment Assistance"
                     : "Bantuan Kendala Pembayaran"
                   : context === "topup"
-                  ? language === "en"
-                    ? "AI Credit Top Up Assistance"
-                    : "Bantuan Top Up AI Credit"
-                  : context === "demo"
-                  ? language === "en"
-                    ? "Request Product Demo"
-                    : "Minta Demo AsKing"
-                  : language === "en"
-                    ? "Contact AsKing Support"
-                    : "Hubungi Tim Support AsKing"}
+                    ? language === "en"
+                      ? "AI Credit Top Up Assistance"
+                      : "Bantuan Top Up AI Credit"
+                    : context === "demo"
+                      ? language === "en"
+                        ? "Request Product Demo"
+                        : "Minta Demo AsKing"
+                      : language === "en"
+                        ? "Contact AsKing Support"
+                        : "Hubungi Tim Support AsKing"}
               </h3>
               <p className="text-xs text-[#A5B8AD] leading-tight">
                 {context === "demo"
@@ -202,12 +202,12 @@ Pertanyaan / Kendala: `;
                     ? "Schedule an interactive demo with our specialist"
                     : "Konsultasi & Jadwalkan Sesi Demo Interaktif"
                   : context === "topup"
-                  ? language === "en"
-                    ? "AsKing Customer Manager Technical Support"
-                    : "Layanan Bantuan Resmi & Tim Support Cepat"
-                  : language === "en"
-                    ? "Official Customer Care & Technical Team"
-                    : "Layanan Bantuan Resmi & Tim Support Cepat"}
+                    ? language === "en"
+                      ? "AsKing Customer Manager Technical Support"
+                      : "Layanan Bantuan Resmi & Tim Support Cepat"
+                    : language === "en"
+                      ? "Official Customer Care & Technical Team"
+                      : "Layanan Bantuan Resmi & Tim Support Cepat"}
               </p>
             </div>
           </div>
@@ -227,8 +227,8 @@ Pertanyaan / Kendala: `;
           <div className="space-y-1.5">
             <h4 className="text-sm font-bold text-[#11231B] dark:text-[#F2F7F4]">
               {language === "en"
-                ? "Scan QR Code with WhatsApp Camera"
-                : "Pindai QR Code via Kamera WhatsApp"}
+                ? "Scan QR Code with Camera or Google Lens"
+                : "Pindai QR Code via Kamera atau Google Lens"}
             </h4>
             <p className="text-xs text-[#556A60] dark:text-[#A5B8AD] max-w-sm mx-auto leading-relaxed">
               {context === "payment"
@@ -236,16 +236,16 @@ Pertanyaan / Kendala: `;
                   ? "Having trouble with transfer or need immediate plan approval? Chat directly with our finance & support team."
                   : "Mengalami kendala saat transfer atau butuh persetujuan plan cepat? Hubungi langsung tim support kami."
                 : context === "topup"
-                ? language === "en"
-                  ? "Need verification or having issues with your AI Credit balance? Connect directly with our support team."
-                  : "Butuh verifikasi saldo kuota atau mengalami kendala sinkronisasi AI Credit? Hubungi langsung tim support kami."
-                : context === "demo"
-                ? language === "en"
-                  ? "Scan the QR code or click the button below to connect with our team via WhatsApp to request an interactive product demo."
-                  : "Pindai QR code atau klik tombol di bawah untuk langsung terhubung ke WhatsApp dan jadwalkan sesi demo interaktif aplikasi AsKing."
-                : language === "en"
-                  ? "Our dedicated support team is ready to assist your onboarding, questions, or setup."
-                  : "Tim support kami siap membantu pertanyaan, onboarding, dan kendala teknis Anda."}
+                  ? language === "en"
+                    ? "Need verification or having issues with your AI Credit balance? Connect directly with our support team."
+                    : "Butuh verifikasi saldo kuota atau mengalami kendala sinkronisasi AI Credit? Hubungi langsung tim support kami."
+                  : context === "demo"
+                    ? language === "en"
+                      ? "Scan the QR code or click the button below to connect with our team via WhatsApp to request an interactive product demo."
+                      : "Pindai QR code atau klik tombol di bawah untuk langsung terhubung ke WhatsApp dan jadwalkan sesi demo interaktif aplikasi AsKing."
+                    : language === "en"
+                      ? "Our dedicated support team is ready to assist your onboarding, questions, or setup."
+                      : "Tim support kami siap membantu pertanyaan, onboarding, dan kendala teknis Anda."}
             </p>
           </div>
 
@@ -263,7 +263,7 @@ Pertanyaan / Kendala: `;
           </div>
 
           {/* Contact Details Pill */}
-          <div className="p-3.5 rounded-2xl bg-[#F8FAF7] dark:bg-[#162B21] border border-[#DEE7DF] dark:border-[#1F382B] space-y-1 text-xs text-[#556A60] dark:text-[#A5B8AD]">
+          <div className="p-3.5 my-6 rounded-2xl bg-[#F8FAF7] dark:bg-[#162B21] border border-[#DEE7DF] dark:border-[#1F382B] space-y-1 text-xs text-[#556A60] dark:text-[#A5B8AD]">
             <div className="font-bold text-[#11231B] dark:text-[#F2F7F4] flex items-center justify-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-emerald-600" />
               <span>WhatsApp Support: {formattedPhone}</span>

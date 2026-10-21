@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   Globe,
   Mail,
-  Headphones,
   MessageCircle,
 } from "lucide-react";
 
@@ -144,6 +143,15 @@ function TopUpSuccessContent() {
           </div>
         </div>
       </main>
+
+      {/* WhatsApp Support Modal */}
+      <ContactSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        context="payment"
+        user={emailParam ? { email: emailParam } : null}
+        planName="Top-up AI Credit"
+      />
 
       {/* Footer Copyright */}
       <footer className="max-w-6xl w-full mx-auto px-6 py-6 text-center text-xs text-[#889A90]">
