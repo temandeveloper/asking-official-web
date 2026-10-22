@@ -10,6 +10,10 @@ import {
   CheckCircle2,
   Globe,
   ExternalLink,
+  Lock,
+  AlertTriangle,
+  UserCheck,
+  KeyRound,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
@@ -52,8 +56,8 @@ export default function PrivacyPage() {
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>
                   {language === "id"
-                    ? "Privasi & Kedaulatan Data"
-                    : "Privacy & Data Sovereignty"}
+                    ? "Privasi, Kedaulatan Data & Kepatuhan UU PDP"
+                    : "Privacy, Data Sovereignty & PDP Compliance"}
                 </span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-[#11231B] tracking-tight">
@@ -63,8 +67,8 @@ export default function PrivacyPage() {
               </h1>
               <p className="text-xs text-[#556A60]">
                 {language === "id"
-                  ? "Terakhir Diperbarui: 24 Agustus 2026"
-                  : "Last Updated: August 24, 2026"}
+                  ? "Terakhir Diperbarui: 22 Oktober 2026"
+                  : "Last Updated: October 22, 2026"}
               </p>
             </div>
 
@@ -80,8 +84,8 @@ export default function PrivacyPage() {
               </div>
               <p className="text-xs text-[#4A5F54] leading-relaxed">
                 {language === "id"
-                  ? "Berbeda dengan CRM berbasis cloud tradisional yang menyimpan seluruh percakapan rahasia Anda di server vendor mereka, AsKing dirancang secara mendasar dengan arsitektur Local-First. Riwayat pesan percakapan, kontak pelanggan, dan tiket bantuan Anda disimpan secara lokal di perangkat komputer Anda sendiri."
-                  : "Unlike traditional cloud CRMs that aggregate your sensitive customer chats on their centralized vendor servers, AsKing is fundamentally architected Local-First. Your message logs, contacts, and support tickets reside directly on your own computer."}
+                  ? "Berbeda dengan CRM berbasis cloud konvensional yang mengumpulkan seluruh percakapan rahasia bisnis Anda ke server vendor terpusat, AsKing dirancang secara mendasar dengan arsitektur Local-First. Riwayat pesan percakapan pelanggan (WhatsApp, Telegram, dan Email), kontak, serta tiket bantuan disimpan secara eksklusif di perangkat komputer lokal Anda sendiri. Layanan cloud AsKing hanya digunakan secara minimal untuk keperluan autentikasi akun, validasi lisensi perangkat, dan pemrosesan AI secara temporer."
+                  : "Unlike conventional cloud CRMs that aggregate sensitive customer chats on centralized vendor servers, AsKing is fundamentally architected Local-First. Customer messaging histories (WhatsApp, Telegram, and Email), contacts, and support tickets reside exclusively on your local computer. AsKing cloud services are strictly limited to account authentication, device license verification, and transient AI processing."}
               </p>
             </div>
 
@@ -94,10 +98,13 @@ export default function PrivacyPage() {
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       1
                     </span>
-                    Pendahuluan
+                    Pendahuluan & Dasar Hukum
                   </h2>
                   <p>
-                    Di AsKing, privasi dan kedaulatan data pengguna adalah prinsip utama kami. Kebijakan Privasi ini menjelaskan bagaimana aplikasi desktop AsKing dan situs web resmi kami mengelola data. Kami berkomitmen untuk memberikan transparansi menyeluruh tanpa celah pengawasan tersembunyi.
+                    Kebijakan Privasi ini mengatur bagaimana AsKing ("kami", "aplikasi", atau "layanan") memperoleh, mengumpulkan, memproses, menyimpan, mengamankan, dan menghapus Data Pribadi pengguna aplikasi desktop AsKing maupun pengunjung situs web resmi kami.
+                  </p>
+                  <p>
+                    Kebijakan ini disusun berdasarkan standar tata kelola privasi industri dan mematuhi sepenuhnya ketentuan peraturan perundang-undangan di Republik Indonesia, khususnya <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta peraturan perundang-undangan terkait di bidang Informasi dan Transaksi Elektronik.
                   </p>
                 </section>
 
@@ -111,30 +118,30 @@ export default function PrivacyPage() {
                   </h2>
 
                   <div className="space-y-3">
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
                         Penyimpanan Operasional Local-First
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Data operasional utama seperti kontak, riwayat obrolan, dan tiket Kanban disimpan di perangkat lokal Anda. Fitur tertentu seperti login, AI, update, dan integrasi pesan tetap dapat memerlukan layanan online.
+                        Data operasional komunikasi pelanggan Anda (kontak, pesan masuk, pesan keluar, catatan internal tiket) disimpan secara lokal di komputer Anda. Kami tidak memiliki salinan pesan obrolan pelanggan Anda di cloud AsKing.
                       </p>
                     </div>
 
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Batas Penggunaan Data yang Jelas
+                        Prinsip Minimasi Data (Data Minimization)
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        AsKing tidak menjadikan pesan pelanggan sebagai database cloud operasional utama. Saat Anda memakai AI atau layanan online lain, data yang diperlukan diproses sesuai penjelasan pada bagian terkait dalam kebijakan ini.
+                        Kami hanya mengumpulkan data di cloud yang esensial untuk mengidentifikasi akun Anda, memvalidasi hak lisensi aktif pada perangkat Anda, serta mencatat transaksi langganan.
                       </p>
                     </div>
 
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Kontrol dan Portabilitas Data
+                        Kedaulatan & Kontrol Pengguna Penuh
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Anda dapat mengelola data lokal, membuat backup, dan menggunakan fitur export yang tersedia. Ketersediaan fitur online tetap bergantung pada layanan terkait.
+                        Anda memegang kendali penuh atas data lokal Anda, termasuk hak untuk mengekspor, membuat cadangan mandiri, atau menghapus seluruh berkas aplikasi tanpa jejak di server kami.
                       </p>
                     </div>
                   </div>
@@ -146,86 +153,214 @@ export default function PrivacyPage() {
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       3
                     </span>
-                    Klasifikasi Penyimpanan Informasi
+                    Klasifikasi Informasi & Data yang Disimpan di Cloud AsKing
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
+                    {/* Local Data Box */}
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
                         <HardDrive className="w-4 h-4 text-[#184530]" />
-                        <span>Tersimpan di Komputer Lokal Anda</span>
+                        <span>Tersimpan di Komputer Lokal Anda (Local-First)</span>
                       </div>
+                      <p className="text-xs text-[#556A60]">
+                        Data berikut berada di penyimpanan lokal perangkat Anda dan <strong>tidak pernah</strong> diunggah ke server cloud AsKing:
+                      </p>
                       <ul className="text-xs text-[#556A60] space-y-1 list-disc list-inside">
-                        <li>Riwayat pesan chat WhatsApp dan Telegram</li>
-                        <li>Daftar kontak dan nomor telepon pelanggan</li>
+                        <li>Riwayat pesan percakapan WhatsApp, Telegram, dan Email</li>
+                        <li>Daftar kontak buku telepon dan profil pelanggan</li>
                         <li>Papan Kanban tiket, catatan internal, dan status SLA</li>
                         <li>Jadwal broadcast dan template pesan kustom</li>
-                        <li>Pengaturan tema antarmuka dan preferensi aplikasi</li>
+                        <li>Pengaturan tema antarmuka dan preferensi aplikasi desktop</li>
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
+                    {/* Cloud Data Box */}
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
                         <Database className="w-4 h-4 text-[#184530]" />
-                        <span>Data Autentikasi Cloud (Online)</span>
+                        <span>Data yang Disimpan di Cloud AsKing</span>
                       </div>
+                      <p className="text-xs text-[#556A60]">
+                        Data yang kami kelola di infrastruktur cloud terenkripsi secara terbatas mencakup:
+                      </p>
                       <ul className="text-xs text-[#556A60] space-y-1 list-disc list-inside">
-                        <li>Alamat email untuk masuk akun pengguna</li>
-                        <li>Nama profil terdaftar Anda</li>
-                        <li>Sesi login Single Sign-On (SSO) aplikasi desktop</li>
+                        <li><strong>Identitas Akun:</strong> Alamat email, nama profil terdaftar, avatar (jika login via Google), serta ID Pengguna.</li>
+                        <li><strong>Data Lisensi & Langganan:</strong> Tipe paket langganan (Starter, Pro, Enterprise), status masa aktif lisensi, dan riwayat invoice pembayaran.</li>
+                        <li><strong>Pengenal Perangkat:</strong> Kode Aktivasi lisensi dan pengenal unik perangkat komputer Anda (Device ID).</li>
                       </ul>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
-                    <h3 className="mb-1.5 font-bold text-[#11231B]">Pengukuran Website dan Pemasaran</h3>
+                  {/* Purpose Table */}
+                  <div className="overflow-x-auto rounded-2xl border border-[#DEE7DF] bg-white">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#F8FAF7] text-[#11231B] border-b border-[#DEE7DF]">
+                        <tr>
+                          <th className="py-2.5 px-3.5 font-bold">Kategori Data Cloud</th>
+                          <th className="py-2.5 px-3.5 font-bold">Elemen Data</th>
+                          <th className="py-2.5 px-3.5 font-bold">Tujuan & Fungsi Pemrosesan</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#DEE7DF] text-[#4B6055]">
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">Otentikasi Akun</td>
+                          <td className="py-2.5 px-3.5">Alamat email, nama akun, ID Pengguna</td>
+                          <td className="py-2.5 px-3.5">Mengautentikasi sesi masuk akun, manajemen profil, dan komunikasi administratif resmi.</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">Lisensi & Transaksi</td>
+                          <td className="py-2.5 px-3.5">Paket langganan, nomor invoice, tanggal masa aktif lisensi</td>
+                          <td className="py-2.5 px-3.5">Memverifikasi keabsahan hak lisensi aktif aplikasi dan pencatatan riwayat langganan.</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">Binding Perangkat</td>
+                          <td className="py-2.5 px-3.5">Kode Aktivasi & Pengenal Perangkat (Device ID)</td>
+                          <td className="py-2.5 px-3.5">Memastikan lisensi aktif digunakan pada perangkat komputer desktop yang Anda daftarkan.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Financial Guarantee Card */}
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-xs text-[#234A35] space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-[#184530]">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Jaminan Bebas Penyimpanan Data Finansial Sensitif</span>
+                    </div>
                     <p>
-                      Situs web kami menggunakan Meta Pixel untuk mengukur kunjungan halaman, interaksi dengan paket, pendaftaran akun yang berhasil, dan klik menuju Microsoft Store. Meta dapat menerima pengenal browser/perangkat serta aktivitas pada situs web ini sesuai kebijakan privasinya. Kami tidak mengirim isi pesan pelanggan, kontak, tiket, atau data bisnis lokal aplikasi Anda melalui Meta Pixel.
+                      AsKing <strong>tidak pernah menyimpan, memproses, atau memiliki akses</strong> terhadap data nomor kartu kredit, kode CVV/CVC, tanggal kedaluwarsa kartu, PIN ATM, atau kata sandi internet banking Anda. Seluruh transaksi pembayaran diproses secara langsung oleh mitra payment gateway resmi berizin.
+                    </p>
+                  </div>
+
+                  {/* Website Analytics */}
+                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
+                    <h3 className="mb-1.5 font-bold text-[#11231B]">Pengukuran Situs Web dan Analitik</h3>
+                    <p>
+                      Situs web resmi kami dapat menggunakan alat analitik untuk mengukur kunjungan halaman dan pendaftaran akun baru. Kami tidak pernah mengirimkan isi percakapan pelanggan, kontak, tiket, atau data aplikasi desktop Anda melalui alat analitik web tersebut.
                     </p>
                   </div>
                 </section>
 
-                {/* Section 4: AI Processing via Gemini */}
-                <section className="space-y-3">
+                {/* Section 4: Data Security & Access Controls */}
+                <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       4
                     </span>
+                    Keamanan Data & Pembatasan Akses
+                  </h2>
+                  <p>
+                    AsKing menerapkan langkah pengamanan teknis dan organisasional standar industri untuk menjaga kerahasiaan dan keamanan data akun Anda:
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <Lock className="w-4 h-4 text-[#184530]" />
+                        <span>Enkripsi Komunikasi & Penyimpanan</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        Seluruh pertukaran data antara aplikasi desktop AsKing dan cloud dilindungi dengan sambungan terenkripsi (HTTPS). Data akun di cloud juga disimpan dengan sistem enkripsi berstandar industri.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <KeyRound className="w-4 h-4 text-[#184530]" />
+                        <span>Perlindungan Kredensial Akun</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        Kata sandi dan token sesi akun diamankan dengan metode enkripsi satu arah, sehingga tidak dapat dibaca dalam bentuk teks terbuka oleh siapa pun, termasuk staf kami.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <UserCheck className="w-4 h-4 text-[#184530]" />
+                        <span>Pemisahan Data & Batasan Akses</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        Sistem kami menerapkan pemisahan data yang ketat antar-pengguna. Setiap akun hanya memiliki akses ke datanya sendiri, dan akses operasional sistem dibatasi secara ketat hanya untuk fungsi yang berwenang.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 5: Indonesian PDP Law (UU No. 27 Tahun 2022) Compliance */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      5
+                    </span>
+                    Kepatuhan Terhadap UU Pelindungan Data Pribadi (UU No. 27/2022)
+                  </h2>
+                  <p>
+                    AsKing tunduk dan patuh pada ketentuan <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> dengan rincian pemenuhan sebagai berikut:
+                  </p>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        A. Dasar Pemrosesan Data Pribadi yang Sah (Pasal 20 UU PDP)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Pemrosesan data pribadi oleh AsKing berlandaskan pada: (1) <strong>Persetujuan sah yang eksplisit</strong> yang diberikan pengguna saat mendaftar akun dan menyetujui Kebijakan Privasi ini, serta (2) <strong>Pelaksanaan kewajiban perjanjian lisensi</strong> perangkat lunak untuk mengoperasikan fitur aplikasi yang Anda gunakan.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        B. Kedudukan Pengendali Data Pribadi vs Arsitektur Local-First
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Untuk data akun, transaksi, dan lisensi: AsKing bertindak sebagai <strong>Pengendali Data Pribadi</strong>. Namun untuk pesan percakapan, kontak pelanggan akhir, dan tiket bisnis Anda: <strong>Pengguna bertindak sebagai Pengendali Data Pribadi independen</strong> atas data konsumen Anda. AsKing menyediakan perangkat lunak lokal (Local-First) tanpa bertindak sebagai penampung data pesan pelanggan Anda di cloud.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 6: AI Features via Google Gemini */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      6
+                    </span>
                     Pemrosesan Fitur Kecerdasan Buatan (AI)
                   </h2>
                   <p>
-                    Saat Anda menggunakan fitur <strong>AsKing AI Assistant</strong> atau <strong>AI Customer Agent</strong>:
+                    Saat Anda mengaktifkan fitur <strong>AsKing AI Assistant</strong> atau <strong>AI Customer Agent</strong>:
                   </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
-                    <li>Konteks pesan atau pertanyaan dikirimkan secara aman melalui koneksi terenkripsi (HTTPS) ke layanan pemrosesan AI untuk menghasilkan balasan atau analisis seketika.</li>
-                    <li>Kami tidak menyimpan percakapan tersebut secara permanen di server kami setelah jawaban selesai diproses.</li>
+                  <ul className="list-disc list-inside space-y-1.5 pl-2 text-xs">
+                    <li>Konteks pesan atau pertanyaan yang Anda minta untuk diproses dikirimkan secara aman melalui koneksi terenkripsi ke layanan AI (Google Gemini) seketika untuk menghasilkan draf balasan atau ringkasan.</li>
+                    <li>Kami tidak menyimpan percakapan tersebut secara permanen di server kami setelah jawaban selesai dikirimkan ke perangkat Anda.</li>
                     <li>
-                      Kami menggunakan Google Gemini sebagai pemrosesan AI, silakan baca juga{" "}
+                      Pemrosesan pihak ketiga oleh penyedia model bahasa tunduk pada ketentuan keamanan penyedia. Anda dapat meninjau{" "}
                       <a
                         href="https://policies.google.com/privacy"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-[#184530] font-bold underline"
                       >
-                        <span>Kebijakan Privasi Google Gemini</span>
+                        <span>Kebijakan Privasi Google</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>.
                     </li>
                   </ul>
                 </section>
 
-                {/* Section 5: External Messaging Channels */}
+                {/* Section 7: External Messaging Channels */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      5
+                      7
                     </span>
-                    Saluran Pesan Eksternal (WhatsApp & Telegram)
+                    Saluran Komunikasi Eksternal (WhatsApp, Telegram, dan Email)
                   </h2>
                   <p>
-                    Aplikasi AsKing menghubungkan alur kerja pesan Anda dengan saluran eksternal. Kami menggunakan 2 saluran pesan eksternal yaitu WhatsApp dan Telegram. Silakan baca dan pahami juga kebijakan privasi masing-masing platform:
+                    Aplikasi AsKing menghubungkan alur kerja percakapan Anda dengan saluran komunikasi resmi Anda (WhatsApp, Telegram, dan Email) secara langsung dari komputer lokal Anda tanpa perantara server pihak ketiga. Kredensial akun dan riwayat pesan Anda tetap berada di perangkat lokal Anda. Silakan pelajari kebijakan privasi masing-masing platform:
                   </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
+                  <ul className="list-disc list-inside space-y-1.5 pl-2 text-xs">
                     <li>
                       <a
                         href="https://www.whatsapp.com/legal/privacy-policy"
@@ -251,56 +386,93 @@ export default function PrivacyPage() {
                   </ul>
                 </section>
 
-                {/* Section 6: Security & Device Responsibility */}
-                <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      6
-                    </span>
-                    Keamanan Data & Tanggung Jawab Perangkat
-                  </h2>
-                  <p>
-                    Karena seluruh data pesan dan kontak pelanggan Anda tersimpan secara lokal di komputer Anda:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
-                    <li>Keamanan data Anda bergantung pada perlindungan bawaan perangkat Anda, seperti kunci kata sandi komputer, enkripsi disk sistem operasi, dan hak akses file perangkat.</li>
-                    <li>AsKing dibangun tanpa pintu belakang (backdoor) sehingga data Anda hanya dapat diakses oleh pihak yang memegang akses fisik/login ke perangkat Anda.</li>
-                  </ul>
-                </section>
-
-                {/* Section 7: User Rights */}
-                <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      7
-                    </span>
-                    Hak & Kontrol Pengguna
-                  </h2>
-                  <div className="space-y-2 text-xs">
-                    <p>
-                      <strong>Akses:</strong> Anda memiliki akses langsung ke seluruh file database lokal Anda.
-                    </p>
-                    <p>
-                      <strong>Ekspor:</strong> Anda dapat mengekspor kontak dan data tiket kapan saja.
-                    </p>
-                    <p>
-                      <strong>Penghapusan:</strong> Menghapus (uninstall) aplikasi atau membersihkan data lokal akan menghapus seluruh data dari perangkat secara permanen.
-                    </p>
-                  </div>
-                </section>
-
-                {/* Section 8: Policy Updates & Contact */}
+                {/* Section 8: User Rights (UU PDP Pasal 5-13) */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       8
                     </span>
-                    Pembaruan Kebijakan & Kontak Kami
+                    Hak-Hak Subjek Data Pribadi (Pasal 5 s.d. 13 UU PDP)
                   </h2>
                   <p>
-                    Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu. Pembaruan akan selalu dicantumkan pada halaman ini dengan tanggal revisi terbaru.
+                    Sebagai Subjek Data Pribadi, Anda memiliki hak-hak yang dijamin sepenuhnya oleh hukum:
                   </p>
-                  <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">1. Hak Mendapatkan Informasi (Pasal 5)</h4>
+                      <p className="text-[#556A60]">Mendapatkan kejelasan mengenai identitas pihak, tujuan pemrosesan data, dan dasar hukum pemrosesan data.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">2. Hak Akses & Salinan Data (Pasal 6 & 10)</h4>
+                      <p className="text-[#556A60]">Mengakses dan memperoleh salinan data pribadi akun yang tersimpan di cloud kami dalam format terstruktur.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">3. Hak Perbaikan / Koreksi (Pasal 7)</h4>
+                      <p className="text-[#556A60]">Memperbaiki kesalahan, ketidakakuratan, atau melengkapi data pribadi akun Anda yang belum tepat.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">4. Hak Penghapusan / Pemusnahan (Pasal 8)</h4>
+                      <p className="text-[#556A60]">Hak untuk menghapus, mengakhiri pemrosesan, atau memusnahkan data akun Anda (Right to be Forgotten).</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">5. Hak Menarik Persetujuan (Pasal 9)</h4>
+                      <p className="text-[#556A60]">Menarik kembali persetujuan pemrosesan data pribadi akun yang sebelumnya telah diberikan kepada kami.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">6. Hak Menunda atau Membatasi (Pasal 11)</h4>
+                      <p className="text-[#556A60]">Meminta penundaan atau pembatasan pemrosesan data pribadi secara proporsional sesuai peruntukan.</p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 9: Retention, Breach Notification & Erasure */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      9
+                    </span>
+                    Retensi Data, Prosedur Pemusnahan & Notifikasi Insiden (Pasal 46 UU PDP)
+                  </h2>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <h3 className="font-bold text-[#11231B]">Masa Retensi Data (Pasal 27 UU PDP)</h3>
+                      <p className="text-[#556A60]">
+                        Data akun dan lisensi disimpan selama akun Anda aktif menggunakan AsKing. Jika Anda mengajukan penutupan akun permanen, data profil Anda akan dihapus dari server cloud aktif dalam waktu maksimal 30 hari kalender, kecuali riwayat faktur keuangan yang wajib diarsipkan sementara untuk mematuhi kewajiban pembukuan perpajakan yang diatur undang-undang.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Komitmen Notifikasi Kegagalan Pelindungan Data Pribadi (Maksimal 3 x 24 Jam)</span>
+                      </div>
+                      <p className="text-amber-800">
+                        Sesuai amanat <strong>Pasal 46 UU PDP</strong>, dalam hal terjadi insiden kegagalan pelindungan data pribadi (data breach), AsKing berkomitmen untuk menyampaikan pemberitahuan tertulis kepada Pengguna terdampak dan Lembaga Pengawas Pelindungan Data Pribadi dalam kurun waktu maksimal <strong>3 x 24 jam (72 jam)</strong> sejak insiden teridentifikasi. Pemberitahuan akan memuat rincian data yang terkompromi, perkiraan waktu kejadian, serta langkah-langkah mitigasi dan pemulihan yang sedang dijalankan.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 10: Policy Updates & DPO Contact */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      10
+                    </span>
+                    Pembaruan Kebijakan & Kontak Petugas Pelindungan Data (DPO)
+                  </h2>
+                  <p>
+                    Kami dapat memperbarui Kebijakan Privasi ini secara berkala guna menyesuaikan dengan perkembangan hukum, teknologi, atau pembaruan fitur AsKing. Setiap perubahan signifikan akan dipublikasikan pada halaman ini dengan tanggal pembaruan terbaru.
+                  </p>
+                  <p>
+                    Jika Anda ingin menjalankan hak-hak subjek data (seperti permohonan akses data, koreksi, atau penutupan akun permanen) atau memiliki pertanyaan dan aduan terkait privasi, silakan hubungi tim Pelindungan Data Pribadi kami:
+                  </p>
+                  <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs space-y-1.5">
+                    <p>
+                      <strong>Kontak Resmi Pelindungan Data Pribadi (DPO AsKing):</strong>
+                    </p>
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
@@ -309,6 +481,9 @@ export default function PrivacyPage() {
                       >
                         asking@godiscus.com
                       </a>
+                    </p>
+                    <p>
+                      <strong>Layanan Bantuan Resmi:</strong> WhatsApp Support AsKing Customer Manager (+62 877-6900-5244)
                     </p>
                   </div>
                 </section>
@@ -322,10 +497,13 @@ export default function PrivacyPage() {
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       1
                     </span>
-                    Introduction
+                    Introduction & Legal Foundation
                   </h2>
                   <p>
-                    At AsKing, privacy and user data control are core principles. This Privacy Policy explains how our desktop application and official website handle data, including the boundaries of local storage and online features.
+                    This Privacy Policy governs how AsKing ("we", "us", or "the service") acquires, collects, processes, stores, secures, and erases Personal Data belonging to users of the AsKing desktop application and visitors to our official website.
+                  </p>
+                  <p>
+                    This policy is formulated according to industry-standard data sovereignty practices and strictly complies with the statutory regulations of the Republic of Indonesia, specifically <strong>Law Number 27 of 2022 on Personal Data Protection (Indonesia PDP Law / UU PDP)</strong> and applicable electronic information regulations.
                   </p>
                 </section>
 
@@ -339,30 +517,30 @@ export default function PrivacyPage() {
                   </h2>
 
                   <div className="space-y-3">
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
                         Local-First Operational Storage
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        Core operational data such as customer directories, chat histories, and Kanban tickets reside on your device. Features such as login, AI, updates, and messaging integrations may still require online services.
+                        Your customer communication data (contacts, incoming and outgoing messages, internal ticket notes) is stored locally on your personal computer. We do not retain copies of your customer conversations on AsKing cloud servers.
                       </p>
                     </div>
 
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Clear Data Boundaries
+                        Data Minimization Principle
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        AsKing does not use customer messages as its primary cloud operations database. When you use AI or another online feature, the required data is processed as described in the relevant section of this policy.
+                        We only collect cloud data strictly necessary to authenticate your account, validate active software licenses on your authorized device, and verify subscription transactions.
                       </p>
                     </div>
 
-                    <div className="border-l-4 border-[#184530] pl-4 py-1.5 bg-[#F8FAF7] rounded-r-xl">
+                    <div className="border-l-4 border-[#184530] pl-4 py-2 bg-[#F8FAF7] rounded-r-xl">
                       <h3 className="font-bold text-xs text-[#11231B] mb-1">
-                        Data Control and Portability
+                        Full User Sovereignty & Control
                       </h3>
                       <p className="text-xs text-[#556A60]">
-                        You can manage local data, create backups, and use the available export tools. Online feature availability remains dependent on the relevant services.
+                        You maintain full control over your local data, including the right to export records, create independent backups, or delete application files without residual traces on our servers.
                       </p>
                     </div>
                   </div>
@@ -374,61 +552,189 @@ export default function PrivacyPage() {
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       3
                     </span>
-                    Information Storage Classification
+                    Information Classification & Cloud Stored Data
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
+                    {/* Local Data Box */}
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
                         <HardDrive className="w-4 h-4 text-[#184530]" />
                         <span>Stored On Your Computer (Local-First)</span>
                       </div>
+                      <p className="text-xs text-[#556A60]">
+                        The following items reside exclusively on your local computer and are <strong>never</strong> transmitted to AsKing cloud servers:
+                      </p>
                       <ul className="text-xs text-[#556A60] space-y-1 list-disc list-inside">
-                        <li>WhatsApp and Telegram message conversation logs</li>
+                        <li>WhatsApp, Telegram, and Email message conversation logs</li>
                         <li>Customer contact directory and phone numbers</li>
                         <li>Kanban tickets, internal notes, and SLA tags</li>
                         <li>Broadcast schedules and custom message templates</li>
-                        <li>UI theme settings and desktop preferences</li>
+                        <li>Desktop user interface theme and preferences</li>
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2">
+                    {/* Cloud Data Box */}
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-2.5">
                       <div className="font-bold text-xs text-[#11231B] flex items-center gap-1.5">
                         <Database className="w-4 h-4 text-[#184530]" />
-                        <span>Online Cloud Data (Account Authentication)</span>
+                        <span>Data Stored in AsKing Cloud</span>
                       </div>
+                      <p className="text-xs text-[#556A60]">
+                        Information stored in our encrypted cloud infrastructure is limited to:
+                      </p>
                       <ul className="text-xs text-[#556A60] space-y-1 list-disc list-inside">
-                        <li>Email address used for account authentication</li>
-                        <li>Your registered profile display name</li>
-                        <li>Desktop app single sign-on (SSO) session status</li>
+                        <li><strong>Account Identity:</strong> Email address, registered display name, avatar URL (if Google login is used), and User ID.</li>
+                        <li><strong>License & Subscription:</strong> Plan tier (Starter, Pro, Enterprise), expiration timestamp (expired_at), and billing invoice records.</li>
+                        <li><strong>Device Binding:</strong> Unique Activation Code and machine device identifier (Device ID).</li>
                       </ul>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
-                    <h3 className="mb-1.5 font-bold text-[#11231B]">Website Measurement and Marketing</h3>
+                  {/* Purpose Table */}
+                  <div className="overflow-x-auto rounded-2xl border border-[#DEE7DF] bg-white">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#F8FAF7] text-[#11231B] border-b border-[#DEE7DF]">
+                        <tr>
+                          <th className="py-2.5 px-3.5 font-bold">Cloud Data Category</th>
+                          <th className="py-2.5 px-3.5 font-bold">Data Elements</th>
+                          <th className="py-2.5 px-3.5 font-bold">Purpose & Legal Basis</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#DEE7DF] text-[#4B6055]">
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">Account Authentication</td>
+                          <td className="py-2.5 px-3.5">Email address, profile display name, User ID</td>
+                          <td className="py-2.5 px-3.5">Authenticating login sessions, profile management, and official administrative updates.</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">License & Transactions</td>
+                          <td className="py-2.5 px-3.5">Tier plan, invoice reference ID, active/expiry timestamps</td>
+                          <td className="py-2.5 px-3.5">Enabling software entitlements, verifying active subscription status, and billing records.</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 px-3.5 font-semibold text-[#11231B]">Device Binding</td>
+                          <td className="py-2.5 px-3.5">Activation Code & Device Identifier (Device ID)</td>
+                          <td className="py-2.5 px-3.5">Ensuring active licenses are bound to your authorized registered computer.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Financial Guarantee Card */}
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-xs text-[#234A35] space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-[#184530]">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Zero Financial Data Storage Guarantee</span>
+                    </div>
                     <p>
-                      Our website uses Meta Pixel to measure page visits, pricing interactions, successful account registrations, and clicks to Microsoft Store. Meta may receive browser/device identifiers and activity on this website under its privacy policy. We do not send customer message content, contacts, tickets, or your app&apos;s local business data through Meta Pixel.
+                      AsKing <strong>never collects, processes, or stores</strong> credit card numbers, CVV/CVC codes, card expiration dates, ATM PINs, or banking credentials. All subscription transactions are processed directly through licensed payment gateways.
+                    </p>
+                  </div>
+
+                  {/* Website Analytics */}
+                  <div className="rounded-2xl border border-[#DEE7DF] bg-[#F8FAF7] p-4 text-xs text-[#556A60]">
+                    <h3 className="mb-1.5 font-bold text-[#11231B]">Website Analytics and Attribution</h3>
+                    <p>
+                      Our official website uses measurement tools including Meta Pixel to track page impressions, package selections, and account creations. Browser and device telemetry are processed under third-party terms. We never route customer chat logs, contacts, tickets, or desktop app data to these marketing scripts.
                     </p>
                   </div>
                 </section>
 
-                {/* Section 4: AI Processing via Gemini */}
-                <section className="space-y-3">
+                {/* Section 4: Data Security & Access Controls */}
+                <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       4
                     </span>
+                    Data Security & Access Controls
+                  </h2>
+                  <p>
+                    AsKing implements industry-standard technical and organizational safeguards to ensure user data remains protected against unauthorized access, leaks, or tampering:
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <Lock className="w-4 h-4 text-[#184530]" />
+                        <span>Encrypted Communications & Storage</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        All data exchanged between the desktop application and cloud services is protected using secure encrypted connections (HTTPS). Account data in the cloud is stored with industry-standard encryption.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <KeyRound className="w-4 h-4 text-[#184530]" />
+                        <span>Account Credential Protection</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        Account passwords and login session tokens are secured using one-way cryptographic encryption, ensuring credentials cannot be read in plaintext by anyone, including our own staff.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <div className="flex items-center gap-2 font-bold text-[#11231B]">
+                        <UserCheck className="w-4 h-4 text-[#184530]" />
+                        <span>Data Isolation & Access Controls</span>
+                      </div>
+                      <p className="text-[#556A60]">
+                        Our systems enforce strict data isolation between accounts. Each user can only view and manage their own records, and internal system operations are restricted based on authorized necessity.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 5: Indonesian PDP Law (UU No. 27/2022) Compliance */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      5
+                    </span>
+                    Compliance with Indonesia Personal Data Protection Law (UU PDP)
+                  </h2>
+                  <p>
+                    AsKing operates in full adherence to <strong>Law Number 27 of 2022 on Personal Data Protection (UU PDP)</strong>:
+                  </p>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        A. Lawful Basis for Processing (Article 20 UU PDP)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Processing is grounded on: (1) <strong>Explicit and valid consent</strong> provided upon user registration, and (2) <strong>Contractual necessity</strong> required to deliver software licenses, feature access, and technical support.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        B. Data Controller Status vs Local-First Architecture
+                      </h3>
+                      <p className="text-[#556A60]">
+                        For account, licensing, and billing data: AsKing acts as the <strong>Personal Data Controller</strong>. For customer messaging records and ticket notes: <strong>You act as an independent Personal Data Controller</strong> over your consumer data. AsKing delivers a Local-First application and does not ingest or aggregate your customer chats in the cloud.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 6: AI Features via Google Gemini */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      6
+                    </span>
                     Artificial Intelligence (AI) Features Processing
                   </h2>
                   <p>
-                    When you use <strong>AsKing AI Assistant</strong> or <strong>AI Customer Agent</strong>:
+                    When using the <strong>AsKing AI Assistant</strong> or <strong>AI Customer Agent</strong>:
                   </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
-                    <li>Relevant context is transmitted via secure encrypted connections (HTTPS) strictly to generate the requested auto-reply or summary in real time.</li>
-                    <li>We do not retain or store these messages permanently on our servers after generating the response.</li>
+                  <ul className="list-disc list-inside space-y-1.5 pl-2 text-xs">
+                    <li>The message context or inquiry you choose to process is sent over secure encrypted connections to the AI service (Google Gemini) strictly to generate draft replies or summaries in real time.</li>
+                    <li>We do not retain message payloads permanently on our servers after dispatching responses to your local device.</li>
                     <li>
-                      We use Google Gemini for AI processing; please also review the{" "}
+                      Third-party processing is governed by the AI model provider. You can review the{" "}
                       <a
                         href="https://policies.google.com/privacy"
                         target="_blank"
@@ -442,18 +748,18 @@ export default function PrivacyPage() {
                   </ul>
                 </section>
 
-                {/* Section 5: External Messaging Channels */}
+                {/* Section 7: External Messaging Channels */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      5
+                      7
                     </span>
-                    External Messaging Channels (WhatsApp & Telegram)
+                    External Communication Channels (WhatsApp, Telegram, and Email)
                   </h2>
                   <p>
-                    AsKing integrates with 2 external messaging channels, WhatsApp and Telegram. Please review their privacy policies:
+                    AsKing connects your messaging workflows directly with your official communication channels (WhatsApp, Telegram, and Email) directly from your local computer without third-party server intermediaries. Your credentials and conversation histories remain securely on your local device. Please review their individual privacy policies:
                   </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
+                  <ul className="list-disc list-inside space-y-1.5 pl-2 text-xs">
                     <li>
                       <a
                         href="https://www.whatsapp.com/legal/privacy-policy"
@@ -479,56 +785,93 @@ export default function PrivacyPage() {
                   </ul>
                 </section>
 
-                {/* Section 6: Security & Device Responsibility */}
-                <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      6
-                    </span>
-                    Data Security & Device Responsibility
-                  </h2>
-                  <p>
-                    Since customer data is stored locally on your device:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-2">
-                    <li>Security depends on your device's built-in protections, including OS passcodes, full disk encryption, and filesystem permissions.</li>
-                    <li>AsKing is built with zero backdoors, ensuring your data is accessible only by authorized individuals with access to your device.</li>
-                  </ul>
-                </section>
-
-                {/* Section 7: User Rights */}
-                <section className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
-                      7
-                    </span>
-                    User Rights & Portability
-                  </h2>
-                  <div className="space-y-2 text-xs">
-                    <p>
-                      <strong>Access:</strong> Direct access to your local files and databases.
-                    </p>
-                    <p>
-                      <strong>Export:</strong> Export your contacts and tickets at any time.
-                    </p>
-                    <p>
-                      <strong>Delete:</strong> Uninstalling the application or wiping app data permanently deletes local records.
-                    </p>
-                  </div>
-                </section>
-
-                {/* Section 8: Policy Updates & Contact */}
+                {/* Section 8: User Rights (UU PDP Articles 5-13) */}
                 <section className="space-y-3">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       8
                     </span>
-                    Policy Changes & Contact Information
+                    Data Subject Rights (Articles 5 through 13 UU PDP)
                   </h2>
                   <p>
-                    We may update this Privacy Policy from time to time. Revisions will be posted here with an updated "Last Updated" date.
+                    As a Personal Data Subject, you are entitled to comprehensive statutory rights under Indonesian law:
                   </p>
-                  <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">1. Right to Information (Article 5)</h4>
+                      <p className="text-[#556A60]">Clarity regarding data processing identity, purposes, and legal basis.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">2. Right to Access & Portability (Articles 6 & 10)</h4>
+                      <p className="text-[#556A60]">Access and obtain copies of your stored cloud data in structured machine-readable formats.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">3. Right to Rectification (Article 7)</h4>
+                      <p className="text-[#556A60]">Correct inaccuracies, update outdated profile data, or complete account records.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">4. Right to Erasure (Article 8)</h4>
+                      <p className="text-[#556A60]">Request the deletion or permanent destruction of your personal account data (Right to be Forgotten).</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">5. Right to Withdraw Consent (Article 9)</h4>
+                      <p className="text-[#556A60]">Revoke previously granted consent for personal data processing at any time.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                      <h4 className="font-bold text-[#11231B] mb-1">6. Right to Restrict Processing (Article 11)</h4>
+                      <p className="text-[#556A60]">Request suspension or limitation of processing under appropriate legal circumstances.</p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 9: Retention, Breach Notification & Erasure */}
+                <section className="space-y-4">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      9
+                    </span>
+                    Data Retention, Erasure & Security Breach Notifications (Article 46 UU PDP)
+                  </h2>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1.5">
+                      <h3 className="font-bold text-[#11231B]">Data Retention Schedule (Article 27 UU PDP)</h3>
+                      <p className="text-[#556A60]">
+                        Account and subscription records are retained as long as your account remains active. Upon verified account closure requests, personal profile data is purged from active databases within 30 calendar days, except where financial invoice records must be archived to fulfill mandatory fiscal accounting statutes.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Data Breach Notification Protocol (Maximum 72 Hours)</span>
+                      </div>
+                      <p className="text-amber-800">
+                        In adherence to <strong>Article 46 of the Indonesia PDP Law</strong>, in the unlikely event of a personal data breach, AsKing commits to delivering official written notification to affected users and the statutory Data Protection Authority within a maximum of <strong>3 x 24 hours (72 hours)</strong> following incident confirmation. The notice will detail compromised elements, timeline estimates, and ongoing remedial actions.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section 10: Policy Updates & DPO Contact */}
+                <section className="space-y-3">
+                  <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
+                      10
+                    </span>
+                    Policy Modifications & Data Protection Officer Contact
+                  </h2>
+                  <p>
+                    We may update this Privacy Policy periodically to align with evolving statutory requirements, security architectures, or product features. Updates are published on this page with a revised date.
+                  </p>
+                  <p>
+                    To exercise your data subject rights (such as data extraction, correction, or account closure) or to submit privacy inquiries, please contact our dedicated Data Protection Officer:
+                  </p>
+                  <div className="p-4 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF] text-xs space-y-1.5">
+                    <p>
+                      <strong>Official Data Protection Officer (DPO) Contact:</strong>
+                    </p>
                     <p>
                       <strong>Email:</strong>{" "}
                       <a
@@ -537,6 +880,9 @@ export default function PrivacyPage() {
                       >
                         asking@godiscus.com
                       </a>
+                    </p>
+                    <p>
+                      <strong>Customer Support:</strong> AsKing Customer Manager WhatsApp Support (+62 813-8888-0644)
                     </p>
                   </div>
                 </section>
