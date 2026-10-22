@@ -84,18 +84,13 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li>
-                <a href="https://x.com/" className="hover:text-white transition-colors">
-                  X
-                </a>
-              </li>
-              <li>
-                <a href="https://instagram.com/" className="hover:text-white transition-colors">
+                <a href="https://www.instagram.com/asking.crm" className="hover:text-white transition-colors">
                   Instagram
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com/" className="hover:text-white transition-colors">
-                  YouTube
+                <a href="https://www.facebook.com/share/19q1zVGrcU/" className="hover:text-white transition-colors">
+                  Facebook
                 </a>
               </li>
             </ul>

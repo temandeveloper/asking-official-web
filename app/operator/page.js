@@ -27,6 +27,8 @@ import {
   Loader2,
   ChevronDown,
   FileText,
+  RotateCcw,
+  Laptop,
 } from "lucide-react";
 
 function msToDatetimeLocal(ms) {
@@ -71,6 +73,7 @@ export default function OperatorDashboardPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [copiedUid, setCopiedUid] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
+  const [isResettingDevice, setIsResettingDevice] = useState(false);
 
   // Business Requirement Detail Modal State
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -220,6 +223,7 @@ export default function OperatorDashboardPage() {
           "x-operator-email": operatorEmail,
         },
         body: JSON.stringify({
+          id: editingRecord.id,
           uid: editingRecord.uid,
           jenis_plan: Number(editingRecord.jenis_plan),
           note_plan: editingRecord.note_plan,
@@ -231,6 +235,7 @@ export default function OperatorDashboardPage() {
           discount: Number(editingRecord.discount ?? 60),
           price: Number(editingRecord.price ?? 79000),
           business_requirement: editingRecord.business_requirement || null,
+          reset_deviceid: editingRecord.deviceid === null,
         }),
       });
 
@@ -247,6 +252,56 @@ export default function OperatorDashboardPage() {
       showToast(err.message || "Gagal menyimpan perubahan.", "error");
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  // 5. Reset Device ID for the User
+  const handleResetDeviceId = async () => {
+    if (!editingRecord) return;
+    const targetEmail = editingRecord.user_email || editingRecord.uid || "pengguna ini";
+    const confirmed = window.confirm(
+      `Apakah Anda yakin ingin mereset Device ID untuk ${targetEmail}?\n\nPerangkat desktop saat ini akan dilepas, sehingga pengguna dapat login di komputer/laptop baru.`
+    );
+    if (!confirmed) return;
+
+    setIsResettingDevice(true);
+    try {
+      const res = await fetch("/api/operator/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-operator-email": operatorEmail,
+        },
+        body: JSON.stringify({
+          action: "reset_deviceid",
+          id: editingRecord.id,
+          uid: editingRecord.uid,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Gagal mereset Device ID.");
+      }
+
+      showToast("Device ID berhasil direset! Pengguna dapat login di perangkat baru.");
+
+      // Update local state for editingRecord
+      setEditingRecord((prev) => (prev ? { ...prev, deviceid: null } : null));
+
+      // Update payments list in state
+      setPayments((prev) =>
+        prev.map((item) =>
+          (item.id && item.id === editingRecord.id) || (item.uid && item.uid === editingRecord.uid)
+            ? { ...item, deviceid: null }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error("Reset device error:", err);
+      showToast(err.message || "Gagal mereset Device ID.", "error");
+    } finally {
+      setIsResettingDevice(false);
     }
   };
 
@@ -280,6 +335,7 @@ export default function OperatorDashboardPage() {
         !searchQuery.trim() ||
         (p.uid || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.activation_code || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        (p.deviceid || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_email || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.user_name || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
         (p.note_plan || "").toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
@@ -325,6 +381,7 @@ export default function OperatorDashboardPage() {
     const headers = [
       "UID",
       "Kode Aktivasi",
+      "Device ID",
       "Nama Pelanggan",
       "Email",
       "Kebutuhan Bisnis",
@@ -339,6 +396,7 @@ export default function OperatorDashboardPage() {
     const rows = filteredPayments.map((p) => [
       p.uid,
       `"${p.activation_code || "-"}"`,
+      `"${p.deviceid || "-"}"`,
       `"${p.user_name || "-"}"`,
       p.user_email || "-",
       `"${(p.business_requirement || "").replace(/"/g, '""')}"`,
@@ -679,29 +737,55 @@ export default function OperatorDashboardPage() {
                           </div>
                         </td>
 
-                        {/* 3. Activation Code */}
+                        {/* 3. Activation Code & Device Status */}
                         <td className="py-4 px-5 min-w-[190px]">
-                          {row.activation_code ? (
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[11px] font-bold text-[#184530] bg-[#E5EFE7] px-2.5 py-1 rounded-lg border border-[#CFE2D3] tracking-wide select-all">
-                                {row.activation_code}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => handleCopyCode(row.activation_code)}
-                                className="p-1 rounded hover:bg-[#EBF1EB] text-[#6B8075] hover:text-[#11231B] transition-colors cursor-pointer"
-                                title="Salin Kode Aktivasi"
-                              >
-                                {copiedCode === row.activation_code ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                ) : (
-                                  <Copy className="w-3.5 h-3.5" />
-                                )}
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-[#8FA599] italic">-</span>
-                          )}
+                          <div className="space-y-1.5">
+                            {row.activation_code ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[11px] font-bold text-[#184530] bg-[#E5EFE7] px-2.5 py-1 rounded-lg border border-[#CFE2D3] tracking-wide select-all">
+                                  {row.activation_code}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyCode(row.activation_code)}
+                                  className="p-1 rounded hover:bg-[#EBF1EB] text-[#6B8075] hover:text-[#11231B] transition-colors cursor-pointer"
+                                  title="Salin Kode Aktivasi"
+                                >
+                                  {copiedCode === row.activation_code ? (
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-[#8FA599] italic block">-</span>
+                            )}
+
+                            {/* Device ID Lock Status */}
+                            {row.deviceid ? (
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className="inline-flex items-center gap-1 text-[9.5px] font-mono text-[#4A6054] bg-[#F0F4F1] px-2 py-0.5 rounded-md border border-[#DEE7DF]"
+                                  title={`Terkunci di Device ID: ${row.deviceid}`}
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
+                                  <Laptop className="w-2.5 h-2.5 text-[#556A60]" />
+                                  <span>{row.deviceid.slice(0, 8)}...</span>
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className="inline-flex items-center gap-1 text-[9.5px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-medium"
+                                  title="Belum terikat ke perangkat apapun / Siap login"
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                                  <span>Unbound</span>
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </td>
 
                         {/* 4. Kebutuhan Bisnis */}
@@ -973,6 +1057,75 @@ export default function OperatorDashboardPage() {
                   </div>
                 </div>
               )}
+
+              {/* Device ID (Kunci Perangkat) & Reset Device Action */}
+              <div className="space-y-2 p-3.5 rounded-2xl bg-[#F8FAF7] border border-[#DEE7DF]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Laptop className="w-3.5 h-3.5 text-[#184530]" />
+                    <label className="font-bold text-[#2D3E35]">Kunci Perangkat (Device ID)</label>
+                  </div>
+                  {editingRecord.deviceid ? (
+                    <span className="text-[10px] text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse" />
+                      Terkunci ke 1 Perangkat
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                      Belum Terikat (Siap Login)
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      editingRecord.deviceid ||
+                      "(Belum ada perangkat yang terikat / Siap di perangkat baru)"
+                    }
+                    className={`w-full px-3.5 py-2 rounded-xl border text-xs font-mono select-all transition-colors ${
+                      editingRecord.deviceid
+                        ? "bg-white border-[#CFE2D3] text-[#11231B] font-bold"
+                        : "bg-[#EEF3EF] border-[#DEE7DF] text-[#7A8F83] italic"
+                    }`}
+                  />
+                  {editingRecord.deviceid ? (
+                    <button
+                      type="button"
+                      disabled={isResettingDevice}
+                      onClick={handleResetDeviceId}
+                      className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 disabled:opacity-50"
+                      title="Hapus data Device ID agar lisensi dapat digunakan di perangkat/laptop baru"
+                    >
+                      {isResettingDevice ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" />
+                          <span>Mereset...</span>
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Reset Device ID</span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="px-3 py-2 rounded-xl bg-[#EAF2EC] border border-[#CFE2D3] text-[#184530] text-xs font-bold flex items-center gap-1.5 shrink-0 select-none">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Unbound</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-[10.5px] text-[#6B8075] leading-relaxed">
+                  {editingRecord.deviceid
+                    ? 'Klik "Reset Device ID" jika pelanggan berganti laptop atau instal ulang OS agar dapat langsung login di perangkat barunya.'
+                    : "Status lisensi bebas. Perangkat pertama yang login dengan akun ini akan otomatis mengunci lisensi ke mesin tersebut."}
+                </p>
+              </div>
 
               {/* Plan & Status Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

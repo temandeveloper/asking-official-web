@@ -4,9 +4,11 @@ export const dynamic = "force-dynamic";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 function getSupabase() {
-  return createClient(supabaseUrl, supabaseAnonKey);
+  const key = supabaseServiceKey || supabaseAnonKey;
+  return createClient(supabaseUrl, key);
 }
 
 // Verify operator authorization dynamically from tb_operator database
@@ -131,6 +133,85 @@ export async function GET(request) {
   }
 }
 
+// POST: Execute specific operator actions (e.g. reset device ID)
+export async function POST(request) {
+  try {
+    const supabase = getSupabase();
+    const authCheck = await verifyOperator(request, supabase);
+
+    if (!authCheck.authorized) {
+      return NextResponse.json(
+        { success: false, message: authCheck.message },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { action, id, uid } = body;
+
+    if (action === "reset_deviceid" || action === "reset_device") {
+      if (!id && !uid) {
+        return NextResponse.json(
+          { success: false, message: "Parameter ID atau UID wajib disertakan." },
+          { status: 400 }
+        );
+      }
+
+      // 1. Try atomic RPC reset_operator_deviceid
+      let resetSuccess = false;
+      try {
+        const { data: rpcData, error: rpcError } = await supabase.rpc("reset_operator_deviceid", {
+          p_id: id || null,
+          p_uid: uid || null,
+        });
+
+        if (!rpcError && rpcData?.success) {
+          resetSuccess = true;
+        }
+      } catch (e) {
+        console.warn("[Reset Device RPC Warning]:", e);
+      }
+
+      // 2. Fallback direct update using admin key
+      if (!resetSuccess) {
+        let q = supabase.from("tb_payment").update({
+          deviceid: null,
+          updated_at: new Date().toISOString(),
+        });
+        if (id) {
+          q = q.eq("id", id);
+        } else {
+          q = q.eq("uid", uid);
+        }
+        const { error: directErr } = await q;
+        if (directErr) {
+          console.error("[Reset Device Error]:", directErr);
+          return NextResponse.json(
+            { success: false, message: `Gagal mereset Device ID: ${directErr.message}` },
+            { status: 500 }
+          );
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Device ID berhasil direset. Lisensi kini dapat digunakan di perangkat desktop baru.",
+      });
+    }
+
+    return NextResponse.json(
+      { success: false, message: "Aksi tidak dikenali." },
+      { status: 400 }
+    );
+  } catch (err) {
+    console.error("[Operator Payments POST] Server error:", err);
+    return NextResponse.json(
+      { success: false, message: "Internal server error." },
+      { status: 500 }
+    );
+  }
+}
+
 // PUT: Update / Approve a tb_payment record
 export async function PUT(request) {
   try {
@@ -147,6 +228,7 @@ export async function PUT(request) {
     const body = await request.json();
     const {
       uid,
+      id,
       jenis_plan,
       datetime_payment,
       datetime_expired,
@@ -157,6 +239,7 @@ export async function PUT(request) {
       discount,
       price,
       business_requirement,
+      reset_deviceid,
     } = body;
 
     if (!uid) {
@@ -239,6 +322,22 @@ export async function PUT(request) {
         { success: false, message: `Gagal memperbarui data: ${error.message}` },
         { status: 500 }
       );
+    }
+
+    // If reset_deviceid is requested during edit save
+    if (reset_deviceid) {
+      try {
+        await supabase.rpc("reset_operator_deviceid", {
+          p_id: id || null,
+          p_uid: uid || null,
+        });
+      } catch (e) {
+        console.warn("[Reset Device RPC during PUT warning]:", e);
+      }
+      let directQ = supabase.from("tb_payment").update({ deviceid: null, updated_at: new Date().toISOString() });
+      if (id) directQ = directQ.eq("id", id);
+      else if (uid) directQ = directQ.eq("uid", uid);
+      await directQ;
     }
 
     return NextResponse.json({
