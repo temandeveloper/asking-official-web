@@ -6,6 +6,8 @@ import Script from "next/script";
 import { trackMetaEvent } from "@/lib/metaPixel";
 
 export default function MetaPixel({ pixelId }) {
+  if (!pixelId) return null;
+
   const pathname = usePathname();
   const [isReady, setIsReady] = useState(false);
   const lastTrackedPath = useRef(null);

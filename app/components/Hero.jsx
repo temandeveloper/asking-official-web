@@ -14,10 +14,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { trackMetaLinkEvent } from "@/lib/metaPixel";
+import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
-
-const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
 
 export default function Hero() {
   const { t } = useTranslation();
@@ -166,8 +164,6 @@ export default function Hero() {
           >
             <a
               href={CHECKOUT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               onClick={(event) =>
                 trackMetaLinkEvent(event, "InitiateCheckout", {
                   content_name: "AsKing Lisensi Sekali Bayar",

@@ -16,10 +16,8 @@ import {
 } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
-import { trackMetaLinkEvent } from "@/lib/metaPixel";
+import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
-
-const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
 
 export function AsKingLogo({ className = "w-9 h-9" }) {
   return (
@@ -149,11 +147,10 @@ export default function Navbar() {
                     setLanguage("id");
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                    language === "id"
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "id"
                       ? "bg-[#12281F] text-[#B8F55C]"
                       : "text-[#3D5247] hover:bg-[#F2F7F3]"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span>🇮🇩</span>
@@ -168,11 +165,10 @@ export default function Navbar() {
                     setLanguage("en");
                     setLangDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-                    language === "en"
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${language === "en"
                       ? "bg-[#12281F] text-[#B8F55C]"
                       : "text-[#3D5247] hover:bg-[#F2F7F3]"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span>🇬🇧</span>
@@ -187,8 +183,6 @@ export default function Navbar() {
           {/* Single Primary Action Button: Dapatkan Lisensi */}
           <a
             href={CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={(event) =>
               trackMetaLinkEvent(event, "InitiateCheckout", {
                 content_name: "AsKing Lisensi Sekali Bayar",
@@ -209,8 +203,6 @@ export default function Navbar() {
           {/* Compact Primary CTA Button on Mobile Top Bar */}
           <a
             href={CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={(event) =>
               trackMetaLinkEvent(event, "InitiateCheckout", {
                 content_name: "AsKing Lisensi Sekali Bayar",
@@ -292,11 +284,10 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setLanguage("id")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  language === "id"
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${language === "id"
                     ? "bg-[#12281F] text-[#B8F55C] shadow-2xs"
                     : "text-[#4B6055] hover:text-[#11231B]"
-                }`}
+                  }`}
               >
                 <span>🇮🇩</span>
                 <span>Indonesia</span>
@@ -306,11 +297,10 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setLanguage("en")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  language === "en"
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${language === "en"
                     ? "bg-[#12281F] text-[#B8F55C] shadow-2xs"
                     : "text-[#4B6055] hover:text-[#11231B]"
-                }`}
+                  }`}
               >
                 <span>🇬🇧</span>
                 <span>English</span>
@@ -323,8 +313,6 @@ export default function Navbar() {
           <div className="pt-2">
             <a
               href={CHECKOUT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               onClick={(event) => {
                 setMobileMenuOpen(false);
                 trackMetaLinkEvent(event, "InitiateCheckout", {

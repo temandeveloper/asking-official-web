@@ -3,9 +3,7 @@
 import { Check, ShieldCheck, ArrowRight, Laptop, Lock, HelpCircle, Flame } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
-import { trackMetaLinkEvent } from "@/lib/metaPixel";
-
-const CHECKOUT_URL = "http://lynk.id/asking-customer-manager/22ponx98x7vv/checkout";
+import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
 
 export default function PricingSection() {
   const { t, language } = useTranslation();
@@ -145,8 +143,6 @@ export default function PricingSection() {
               <div className="space-y-3.5 pt-4">
                 <a
                   href={CHECKOUT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   onClick={(event) =>
                     trackMetaLinkEvent(event, "InitiateCheckout", {
                       content_name: "AsKing Lisensi Sekali Bayar",
