@@ -174,7 +174,7 @@ export default function Hero() {
               }
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] font-bold text-[15px] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 border border-[#234235]"
             >
-              <span>{t("nav.get_now")}</span>
+              <span>{t("hero.cta_primary")}</span>
               <ArrowRight className="w-4 h-4 text-[#B8F55C]" />
             </a>
 
