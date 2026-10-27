@@ -94,8 +94,7 @@ export default function PricingSection() {
               <div className="space-y-6">
                 {/* Badges */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18362B] border border-[#2A5241] text-xs font-bold text-[#B8F55C]">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#B8F55C]" />
+                  <span className="inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-bold border-rose-500/40 bg-rose-500/20 text-rose-300">
                     <span>{t("pricing.pro_plus_badge")}</span>
                   </span>
                 </div>

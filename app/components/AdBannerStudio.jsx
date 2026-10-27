@@ -29,8 +29,8 @@ const WEBSITE_URL = "https://asking.godiscus.com";
 const INCLUDED_BENEFITS = [
   {
     icon: MessageSquare,
-    title: "Kelola, Penjadwalan dan Blast Pesan",
-    desc: "Kelola Pesan, Penjadwalan, dan Blast Pesan WhatsApp, Telegram, dan Email.",
+    title: "Follow-up & Blast Otomatis",
+    desc: "Kirim info promo atau sapa banyak pelanggan sekaligus ke WhatsApp, Telegram, dan Email.",
   },
   {
     icon: Globe,
@@ -40,11 +40,11 @@ const INCLUDED_BENEFITS = [
   {
     icon: Kanban,
     title: "CRM Manajemen Layanan & Penjualan",
-    desc: "Papan Kanban rapi untuk pantau layanan pelanggan, komplain, dan penjualan.",
+    desc: "Papan Kanban rapi agar tidak ada chat prospek yang terlewat dan keluhan pelanggan tuntas tertangani.",
   },
   {
     icon: Bot,
-    title: "1.500 Kuota AI Credit",
+    title: "AI Customer Agent (1.500 AI Credit)",
     desc: "AI Agent yang siap balas pesan pelanggan kapanpun dan mencatat kebutuhan pelanggan secara otomatis.",
   },
   {
@@ -76,7 +76,7 @@ const BANNERS = [
     type: "intro",
     theme: "light",
     eyebrow: "SOLUSI ALL-IN-ONE CUSTOMER & PESAN BISNIS PRIVATE",
-    title: "Satu Aplikasi untuk Mengelola\nPelanggan & Pesan Tanpa Pusing\nBiaya Berlangganan yang Mahal",
+    title: "Tingkatkan Layanan dan\n Penjualan, Tanpa Pusing\nBiaya Berlangganan yang Mahal",
     description: "Saat biaya software makin mahal, AsKing bantu Anda satukan WhatsApp, Telegram, Email, CRM, dan Web Landing Page bisnis Anda dalam sekali bayar yang terjangkau.",
     accent: "#184530",
   },
@@ -298,12 +298,9 @@ function PriceBlock({ compact = false, theme = "dark", plan = "lifetime" }) {
           Hemat {discount}%
         </span>
         <div
-          className={`inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold ${isLight
-            ? "border-[#CFE2D3] bg-[#EBF1EB] text-[#184530]"
-            : "border-rose-500/40 bg-rose-500/20 text-rose-300"
-            }`}
+          className={`inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold border-rose-500/40 bg-rose-500/20 text-rose-600`}
         >
-          <span>🔥 Promo Terbatas 100 Lisensi</span>
+          <span>🔥 Promo Terbatas</span>
         </div>
       </div>
     </div>
