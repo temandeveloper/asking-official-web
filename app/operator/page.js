@@ -29,6 +29,7 @@ import {
   FileText,
   RotateCcw,
   Laptop,
+  Mail,
 } from "lucide-react";
 
 function msToDatetimeLocal(ms) {
@@ -74,6 +75,7 @@ export default function OperatorDashboardPage() {
   const [copiedUid, setCopiedUid] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
   const [isResettingDevice, setIsResettingDevice] = useState(false);
+  const [resendingEmailId, setResendingEmailId] = useState(null);
 
   // Business Requirement Detail Modal State
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -302,6 +304,46 @@ export default function OperatorDashboardPage() {
       showToast(err.message || "Gagal mereset Device ID.", "error");
     } finally {
       setIsResettingDevice(false);
+    }
+  };
+
+  // 6. Resend License Email to Customer
+  const handleResendEmail = async (record) => {
+    if (!record) return;
+    const targetEmail = record.user_email || record.uid || "pengguna ini";
+    const code = record.activation_code || "-";
+    const confirmed = window.confirm(
+      `Kirim ulang email kode aktivasi lisensi ke:\n${targetEmail}\n\nKode Lisensi: ${code}\n\nLanjutkan pengiriman?`
+    );
+    if (!confirmed) return;
+
+    const rowId = record.id || record.uid;
+    setResendingEmailId(rowId);
+    try {
+      const res = await fetch("/api/operator/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-operator-email": operatorEmail,
+        },
+        body: JSON.stringify({
+          action: "resend_email",
+          id: record.id,
+          uid: record.uid,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Gagal mengirim ulang email lisensi.");
+      }
+
+      showToast(json.message || `Email kode aktivasi berhasil dikirim ke ${targetEmail}!`);
+    } catch (err) {
+      console.error("Resend email error:", err);
+      showToast(err.message || "Gagal mengirim email.", "error");
+    } finally {
+      setResendingEmailId(null);
     }
   };
 
@@ -693,6 +735,24 @@ export default function OperatorDashboardPage() {
                               </button>
                             )}
 
+                            {/* Resend License Email Button if activation_code exists */}
+                            {row.activation_code && (
+                              <button
+                                type="button"
+                                disabled={resendingEmailId === (row.id || row.uid)}
+                                onClick={() => handleResendEmail(row)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 text-[11px] font-bold transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50"
+                                title={`Kirim ulang email lisensi ke ${row.user_email || "pelanggan"}`}
+                              >
+                                {resendingEmailId === (row.id || row.uid) ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                                ) : (
+                                  <Mail className="w-3.5 h-3.5 text-blue-600" />
+                                )}
+                                <span className="hidden xl:inline">Email</span>
+                              </button>
+                            )}
+
                             {/* Edit Button */}
                             <button
                               type="button"
@@ -1051,6 +1111,26 @@ export default function OperatorDashboardPage() {
                         <>
                           <Copy className="w-3.5 h-3.5" />
                           <span>Salin</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={resendingEmailId === (editingRecord.id || editingRecord.uid)}
+                      onClick={() => handleResendEmail(editingRecord)}
+                      className="px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 disabled:opacity-50"
+                      title="Kirim ulang email lisensi dan petunjuk aktivasi ke email pelanggan"
+                    >
+                      {resendingEmailId === (editingRecord.id || editingRecord.uid) ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                          <span>Mengirim...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Kirim Ulang Email</span>
                         </>
                       )}
                     </button>

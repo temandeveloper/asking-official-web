@@ -569,7 +569,7 @@ async function processSuccessfulPayment({
       activationCode,
       language: "en",
       paymentProvider: "paypal",
-      transactionId: paymentId || orderId,
+      transactionId: refId || captureId || orderId,
     });
     console.log(
       `[PayPal] Email dispatch result for ${cleanEmail}:`,

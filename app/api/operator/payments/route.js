@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendLicenseDeliveryEmail } from "@/lib/email/licenseMailer";
 export const dynamic = "force-dynamic";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -196,6 +197,103 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         message: "Device ID berhasil direset. Lisensi kini dapat digunakan di perangkat desktop baru.",
+      });
+    }
+
+    if (action === "resend_email") {
+      if (!id && !uid) {
+        return NextResponse.json(
+          { success: false, message: "Parameter ID atau UID wajib disertakan." },
+          { status: 400 }
+        );
+      }
+
+      let q = supabase.from("tb_payment").select("*");
+      if (id) {
+        q = q.eq("id", id);
+      } else {
+        q = q.eq("uid", uid);
+      }
+      const { data: payment, error: pError } = await q.maybeSingle();
+
+      if (pError || !payment) {
+        return NextResponse.json(
+          { success: false, message: "Data transaksi tidak ditemukan." },
+          { status: 404 }
+        );
+      }
+
+      if (!payment.activation_code) {
+        return NextResponse.json(
+          { success: false, message: "Transaksi ini tidak memiliki kode aktivasi lisensi." },
+          { status: 400 }
+        );
+      }
+
+      let customerEmail = payment.user_email?.trim();
+      let customerName = payment.user_name?.trim();
+
+      // Fallback: look up in Supabase Auth if user_email is missing in tb_payment
+      if (!customerEmail && payment.uid) {
+        try {
+          const { data: authUser } = await supabase.auth.admin.getUserById(payment.uid);
+          if (authUser?.user?.email) {
+            customerEmail = authUser.user.email;
+            if (!customerName && authUser.user.user_metadata?.full_name) {
+              customerName = authUser.user.user_metadata.full_name;
+            }
+          }
+        } catch (authErr) {
+          console.warn("[Operator resend_email] Could not fetch auth user:", authErr);
+        }
+      }
+
+      if (!customerEmail) {
+        return NextResponse.json(
+          { success: false, message: "Alamat email pelanggan tidak ditemukan untuk akun ini." },
+          { status: 400 }
+        );
+      }
+
+      const notePlan = payment.note_plan || "";
+      const source = payment.payment_payload?.source || "";
+      const isPaypal =
+        source === "paypal" ||
+        notePlan.toLowerCase().includes("paypal") ||
+        (payment.business_requirement && payment.business_requirement.toLowerCase().includes("paypal"));
+
+      const language = isPaypal ? "en" : "id";
+      const paymentProvider = isPaypal ? "paypal" : (source || "manual");
+      const transactionId =
+        payment.payment_payload?.paypal_ref_id ||
+        payment.payment_payload?.ref_id ||
+        payment.payment_payload?.txn_id ||
+        payment.payment_payload?.id ||
+        payment.id;
+
+      const emailResult = await sendLicenseDeliveryEmail({
+        customerEmail,
+        customerName: customerName || "Pelanggan AsKing",
+        activationCode: payment.activation_code,
+        language,
+        paymentProvider,
+        transactionId,
+      });
+
+      if (!emailResult?.sent) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Gagal mengirim email ke ${customerEmail}: ${emailResult?.error || emailResult?.reason || "Koneksi SMTP bermasalah."}`,
+          },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Email kode aktivasi berhasil dikirim ulang ke ${customerEmail}!`,
+        message_id: emailResult.messageId || null,
       });
     }
 
