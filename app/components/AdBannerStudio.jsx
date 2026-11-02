@@ -59,7 +59,51 @@ const INCLUDED_BENEFITS = [
   },
 ];
 
+const INCLUDED_BENEFITS_INTL = [
+  {
+    icon: ShieldCheck,
+    title: "100% Local-First & GDPR Safe",
+    desc: "Customer chats, contacts, and tickets stay strictly on your local PC.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Follow-up & Scheduled Messaging",
+    desc: "Manage and broadcast scheduled updates across WhatsApp, Telegram, and Email.",
+  },
+  {
+    icon: Kanban,
+    title: "Visual Kanban CRM Workflow",
+    desc: "Visual pipeline to track support tickets, customer inquiries, and deal stages.",
+  },
+  {
+    icon: Bot,
+    title: "24/7 AI Customer Agent (1,500 Credits)",
+    desc: "Autonomous AI agent ready to answer customer FAQs and log leads automatically.",
+  },
+  {
+    icon: Globe,
+    title: "Business Landing Page Builder",
+    desc: "Create fast promo landing pages without code, with 1 free subdomain included.",
+  },
+  {
+    icon: Headset,
+    title: "Regular Updates & Support",
+    desc: "Continuous desktop improvements, practical documentation, and direct help.",
+  },
+];
+
 const BANNERS = [
+  {
+    id: "intro_intl_privacy",
+    label: "🌍 Global Privacy (Landing Page Light)",
+    type: "intro",
+    theme: "light",
+    isInternational: true,
+    eyebrow: "100% LOCAL-FIRST & GDPR COMPLIANT",
+    title: "Your Business Data Never\nLeaves Your Device.\nZero Monthly CRM Fees.",
+    description: "Stop paying $79/mo for cloud CRMs that store your private customer chats on their servers. Manage WhatsApp, Telegram, Email, and Kanban CRM 100% privately on your PC.",
+    accent: "#184530",
+  },
   {
     id: "intro",
     label: "Pembuka (Dark Palette)",
@@ -246,21 +290,38 @@ function WindowsIcon({ className = "w-4 h-4" }) {
   );
 }
 
-function PriceBlock({ compact = false, theme = "dark", plan = "lifetime" }) {
+function PriceBlock({ compact = false, theme = "dark", plan = "lifetime", isInternational = false }) {
   const isLight = theme === "light";
   const isLifetime = plan === "lifetime";
 
-  const originalPrice = isLifetime
-    ? PRICING_CONFIG.proPlusOriginalPrice
-    : PRICING_CONFIG.proOriginalPrice;
-  const price = isLifetime
-    ? PRICING_CONFIG.proPlusPrice
-    : PRICING_CONFIG.proPrice;
-  const discount = isLifetime
-    ? PRICING_CONFIG.proPlusDiscountPercent
-    : PRICING_CONFIG.proDiscountPercent;
-  const period = isLifetime ? "sekali bayar" : "bulan";
-  const planLabel = isLifetime ? "Lisensi Sekali Bayar" : "Pro Business";
+  const originalPrice = isInternational
+    ? PRICING_CONFIG.intlOriginalPrice
+    : isLifetime
+      ? PRICING_CONFIG.proPlusOriginalPrice
+      : PRICING_CONFIG.proOriginalPrice;
+  const price = isInternational
+    ? PRICING_CONFIG.intlPrice
+    : isLifetime
+      ? PRICING_CONFIG.proPlusPrice
+      : PRICING_CONFIG.proPrice;
+  const discount = isInternational
+    ? PRICING_CONFIG.intlDiscountPercent
+    : isLifetime
+      ? PRICING_CONFIG.proPlusDiscountPercent
+      : PRICING_CONFIG.proDiscountPercent;
+  const period = isInternational
+    ? "one-time"
+    : isLifetime
+      ? "sekali bayar"
+      : "bulan";
+  const planLabel = isInternational
+    ? "LIFETIME LICENSE"
+    : isLifetime
+      ? "Lisensi Sekali Bayar"
+      : "Pro Business";
+  const currencySymbol = isInternational ? "$" : "Rp ";
+  const discountLabel = isInternational ? `Save ${discount}%` : `Hemat ${discount}%`;
+  const promoLabel = isInternational ? "🔥 Limited Promo" : "🔥 Promo Terbatas";
 
   return (
     <div className={`flex items-end gap-2.5 sm:gap-3 ${compact ? "" : "mt-2 sm:mt-3"}`}>
@@ -275,13 +336,13 @@ function PriceBlock({ compact = false, theme = "dark", plan = "lifetime" }) {
           className={`mt-0.5 text-xs sm:text-sm font-bold text-left line-through ${isLight ? "text-[#8EA096]" : "text-[#7B8F83]"
             }`}
         >
-          Rp {originalPrice}
+          {currencySymbol}{originalPrice}
         </p>
         <p
           className={`text-2xl sm:text-3xl lg:text-[34px] font-black leading-none tracking-tighter ${isLight ? "text-[#12281F]" : "text-[#B8F55C]"
             }`}
         >
-          Rp {price}
+          {currencySymbol}{price}
           <span
             className={`ml-1 text-xs sm:text-sm font-medium tracking-normal ${isLight ? "text-[#556A60]" : "text-[#C4D2C9]"
               }`}
@@ -295,12 +356,12 @@ function PriceBlock({ compact = false, theme = "dark", plan = "lifetime" }) {
           className={`rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-black ${isLight ? "bg-[#184530] text-[#B8F55C]" : "bg-[#B8F55C] text-[#11281F]"
             }`}
         >
-          Hemat {discount}%
+          {discountLabel}
         </span>
         <div
           className={`inline-flex max-w-full items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-bold border-rose-500/40 bg-rose-500/20 text-rose-600`}
         >
-          <span>🔥 Promo Terbatas</span>
+          <span>{promoLabel}</span>
         </div>
       </div>
     </div>
@@ -457,7 +518,14 @@ export default function AdBannerStudio() {
                         : "border-[#2E5544] bg-[#173427]/80 text-[#DCE8DF]"
                         }`}
                     >
-                      {activeBanner.type === "intro_legacy" ? (
+                      {activeBanner.isInternational ? (
+                        <>
+                          <ShieldCheck
+                            className={`h-4 w-4 ${isLight ? "text-[#184530]" : "text-[#B8F55C]"}`}
+                          />{" "}
+                          100% Local-First & GDPR Compliant
+                        </>
+                      ) : activeBanner.type === "intro_legacy" ? (
                         <>
                           <WindowsIcon className="h-4 w-4 text-[#B8F55C]" /> Available on Microsoft Store
                         </>
@@ -530,18 +598,18 @@ export default function AdBannerStudio() {
                             className={`text-[10px] sm:text-[10.5px] font-extrabold uppercase tracking-[0.14em] flex items-center gap-1.5 ${isLight ? "text-[#184530]" : "text-[#B8F55C]"
                               }`}
                           >
-                            Apa yang Anda Dapatkan?
+                            {activeBanner.isInternational ? "WHAT'S INCLUDED:" : "Apa yang Anda Dapatkan?"}
                           </span>
                           <span
                             className={`text-[9.5px] font-bold ${isLight ? "text-[#556A60]" : "text-[#A5B8AD]"
                               }`}
                           >
-                            Masih banyak fitur menarik lainnya
+                            {activeBanner.isInternational ? "Zero recurring monthly fees" : "Masih banyak fitur menarik lainnya"}
                           </span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
-                          {INCLUDED_BENEFITS.map((item, idx) => (
+                          {(activeBanner.isInternational ? INCLUDED_BENEFITS_INTL : INCLUDED_BENEFITS).map((item, idx) => (
                             <div
                               key={idx}
                               className={`flex items-start gap-2 sm:gap-2.5 rounded-xl p-2 sm:p-2.5 border transition-all ${isLight
@@ -582,7 +650,12 @@ export default function AdBannerStudio() {
                           }`}
                       >
                         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-                          <PriceBlock compact theme={colorTheme} plan="lifetime" />
+                          <PriceBlock
+                            compact
+                            theme={colorTheme}
+                            plan="lifetime"
+                            isInternational={Boolean(activeBanner.isInternational)}
+                          />
 
                           <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
                             <a
@@ -592,8 +665,16 @@ export default function AdBannerStudio() {
                               className="inline-block transition-transform hover:scale-[1.03] active:scale-[0.98] drop-shadow-md rounded-[5px]"
                             >
                               <img
-                                src="/badges/microsoft-store-id-light.svg"
-                                alt="Tersedia di Microsoft Store"
+                                src={
+                                  activeBanner.isInternational
+                                    ? "/badges/microsoft-store-en-light.svg"
+                                    : "/badges/microsoft-store-id-light.svg"
+                                }
+                                alt={
+                                  activeBanner.isInternational
+                                    ? "Available on Microsoft Store"
+                                    : "Tersedia di Microsoft Store"
+                                }
                                 className="h-11 sm:h-12 w-auto object-contain"
                               />
                             </a>

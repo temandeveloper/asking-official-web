@@ -567,6 +567,9 @@ async function processSuccessfulPayment({
       customerEmail: cleanEmail,
       customerName,
       activationCode,
+      language: "en",
+      paymentProvider: "paypal",
+      transactionId: paymentId || orderId,
     });
     console.log(
       `[PayPal] Email dispatch result for ${cleanEmail}:`,

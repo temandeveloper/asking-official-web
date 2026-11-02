@@ -5,6 +5,7 @@ import { translations } from "./translations";
 
 /**
  * Auto-detect user locale based on:
+ * 0. URL query parameter (?lang=en or ?lang=id)
  * 1. Saved preference in localStorage ('asking_language')
  * 2. Browser language preferences (navigator.languages / navigator.language)
  * 3. System Timezone (Intl.DateTimeFormat().resolvedOptions().timeZone)
@@ -14,6 +15,22 @@ import { translations } from "./translations";
  */
 export function detectUserLocale() {
   if (typeof window === "undefined") return "id";
+
+  // 0. Priority #0: Explicit URL parameter (?lang=en or ?lang=id)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get("lang")?.toLowerCase();
+    if (urlLang === "id" || urlLang === "en") {
+      try {
+        localStorage.setItem("asking_language", urlLang);
+      } catch (e) {
+        // Ignore localStorage access errors
+      }
+      return urlLang;
+    }
+  } catch (e) {
+    // Ignore URL parse errors
+  }
 
   // 1. Priority #1: Check explicitly saved user preference
   try {

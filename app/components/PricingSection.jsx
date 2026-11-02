@@ -3,10 +3,11 @@
 import { Check, ShieldCheck, ArrowRight, Laptop, Lock, HelpCircle, Flame } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
-import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
+import { trackMetaLinkEvent, getCheckoutUrl } from "@/lib/metaPixel";
 
 export default function PricingSection() {
   const { t, language } = useTranslation();
+  const isEn = language === "en";
 
   const includedItems = t("pricing.what_you_get_items") || [
     "Aplikasi Desktop resmi AsKing Customer Manager",
@@ -18,12 +19,25 @@ export default function PricingSection() {
   ];
 
   const displayOriginalPrice =
-    t("pricing.pro_plus_original_price") || `Rp ${PRICING_CONFIG.proPlusOriginalPrice}`;
+    t("pricing.pro_plus_original_price") ||
+    (isEn ? `$${PRICING_CONFIG.intlOriginalPrice}` : `Rp ${PRICING_CONFIG.proPlusOriginalPrice}`);
   const displayPrice =
-    t("pricing.pro_plus_price") || `Rp ${PRICING_CONFIG.proPlusPrice}`;
-  const displayDiscount = `${PRICING_CONFIG.proPlusDiscountPercent}%`;
+    t("pricing.pro_plus_price") ||
+    (isEn ? `$${PRICING_CONFIG.intlPrice}` : `Rp ${PRICING_CONFIG.proPlusPrice}`);
+  const displayDiscount = isEn
+    ? `${PRICING_CONFIG.intlDiscountPercent}%`
+    : `${PRICING_CONFIG.proPlusDiscountPercent}%`;
   const promoLimitText =
-    t("pricing.pro_plus_promo_limit") || `Promo Terbatas • ${PRICING_CONFIG.proPlusPromoLimit}`;
+    t("pricing.pro_plus_promo_limit") ||
+    (isEn
+      ? `Limited Promo • ${PRICING_CONFIG.intlPromoLimit}`
+      : `Promo Terbatas • ${PRICING_CONFIG.proPlusPromoLimit}`);
+
+  const checkoutUrl = getCheckoutUrl(language);
+  const checkoutAmount = isEn
+    ? PRICING_CONFIG.intlRawAmount
+    : PRICING_CONFIG.proPlusRawAmount;
+  const checkoutCurrency = isEn ? "USD" : "IDR";
 
   return (
     <section id="pricing" className="py-20 md:py-28 px-6 sm:px-8 bg-[#F8FAF7] border-t border-[#DEE7DF] relative overflow-hidden">
@@ -52,13 +66,13 @@ export default function PricingSection() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="text-xs font-extrabold tracking-wider uppercase text-[#184530]">
-                    Paket Lengkap
+                    {t("pricing.package_label")}
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-black text-[#11231B] tracking-tight">
                     {t("pricing.what_you_get_title")}
                   </h3>
                   <p className="text-xs sm:text-sm text-[#556A60] leading-relaxed">
-                    Semua modul utama siap pakai langsung dari komputer Anda tanpa perlu berlangganan cloud CRM terpisah.
+                    {t("pricing.what_you_get_desc")}
                   </p>
                 </div>
 
@@ -84,7 +98,8 @@ export default function PricingSection() {
                   <Lock className="w-4 h-4 text-[#184530]" />
                 </div>
                 <div className="leading-relaxed">
-                  <span className="font-bold text-[#11231B]">Privasi Terjamin:</span> Seluruh riwayat pesan, tiket, dan kontak pelanggan tersimpan di perangkat lokal Anda.
+                  <span className="font-bold text-[#11231B]">{t("pricing.privacy_guaranteed_title")}</span>{" "}
+                  {t("pricing.privacy_guaranteed_desc")}
                 </div>
               </div>
             </div>
@@ -141,13 +156,15 @@ export default function PricingSection() {
               {/* Action Button & Security Assurance */}
               <div className="space-y-3.5 pt-4">
                 <a
-                  href={CHECKOUT_URL}
+                  href={checkoutUrl}
                   onClick={(event) =>
                     trackMetaLinkEvent(event, "InitiateCheckout", {
-                      content_name: "AsKing Lisensi Sekali Bayar",
+                      content_name: isEn
+                        ? "AsKing Lifetime License (PayPal)"
+                        : "AsKing Lisensi Sekali Bayar",
                       content_category: "software",
-                      currency: "IDR",
-                      value: PRICING_CONFIG.proPlusRawAmount,
+                      currency: checkoutCurrency,
+                      value: checkoutAmount,
                     })
                   }
                   className="w-full py-4 px-6 rounded-2xl bg-[#B8F55C] hover:bg-[#A8EB4B] text-[#11281F] font-black text-base flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-xl active:scale-[0.99] cursor-pointer group"
@@ -171,8 +188,8 @@ export default function PricingSection() {
               <Check className="w-4 h-4 text-[#184530]" />
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-[#11231B]">Lisensi Tetap</div>
-              <div className="text-[11px] text-[#556A60]">Tanpa biaya sewa bulanan</div>
+              <div className="text-xs font-bold text-[#11231B]">{t("pricing.badge_fixed_license")}</div>
+              <div className="text-[11px] text-[#556A60]">{t("pricing.badge_fixed_license_desc")}</div>
             </div>
           </div>
 
@@ -181,8 +198,8 @@ export default function PricingSection() {
               <Lock className="w-4 h-4 text-[#184530]" />
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-[#11231B]">Data Lokal Mandiri</div>
-              <div className="text-[11px] text-[#556A60]">100% tersimpan di perangkat</div>
+              <div className="text-xs font-bold text-[#11231B]">{t("pricing.badge_local_data")}</div>
+              <div className="text-[11px] text-[#556A60]">{t("pricing.badge_local_data_desc")}</div>
             </div>
           </div>
 
@@ -191,8 +208,8 @@ export default function PricingSection() {
               <HelpCircle className="w-4 h-4 text-[#184530]" />
             </div>
             <div className="text-left">
-              <div className="text-xs font-bold text-[#11231B]">Dukungan Bantuan</div>
-              <div className="text-[11px] text-[#556A60]">Bantuan & panduan instalasi</div>
+              <div className="text-xs font-bold text-[#11231B]">{t("pricing.badge_support")}</div>
+              <div className="text-[11px] text-[#556A60]">{t("pricing.badge_support_desc")}</div>
             </div>
           </div>
         </div>

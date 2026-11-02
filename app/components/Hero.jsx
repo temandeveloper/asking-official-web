@@ -14,11 +14,17 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
+import { trackMetaLinkEvent, getCheckoutUrl } from "@/lib/metaPixel";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 
 export default function Hero() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const isEn = language === "en";
+  const checkoutUrl = getCheckoutUrl(language);
+  const checkoutAmount = isEn
+    ? PRICING_CONFIG.intlRawAmount
+    : PRICING_CONFIG.proPlusRawAmount;
+  const checkoutCurrency = isEn ? "USD" : "IDR";
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -163,13 +169,15 @@ export default function Hero() {
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
             <a
-              href={CHECKOUT_URL}
+              href={checkoutUrl}
               onClick={(event) =>
                 trackMetaLinkEvent(event, "InitiateCheckout", {
-                  content_name: "AsKing Lisensi Sekali Bayar",
+                  content_name: isEn
+                    ? "AsKing Lifetime License (PayPal)"
+                    : "AsKing Lisensi Sekali Bayar",
                   content_category: "software",
-                  currency: "IDR",
-                  value: PRICING_CONFIG.proPlusRawAmount,
+                  currency: checkoutCurrency,
+                  value: checkoutAmount,
                 })
               }
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] font-bold text-[15px] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 border border-[#234235]"

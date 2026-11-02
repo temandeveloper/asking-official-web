@@ -56,8 +56,8 @@ export default function PrivacyPage() {
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>
                   {language === "id"
-                    ? "Privasi, Kedaulatan Data & Kepatuhan UU PDP"
-                    : "Privacy, Data Sovereignty & PDP Compliance"}
+                    ? "Privasi, Kedaulatan Data & Kepatuhan UU PDP & GDPR"
+                    : "Privacy, Data Sovereignty, PDP & GDPR Compliance"}
                 </span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-[#11231B] tracking-tight">
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
                     Kebijakan Privasi ini mengatur bagaimana AsKing ("kami", "aplikasi", atau "layanan") memperoleh, mengumpulkan, memproses, menyimpan, mengamankan, dan menghapus Data Pribadi pengguna aplikasi desktop AsKing maupun pengunjung situs web resmi kami.
                   </p>
                   <p>
-                    Kebijakan ini disusun berdasarkan standar tata kelola privasi industri dan mematuhi sepenuhnya ketentuan peraturan perundang-undangan di Republik Indonesia, khususnya <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta peraturan perundang-undangan terkait di bidang Informasi dan Transaksi Elektronik.
+                    Kebijakan ini disusun berdasarkan standar tata kelola privasi industri dan mematuhi sepenuhnya ketentuan peraturan perundang-undangan di Republik Indonesia, khususnya <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta mengadopsi standar kepatuhan internasional tertinggi sesuai <strong>General Data Protection Regulation Uni Eropa (GDPR - Regulation (EU) 2016/679)</strong>.
                   </p>
                 </section>
 
@@ -287,22 +287,22 @@ export default function PrivacyPage() {
                   </div>
                 </section>
 
-                {/* Section 5: Indonesian PDP Law (UU No. 27 Tahun 2022) Compliance */}
+                {/* Section 5: Indonesian PDP Law & EU GDPR Compliance */}
                 <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       5
                     </span>
-                    Kepatuhan Terhadap UU Pelindungan Data Pribadi (UU No. 27/2022)
+                    Kepatuhan Terhadap UU PDP (No. 27/2022) & Standar Global GDPR (EU 2016/679)
                   </h2>
                   <p>
-                    AsKing tunduk dan patuh pada ketentuan <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> dengan rincian pemenuhan sebagai berikut:
+                    AsKing beroperasi dengan kepatuhan penuh terhadap <strong>Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong> serta prinsip-prinsip <strong>General Data Protection Regulation Uni Eropa (GDPR)</strong>:
                   </p>
 
                   <div className="space-y-3 text-xs">
                     <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
                       <h3 className="font-bold text-[#11231B]">
-                        A. Dasar Pemrosesan Data Pribadi yang Sah (Pasal 20 UU PDP)
+                        A. Dasar Pemrosesan Data Pribadi yang Sah (Pasal 20 UU PDP & Pasal 6 GDPR)
                       </h3>
                       <p className="text-[#556A60]">
                         Pemrosesan data pribadi oleh AsKing berlandaskan pada: (1) <strong>Persetujuan sah yang eksplisit</strong> yang diberikan pengguna saat mendaftar akun dan menyetujui Kebijakan Privasi ini, serta (2) <strong>Pelaksanaan kewajiban perjanjian lisensi</strong> perangkat lunak untuk mengoperasikan fitur aplikasi yang Anda gunakan.
@@ -311,10 +311,37 @@ export default function PrivacyPage() {
 
                     <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
                       <h3 className="font-bold text-[#11231B]">
-                        B. Kedudukan Pengendali Data Pribadi vs Arsitektur Local-First
+                        B. Kedudukan Pengendali Data vs Pengolah Data (Pasal 4 & 28 GDPR)
                       </h3>
                       <p className="text-[#556A60]">
-                        Untuk data akun, transaksi, dan lisensi: AsKing bertindak sebagai <strong>Pengendali Data Pribadi</strong>. Namun untuk pesan percakapan, kontak pelanggan akhir, dan tiket bisnis Anda: <strong>Pengguna bertindak sebagai Pengendali Data Pribadi independen</strong> atas data konsumen Anda. AsKing menyediakan perangkat lunak lokal (Local-First) tanpa bertindak sebagai penampung data pesan pelanggan Anda di cloud.
+                        Untuk data akun, transaksi, dan aktivasi lisensi: AsKing bertindak sebagai <strong>Pengendali Data Pribadi (Data Controller)</strong>. Namun untuk seluruh riwayat pesan, kontak pelanggan akhir, dan tiket bisnis: <strong>Pengguna bertindak sebagai Pengendali Data Pribadi independen</strong>. AsKing tidak bertindak sebagai perantara penyimpanan (cloud processor) data percakapan bisnis Anda.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        C. Perlindungan Data Sejak Perancangan & Baku (Privacy by Design & by Default - Pasal 25 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Secara arsitektural, AsKing dibangun dengan prinsip <em>Privacy by Design</em>. Seluruh basis data komunikasi (WhatsApp, Telegram, Email, Kanban) disimpan secara lokal di mesin komputer pengguna (Local SQLite / IndexedDB). Server AsKing tidak memiliki celah akses, tidak mengumpulkan telemetri isi pesan, dan tidak menyimpan data komunikasi sensitif Anda.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        D. Kedaulatan Hak Subjek Data & Hak Dihapus (Right to Erasure - Pasal 17 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Karena seluruh data operasional berada di perangkat Anda, Anda memiliki kedaulatan mutlak untuk mengekspor (data portability), mencadangkan, atau menghapus permanen basis data kapan saja tanpa perlu bergantung pada persetujuan atau proses manual dari penyedia server.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        E. Bebas Risiko Transfer Data Lintas Batas (Cross-Border Transfer - Pasal 44-49 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Dengan model Local-First, percakapan pelanggan bisnis Anda tidak pernah dikirimkan atau disimpan di luar wilayah hukum yurisdiksi Anda, meniadakan risiko pelanggaran transfer data internasional.
                       </p>
                     </div>
                   </div>
@@ -503,7 +530,7 @@ export default function PrivacyPage() {
                     This Privacy Policy governs how AsKing ("we", "us", or "the service") acquires, collects, processes, stores, secures, and erases Personal Data belonging to users of the AsKing desktop application and visitors to our official website.
                   </p>
                   <p>
-                    This policy is formulated according to industry-standard data sovereignty practices and strictly complies with the statutory regulations of the Republic of Indonesia, specifically <strong>Law Number 27 of 2022 on Personal Data Protection (Indonesia PDP Law / UU PDP)</strong> and applicable electronic information regulations.
+                    This policy is formulated according to industry-standard data sovereignty practices and strictly complies with the statutory regulations of the Republic of Indonesia, specifically <strong>Law Number 27 of 2022 on Personal Data Protection (Indonesia PDP Law / UU PDP)</strong>, as well as the international benchmarks set by the <strong>European Union General Data Protection Regulation (EU GDPR - Regulation (EU) 2016/679)</strong>.
                   </p>
                 </section>
 
@@ -686,22 +713,22 @@ export default function PrivacyPage() {
                   </div>
                 </section>
 
-                {/* Section 5: Indonesian PDP Law (UU No. 27/2022) Compliance */}
+                {/* Section 5: Indonesian PDP Law & EU GDPR Compliance */}
                 <section className="space-y-4">
                   <h2 className="text-lg font-bold text-[#11231B] flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-[#12281F] text-[#B8F55C] text-xs flex items-center justify-center font-black">
                       5
                     </span>
-                    Compliance with Indonesia Personal Data Protection Law (UU PDP)
+                    Compliance with Indonesia Personal Data Protection Law (UU PDP) & EU GDPR (Regulation (EU) 2016/679)
                   </h2>
                   <p>
-                    AsKing operates in full adherence to <strong>Law Number 27 of 2022 on Personal Data Protection (UU PDP)</strong>:
+                    AsKing operates in full adherence to <strong>Law Number 27 of 2022 on Personal Data Protection (UU PDP)</strong> and the European Union <strong>General Data Protection Regulation (GDPR)</strong>:
                   </p>
 
                   <div className="space-y-3 text-xs">
                     <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
                       <h3 className="font-bold text-[#11231B]">
-                        A. Lawful Basis for Processing (Article 20 UU PDP)
+                        A. Lawful Basis for Processing (Article 20 UU PDP & Article 6 GDPR)
                       </h3>
                       <p className="text-[#556A60]">
                         Processing is grounded on: (1) <strong>Explicit and valid consent</strong> provided upon user registration, and (2) <strong>Contractual necessity</strong> required to deliver software licenses, feature access, and technical support.
@@ -710,10 +737,37 @@ export default function PrivacyPage() {
 
                     <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
                       <h3 className="font-bold text-[#11231B]">
-                        B. Data Controller Status vs Local-First Architecture
+                        B. Data Controller vs. Local Tool Separation (Articles 4 & 28 GDPR)
                       </h3>
                       <p className="text-[#556A60]">
-                        For account, licensing, and billing data: AsKing acts as the <strong>Personal Data Controller</strong>. For customer messaging records and ticket notes: <strong>You act as an independent Personal Data Controller</strong> over your consumer data. AsKing delivers a Local-First application and does not ingest or aggregate your customer chats in the cloud.
+                        For account identity, active licensing, and billing data: AsKing acts as the <strong>Personal Data Controller</strong>. For customer messaging records, ticket logs, and CRM notes: <strong>You act as the independent Personal Data Controller</strong>. AsKing functions as client-side software; we do not store, process, or aggregate your customer chats on remote servers.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        C. Data Protection by Design & by Default (Article 25 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        AsKing’s core software architecture implements <em>Data Protection by Design and by Default</em>. All customer messaging databases (WhatsApp, Telegram, Email, Kanban) are stored strictly within local client storage (SQLite / IndexedDB on your personal workstation). No telemetry or tracking captures your conversational payloads.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        D. Right to Erasure & Data Sovereignty (Articles 17 & 20 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Because all operational data resides locally, you exercise instant and autonomous control over your records. You can export data in standard formats or execute complete data wipes (Right to be Forgotten) immediately from your machine without submitting vendor requests.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-[#F8FAF7] border border-[#DEE7DF] space-y-1">
+                      <h3 className="font-bold text-[#11231B]">
+                        E. No Cross-Border Data Transfer Exposure (Articles 44–49 GDPR)
+                      </h3>
+                      <p className="text-[#556A60]">
+                        Under our Local-First operational model, your end-customer communications never transit through or get archived across international cloud borders, mitigating cross-border compliance liabilities.
                       </p>
                     </div>
                   </div>

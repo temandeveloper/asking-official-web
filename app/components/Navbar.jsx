@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
-import { trackMetaLinkEvent, CHECKOUT_URL } from "@/lib/metaPixel";
+import { trackMetaLinkEvent, getCheckoutUrl } from "@/lib/metaPixel";
 import { PRICING_CONFIG } from "@/lib/config/pricing";
 
 export function AsKingLogo({ className = "w-9 h-9" }) {
@@ -49,6 +49,12 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
 
   const { t, language, setLanguage, toggleLanguage } = useTranslation();
+  const isEn = language === "en";
+  const checkoutUrl = getCheckoutUrl(language);
+  const checkoutAmount = isEn
+    ? PRICING_CONFIG.intlRawAmount
+    : PRICING_CONFIG.proPlusRawAmount;
+  const checkoutCurrency = isEn ? "USD" : "IDR";
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -180,15 +186,17 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Single Primary Action Button: Dapatkan Lisensi */}
+          {/* Single Primary Action Button: Beli Lisensi */}
           <a
-            href={CHECKOUT_URL}
+            href={checkoutUrl}
             onClick={(event) =>
               trackMetaLinkEvent(event, "InitiateCheckout", {
-                content_name: "AsKing Lisensi Sekali Bayar",
+                content_name: isEn
+                  ? "AsKing Lifetime License (PayPal)"
+                  : "AsKing Lisensi Sekali Bayar",
                 content_category: "software",
-                currency: "IDR",
-                value: PRICING_CONFIG.proPlusRawAmount,
+                currency: checkoutCurrency,
+                value: checkoutAmount,
               })
             }
             className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-xs font-bold transition-all shadow-xs active:scale-98 border border-[#234235] cursor-pointer"
@@ -202,13 +210,15 @@ export default function Navbar() {
         <div className="md:hidden flex items-center gap-2">
           {/* Compact Primary CTA Button on Mobile Top Bar */}
           <a
-            href={CHECKOUT_URL}
+            href={checkoutUrl}
             onClick={(event) =>
               trackMetaLinkEvent(event, "InitiateCheckout", {
-                content_name: "AsKing Lisensi Sekali Bayar",
+                content_name: isEn
+                  ? "AsKing Lifetime License (PayPal)"
+                  : "AsKing Lisensi Sekali Bayar",
                 content_category: "software",
-                currency: "IDR",
-                value: PRICING_CONFIG.proPlusRawAmount,
+                currency: checkoutCurrency,
+                value: checkoutAmount,
               })
             }
             className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-[#12281F] text-[#B8F55C] hover:bg-[#1C3B2E] text-[11px] sm:text-xs font-bold transition-all shadow-xs active:scale-95 border border-[#234235] whitespace-nowrap cursor-pointer"
@@ -312,14 +322,16 @@ export default function Navbar() {
           {/* Action CTA Button di Mobile Drawer */}
           <div className="pt-2">
             <a
-              href={CHECKOUT_URL}
+              href={checkoutUrl}
               onClick={(event) => {
                 setMobileMenuOpen(false);
                 trackMetaLinkEvent(event, "InitiateCheckout", {
-                  content_name: "AsKing Lisensi Sekali Bayar",
+                  content_name: isEn
+                    ? "AsKing Lifetime License (PayPal)"
+                    : "AsKing Lisensi Sekali Bayar",
                   content_category: "software",
-                  currency: "IDR",
-                  value: PRICING_CONFIG.proPlusRawAmount,
+                  currency: checkoutCurrency,
+                  value: checkoutAmount,
                 });
               }}
               className="w-full text-center py-3 rounded-full bg-[#12281F] text-[#B8F55C] font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 transition-all"
