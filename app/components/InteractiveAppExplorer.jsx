@@ -98,9 +98,19 @@ const SCREENSHOT_MODULES = [
 ];
 
 export default function InteractiveAppExplorer() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const getScreenshotPath = useCallback(
+    (imgPath) => {
+      if (language === "en") {
+        return imgPath.replace("/screenshots/", "/screenshots/en/");
+      }
+      return imgPath;
+    },
+    [language]
+  );
 
   const currentIndex = SCREENSHOT_MODULES.findIndex((m) => m.id === activeTab);
   const currentModule = SCREENSHOT_MODULES[currentIndex] || SCREENSHOT_MODULES[0];
@@ -206,7 +216,7 @@ export default function InteractiveAppExplorer() {
                 >
                   <div className="relative w-full aspect-[16/10] sm:aspect-[16/9.5] max-h-[560px]">
                     <Image
-                      src={currentModule.image}
+                      src={getScreenshotPath(currentModule.image)}
                       alt={t(`demo.modules.${currentModule.id}.title`)}
                       fill
                       priority
@@ -247,7 +257,7 @@ export default function InteractiveAppExplorer() {
             {/* Bottom Quick Thumbnail Strip */}
             <div className="pt-4 border-t border-[#1F382B]">
               <div className="flex items-center justify-between mb-3 text-xs font-bold text-[#8EA096]">
-                <span>Eksplorasi Screenshot Lengkap</span>
+                <span>{t("demo.explore_full_screenshots")}</span>
                 <span className="text-[#A5B8AD] font-mono">
                   {currentIndex + 1} / {SCREENSHOT_MODULES.length}
                 </span>
@@ -265,7 +275,7 @@ export default function InteractiveAppExplorer() {
                         }`}
                     >
                       <Image
-                        src={item.image}
+                        src={getScreenshotPath(item.image)}
                         alt={t(`demo.tabs.${item.id}`)}
                         fill
                         sizes="120px"
@@ -336,7 +346,7 @@ export default function InteractiveAppExplorer() {
               <div className="relative flex-1 min-h-[360px] max-h-[68vh] overflow-auto p-2 sm:p-4 bg-[#050B08] flex items-center justify-center">
                 <div className="relative w-full h-[64vh] max-w-5xl">
                   <Image
-                    src={currentModule.image}
+                    src={getScreenshotPath(currentModule.image)}
                     alt={t(`demo.modules.${currentModule.id}.title`)}
                     fill
                     priority

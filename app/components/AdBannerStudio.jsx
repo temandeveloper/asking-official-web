@@ -562,7 +562,7 @@ export default function AdBannerStudio() {
                             }`}
                         >
                           <img
-                            src="/screenshots/tikets.webp"
+                            src={activeBanner?.isInternational ? "/screenshots/en/tikets.webp" : "/screenshots/tikets.webp"}
                             alt=""
                             className={`absolute inset-0 h-full w-full scale-105 object-cover object-[75%_20%] blur-[1px] pointer-events-none ${isLight ? "opacity-65" : "opacity-30"
                               }`}
